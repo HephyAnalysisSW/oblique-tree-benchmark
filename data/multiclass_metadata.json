@@ -1,0 +1,79 @@
+{
+  "dataset_id": 42468,
+  "dataset_name": "hls4ml_lhc_jets_hlf",
+  "feature_names": [
+    "zlogz",
+    "c1_b0_mmdt",
+    "c1_b1_mmdt",
+    "c1_b2_mmdt",
+    "c2_b1_mmdt",
+    "c2_b2_mmdt",
+    "d2_b1_mmdt",
+    "d2_b2_mmdt",
+    "d2_a1_b1_mmdt",
+    "d2_a1_b2_mmdt",
+    "m2_b1_mmdt",
+    "m2_b2_mmdt",
+    "n2_b1_mmdt",
+    "n2_b2_mmdt",
+    "mass_mmdt",
+    "multiplicity"
+  ],
+  "class_mode": "multiclass",
+  "class_labels": [
+    "g",
+    "q",
+    "w",
+    "z",
+    "t"
+  ],
+  "class_names": [
+    "gluon",
+    "quark",
+    "W",
+    "Z",
+    "top"
+  ],
+  "split_seed": 42,
+  "split_file": "data/splits/openml_42468_nall_splitseed42_classmulticlass_train0p64_val0p16_test0p2.npz",
+  "preprocessing": "StandardScaler fitted on fixed training indices only",
+  "sizes": {
+    "train": 531200,
+    "validation": 132800,
+    "test": 166000
+  },
+  "task": "multiclass",
+  "label_mapping": {
+    "0": "gluon",
+    "1": "quark",
+    "2": "W",
+    "3": "Z",
+    "4": "top"
+  },
+  "train_validation_test_fraction": {
+    "train": 0.64,
+    "validation": 0.16,
+    "test": 0.2
+  },
+  "data_files": {
+    "standardized": "data/multiclass_standardized.npz",
+    "raw": "data/multiclass_raw.npz"
+  },
+  "array_keys": [
+    "X_train",
+    "y_train",
+    "X_val",
+    "y_val",
+    "X_test",
+    "y_test"
+  ],
+  "standardized_training_representation": true,
+  "sample_weights": null,
+  "sample_weight_note": "No sample or event weights were used in the current BDT benchmark.",
+  "source_cache": "data/cache/openml_42468_nall_splitseed42_classmulticlass_train0p64_val0p16_test0p2.npz",
+  "raw_copy_note": "Raw reconstructed arrays are stored in the matching *_raw.npz file; they were reconstructed as X_raw = X_standardized * scaler_scale + scaler_mean using the training-fitted StandardScaler parameters.",
+  "available_input_representations": [
+    "standardized",
+    "raw"
+  ]
+}

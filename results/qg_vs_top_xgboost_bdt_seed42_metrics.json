@@ -1,0 +1,72 @@
+{
+  "accuracy": 0.9036982531826749,
+  "macro_auc": 0.9586470462766749,
+  "per_class_auc": {
+    "quark/gluon": 0.9586470451421334,
+    "top": 0.9586470474112163
+  },
+  "macro_average_precision": 0.9533393878683214,
+  "per_class_average_precision": {
+    "quark/gluon": 0.9753306142290085,
+    "top": 0.9313481615076343
+  },
+  "cross_entropy": 0.240907338451675,
+  "multiclass_brier_score": 0.14200575649738312,
+  "expected_calibration_error": 0.010582762118685203,
+  "confidence_coverage": {
+    "0.5": {
+      "coverage": 1.0,
+      "accuracy": 0.9036982531826749
+    },
+    "0.7": {
+      "coverage": 0.8814220484028666,
+      "accuracy": 0.9431871462061867
+    },
+    "0.8": {
+      "coverage": 0.7992823231763247,
+      "accuracy": 0.9612338579499596
+    },
+    "0.9": {
+      "coverage": 0.6720559626646776,
+      "accuracy": 0.9755676875543691
+    },
+    "0.95": {
+      "coverage": 0.5584876372103338,
+      "accuracy": 0.9823488006930532
+    }
+  },
+  "confusion_matrix": [
+    [
+      60844,
+      4794
+    ],
+    [
+      4760,
+      28811
+    ]
+  ],
+  "fixed_fpr": 0.01,
+  "fixed_fpr_points": [
+    0.001,
+    0.01,
+    0.1
+  ],
+  "signal_efficiency_at_fixed_fpr": 0.5433558726281612,
+  "per_class_efficiency_at_fixed_fpr": {
+    "quark/gluon": 0.42575703098814716,
+    "top": 0.5433558726281612
+  },
+  "per_class_efficiency_points": {
+    "quark/gluon": {
+      "0.001": 0.1271062494286846,
+      "0.01": 0.42575703098814716,
+      "0.1": 0.8976659861665499
+    },
+    "top": {
+      "0.001": 0.2561436954514313,
+      "0.01": 0.5433558726281612,
+      "0.1": 0.8974412439307736
+    }
+  },
+  "signal_auc": 0.9586470474112163
+}

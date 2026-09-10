@@ -1,0 +1,32 @@
+{
+  "run_name": "multiclass_xgboost_bdt_raw_seed42",
+  "seed": 42,
+  "data": {
+    "dataset_path": "data/multiclass_raw.npz",
+    "metadata_path": "data/multiclass_metadata.json",
+    "input_representation": "raw"
+  },
+  "model": {
+    "type": "xgboost_bdt",
+    "output_model_path": "models/multiclass_xgboost_bdt_raw_seed42.pkl",
+    "xgboost": {
+      "n_estimators": 100,
+      "max_depth": 4,
+      "learning_rate": 0.06,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 1.0,
+      "reg_lambda": 1.0,
+      "tree_method": "hist",
+      "objective": "multi:softprob",
+      "num_class": 5,
+      "eval_metric": ["mlogloss", "merror"],
+      "early_stopping_rounds": 15,
+      "random_state": 42
+    }
+  },
+  "evaluation": {
+    "output_prefix": "results/multiclass_xgboost_bdt_raw_seed42",
+    "fixed_fpr": 0.01
+  }
+}

@@ -1,0 +1,4 @@
+task,seed,accuracy,macro_auc,signal_efficiency_at_fpr_0p01,cross_entropy,expected_calibration_error,metrics_file
+qg_vs_wzt,42,0.8474819277108434,0.9207411789830275,0.5607700125545525,0.34036610858280536,0.012370531352887673,results/qg_vs_wzt_xgboost_bdt_seed42_metrics.json
+qg_vs_top,42,0.9036982531826749,0.9586470462766749,0.5433558726281612,0.240907338451675,0.010582762118685203,results/qg_vs_top_xgboost_bdt_seed42_metrics.json
+multiclass,42,0.7476686746987952,0.9306679792593607,,0.7175872118784635,0.021227368308478076,results/multiclass_xgboost_bdt_seed42_metrics.json

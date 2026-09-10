@@ -1,0 +1,73 @@
+{
+  "run_name": "binary_topqg_xgboost_bdt_d4_100__seed42",
+  "base_run_name": "binary_topqg_xgboost_bdt_d4_100",
+  "backend": "xgboost",
+  "dataset_id": 42468,
+  "model_name": "xgboost_bdt",
+  "model_config": {
+    "name": "xgboost_bdt",
+    "output_dim": 1,
+    "output_mode": "binary_sigmoid",
+    "xgboost": {
+      "n_estimators": 100,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "tree_method": "hist",
+      "n_jobs": 1
+    }
+  },
+  "seed": 42,
+  "split_seed": 42,
+  "accuracy": 0.9036982531826749,
+  "macro_auc": 0.9586470462766749,
+  "per_class_auc": {
+    "quark/gluon": 0.9586470451421334,
+    "top": 0.9586470474112163
+  },
+  "macro_average_precision": 0.9533393878683214,
+  "per_class_average_precision": {
+    "quark/gluon": 0.9753306142290085,
+    "top": 0.9313481615076343
+  },
+  "cross_entropy": 0.240907338451675,
+  "multiclass_brier_score": 0.14200575649738312,
+  "expected_calibration_error": 0.010582762118685203,
+  "confidence_coverage": {
+    "0.5": {
+      "coverage": 1.0,
+      "accuracy": 0.9036982531826749
+    },
+    "0.7": {
+      "coverage": 0.8814220484028666,
+      "accuracy": 0.9431871462061867
+    },
+    "0.8": {
+      "coverage": 0.7992823231763247,
+      "accuracy": 0.9612338579499596
+    },
+    "0.9": {
+      "coverage": 0.6720559626646776,
+      "accuracy": 0.9755676875543691
+    },
+    "0.95": {
+      "coverage": 0.5584876372103338,
+      "accuracy": 0.9823488006930532
+    }
+  },
+  "trigger_proxy": null,
+  "confusion_matrix": [
+    [
+      60844,
+      4794
+    ],
+    [
+      4760,
+      28811
+    ]
+  ],
+  "parameter_count": 3096,
+  "model_size_bytes": 180427,
+  "cpu_latency_ms": 0.18756461329758167
+}

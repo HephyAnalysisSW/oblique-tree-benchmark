@@ -1,0 +1,32 @@
+{
+  "run_name": "qg_vs_top_xgboost_bdt_seed42",
+  "seed": 42,
+  "data": {
+    "dataset_path": "data/qg_vs_top_standardized.npz",
+    "metadata_path": "data/qg_vs_top_metadata.json",
+    "input_representation": "standardized"
+  },
+  "model": {
+    "type": "xgboost_bdt",
+    "output_model_path": "models/qg_vs_top_xgboost_bdt_seed42.pkl",
+    "xgboost": {
+      "n_estimators": 100,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "tree_method": "hist",
+      "n_jobs": 1,
+      "objective": "binary:logistic",
+      "eval_metric": [
+        "logloss",
+        "error"
+      ],
+      "random_state": 42
+    }
+  },
+  "evaluation": {
+    "output_prefix": "results/qg_vs_top_xgboost_bdt_seed42",
+    "fixed_fpr": 0.01
+  }
+}

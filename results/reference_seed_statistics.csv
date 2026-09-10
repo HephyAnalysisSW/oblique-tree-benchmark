@@ -1,0 +1,4 @@
+task,seeds,accuracy_mean,accuracy_std,macro_auc_mean,macro_auc_std,signal_efficiency_at_fixed_fpr_mean,signal_efficiency_at_fixed_fpr_std,cross_entropy_mean,cross_entropy_std,expected_calibration_error_mean,expected_calibration_error_std
+qg_vs_wzt,42,0.8474819277108434,0.0,0.9207411789830275,0.0,0.5607700125545525,0.0,0.34036610858280536,0.0,0.012370531352887673,0.0
+qg_vs_top,42,0.9036982531826749,0.0,0.9586470462766749,0.0,0.5433558726281612,0.0,0.240907338451675,0.0,0.010582762118685203,0.0
+multiclass,42,0.7476686746987952,0.0,0.9306679792593607,0.0,,,0.7175872118784635,0.0,0.021227368308478076,0.0
