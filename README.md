@@ -295,8 +295,7 @@ configs/oblique_raw_template.yaml
 The stub already loads the fixed data partitions. Implement the algorithm there
 and then call the shared evaluator. To compare against another task or seed,
 copy one of the BDT configs and change only the model-specific section and
-output paths. `oblique_template.yaml` uses standardized inputs;
-`oblique_raw_template.yaml` uses raw inputs. Do not change:
+output paths. Do not change:
 
 - standardized and raw data arrays
 - metadata files
