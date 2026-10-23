@@ -635,3 +635,10 @@ are not complete serialized sizes or identifiable degrees of freedom.
 The repository retains the original datasets and reference models already
 tracked in its starting commit. New checkpoints, logs, figures and local
 artifacts are ignored. The split audit checks the exact NPZ before training.
+
+To monitor the constant-leaf scan, run `python scripts/monitor_tao_constant.py`
+(or `--once` for a single check). A lock prevents duplicate monitors. The
+lightweight monitor checks Slurm and saved checkpoints every two minutes,
+publishes `plots/comparisons/constant_training_status.md` and `.json`, and exits
+when both final reports exist. Missing jobs are flagged for attention; the
+monitor does not change model settings or silently restart failed training.
