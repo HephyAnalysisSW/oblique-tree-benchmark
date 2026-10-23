@@ -98,12 +98,18 @@ def publish(scan,rows,active,launched,attention,state):
                     if row['kind']!='factorial' or row['leaf_mode']!=mode or row['split_alpha']!=alpha or not row['validation']:continue
                     i=[1,3,5].index(row['trees']);j=[2,3,4].index(row['depth']);v=row['validation']['signal_efficiency_at_fixed_fpr']
                     values[i,j]=100*v;labels[i,j]=f"{100*v:.2f}%{' *' if row['converged'] else ''}\n{row['status']['training_seconds']/60:.0f} min"
+                ax.set_facecolor('#eeeeee')
                 im=ax.imshow(np.ma.masked_invalid(values),vmin=0,vmax=100*upper,cmap='viridis',aspect='auto')
+                for i in range(3):
+                    for j in range(3):
+                        if (i,j) not in labels:ax.text(j,i,'pending',ha='center',va='center',color='.6',fontsize=9)
+                ax.tick_params(labelbottom=True,labelleft=True)
                 for (i,j),label in labels.items():ax.text(j,i,label,ha='center',va='center',color='white',fontsize=9)
                 ax.set_title(f'{mode} leaves | split/leaf L1={alpha:g}');ax.set_xticks(range(3),[2,3,4]);ax.set_yticks(range(3),[1,3,5]);ax.set_xlabel('Depth');ax.set_ylabel('Trees')
         fig.suptitle(f'Signal efficiency at 1% background | XGBoost {100*bdt:.2f}%\n* converged; other cells provisional; time: training compute wall time')
-        fig.colorbar(im,ax=axes.ravel().tolist(),label='Signal efficiency [%]',shrink=.8)
         fig.subplots_adjust(top=.86,bottom=.08,left=.06,right=.86,hspace=.35,wspace=.2)
+        colorbar_axis=fig.add_axes([.90,.20,.018,.62])
+        fig.colorbar(im,cax=colorbar_axis,label='Signal efficiency [%]')
         fig.savefig(root/'hyper_scan_v1_heatmap.png',dpi=170);plt.close(fig)
     syncer.sync()
     if result['complete']==len(rows) and not state.get('summary_job'):
