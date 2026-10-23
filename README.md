@@ -642,3 +642,47 @@ lightweight monitor checks Slurm and saved checkpoints every two minutes,
 publishes `plots/comparisons/constant_training_status.md` and `.json`, and exits
 when both final reports exist. Missing jobs are flagged for attention; the
 monitor does not change model settings or silently restart failed training.
+
+### Training improvements: controlled studies
+
+The optional `model.split_search='hard_threshold'` update scans every distinct
+training projection threshold along the current hyperplane direction, the
+weighted-logistic proposal, and 25/50/75% blends. Equal projections move together;
+constant routing and the L1 bias term are included. Every proposal is checked
+against the actual hard-tree cross-entropy plus existing penalties before
+acceptance. The original surrogate-only update remains the default for earlier
+studies and checkpoints. The new mode adds no inference parameters.
+
+`configs/tao_hard_search_v1.json` continues the seven converged linear layouts
+using this update. Comparisons are published as `hard_search_*` and
+`hard_search_vs_baseline_*`. Warm starts and additional training time are recorded.
+
+`configs/tao_training_improvements_v1.json` defines the follow-up sequence:
+
+1. Finish and measure the split-search comparison.
+2. At one and three depth-3 trees, compare random seeds 42/43/44 with CART
+   initialization at seed 42. CART uses training events only; forests use
+   bootstrap samples of that partition for initial diversity.
+3. Start from the improved single depth-3 tree, append one zero-output tree,
+   train the whole forest to the same stopping rule, then repeat for three
+   trees. Appending a tree initially preserves the existing predictive function.
+4. Warm-start the improved three-tree model with split and leaf L1 penalties
+   changed separately by factors of ten. Stored parameter counts and nonzero
+   feature-weight counts are reported separately.
+
+`python scripts/monitor_tao_improvements.py` drives these phases, checking every
+two minutes and publishing `plots/comparisons/training_improvements_status.md`.
+Each phase must converge and produce its measured comparison before the next
+starts. Submission receipts prevent duplicate jobs across controller restarts.
+Numerical failures are left visible for inspection; convergence settings are
+not automatically relaxed. Workers use `scripts/train_tao_study.slurm` and
+resume their latest checkpoint at scheduler budgets.
+
+All studies use the immutable exported training and validation arrays and the
+same AUC/efficiency benchmarks. No held-out test evaluation is performed during
+these studies. More seeds and hyperparameter comparisons increase selection
+opportunities, so the final selected configuration still needs a frozen test
+assessment. Training and CPU inference times are retained in the figures and
+reports. The joint leaf KKT test certifies fixed-routing leaf optimization;
+unchanged hard routing indicates exhaustion of the configured proposals,
+not a proof of globally optimal hyperplanes.

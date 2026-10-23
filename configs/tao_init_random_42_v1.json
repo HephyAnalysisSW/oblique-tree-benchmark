@@ -1,0 +1,36 @@
+{
+  "scan_name": "tao_init_random_42_v1",
+  "source_scan": null,
+  "task": "qg_vs_wzt",
+  "seed": 42,
+  "split_alpha": 1e-05,
+  "leaf_alpha": 1e-05,
+  "leaf_mode": "linear",
+  "local_leaf_max_iter": 1000,
+  "global_leaf_chunk_iter": 1000,
+  "split_max_iter": 1000,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "convergence": {
+    "loss_rtol": 1e-05,
+    "kkt_tol": 1e-06,
+    "route_tol": 0.0001,
+    "patience": 3
+  },
+  "minimum_continuation_epochs": 5,
+  "layouts": [
+    {
+      "trees": 1,
+      "depth": 3
+    },
+    {
+      "trees": 3,
+      "depth": 3
+    }
+  ],
+  "split_search": "hard_threshold",
+  "run_suffix": "init_random_42_v1",
+  "publication_prefix": "initialization_study",
+  "initialization": "random",
+  "label": "random seed 42"
+}

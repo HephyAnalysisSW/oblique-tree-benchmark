@@ -1,0 +1,54 @@
+{
+  "phases": [
+    {
+      "name": "hard_search",
+      "configs": [
+        "configs/tao_hard_search_v1.json"
+      ],
+      "report": "hard_search_vs_baseline",
+      "include_linear": true
+    },
+    {
+      "name": "initialization",
+      "configs": [
+        "configs/tao_init_random_42_v1.json",
+        "configs/tao_init_random_43_v1.json",
+        "configs/tao_init_random_44_v1.json",
+        "configs/tao_init_cart_42_v1.json"
+      ],
+      "report": "initialization_study",
+      "baseline": "configs/tao_hard_search_v1.json",
+      "focus_layouts": "1:3,3:3"
+    },
+    {
+      "name": "sequential_2",
+      "configs": [
+        "configs/tao_sequential_n2_v1.json"
+      ],
+      "report": "sequential_2_study",
+      "baseline": "configs/tao_hard_search_v1.json",
+      "focus_layouts": "1:3,2:3,3:3"
+    },
+    {
+      "name": "sequential_3",
+      "configs": [
+        "configs/tao_sequential_n3_v1.json"
+      ],
+      "report": "sequential_3_study",
+      "baseline": "configs/tao_hard_search_v1.json",
+      "focus_layouts": "1:3,2:3,3:3"
+    },
+    {
+      "name": "penalties",
+      "configs": [
+        "configs/tao_penalty_split_low_v1.json",
+        "configs/tao_penalty_split_high_v1.json",
+        "configs/tao_penalty_leaf_low_v1.json",
+        "configs/tao_penalty_leaf_high_v1.json"
+      ],
+      "report": "penalty_study",
+      "baseline": "configs/tao_hard_search_v1.json",
+      "focus_layouts": "3:3"
+    }
+  ]
+}

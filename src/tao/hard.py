@@ -15,6 +15,7 @@ import numpy as np
 from scipy import sparse
 from scipy.optimize import minimize
 from scipy.special import logsumexp, softmax
+from .split_search import best_threshold
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 
@@ -354,6 +355,9 @@ class HardTAOClassifier:
         stats = dict(events=len(y), active_events=int(active.sum()), tied_events=int((delta == 0).sum()),
                      fitted=False, accepted=False, converged=True,
                      losses_seconds=time.perf_counter() - started, solver_seconds=0.0)
+        enhanced=getattr(self,'split_search','surrogate')=='hard_threshold'
+        if enhanced:
+            return self._hard_split_update(tree,node,x,y,weights,normalizer,losses,active,targets,stats)
         if len(np.unique(targets)) < 2:
             return stats
         candidate_w, candidate_b, fit_stats = fit_l1_split(
@@ -373,6 +377,44 @@ class HardTAOClassifier:
                      objective_after=after if accepted else before,
                      converged=fit_stats['converged'], iterations=fit_stats['iterations'],
                      solver_seconds=fit_stats['seconds'], surrogate=fit_stats)
+        return stats
+
+    def _hard_split_update(self,tree,node,x,y,weights,normalizer,losses,active,targets,stats):
+        started=time.perf_counter()
+        old_w,old_b=tree.split_w[node].copy(),float(tree.split_b[node])
+        def value(w,b):
+            right=x@w+b>0
+            return float(np.dot(weights,np.where(right,losses[1],losses[0]))/normalizer+
+                         self.split_alpha*(np.abs(w).sum()+abs(b)))
+        before=value(old_w,old_b);best_value=before;best_w,best_b=old_w,old_b
+        directions=[('current',old_w)]
+        fit_stats=None
+        if len(np.unique(targets))==2:
+            effective=weights[active]*np.abs(losses[0][active]-losses[1][active])
+            candidate_w,candidate_b,fit_stats=fit_l1_split(x[active],targets,effective,normalizer,
+                self.split_alpha,old_w,old_b,self.seed,self.split_max_iter,
+                getattr(self,'split_solver','liblinear'))
+            candidate_value=value(candidate_w,candidate_b)
+            if candidate_value<best_value:best_value,best_w,best_b=candidate_value,candidate_w,candidate_b
+            directions.append(('logistic',candidate_w))
+            for fraction in (.25,.5,.75):
+                directions.append((f'blend_{fraction:g}',(1-fraction)*old_w+fraction*candidate_w))
+        # Even one-sided or tied routing targets can benefit from a constant route.
+        directions.append(('constant',np.zeros_like(old_w)))
+        proposals=[];selected='logistic_raw' if best_value<before else 'unchanged'
+        for name,w in directions:
+            bias,search=best_threshold(x@w,losses[0],losses[1],weights,normalizer,self.split_alpha)
+            after=value(w,bias)  # Recompute using actual hard routing before acceptance.
+            proposals.append(dict(direction=name,objective=after,**search))
+            if after<best_value:best_value,best_w,best_b,selected=after,w,bias,name
+        accepted=bool(best_value<before)
+        if accepted:tree.split_w[node],tree.split_b[node]=best_w,best_b
+        stats.update(fitted=fit_stats is not None,accepted=accepted,objective_before=before,
+            objective_after=best_value,converged=True if fit_stats is None else fit_stats['converged'],
+            iterations=0 if fit_stats is None else fit_stats['iterations'],
+            solver_seconds=0. if fit_stats is None else fit_stats['seconds'],
+            surrogate=fit_stats,search='hard_threshold',selected_direction=selected,
+            proposals=proposals,search_seconds=time.perf_counter()-started)
         return stats
 
     def fit_epoch(self, x, y, sample_weight=None, global_refit=True):

@@ -9,6 +9,7 @@ from data_utils import resolve,load_config,load_metadata,write_json
 from evaluate import compute_metrics
 from tao.hard import HardTAOClassifier
 from tao.convergence import leaf_kkt_residual,convergence_check
+from tao.initialization import initialize_cart,append_zero_tree
 import matplotlib.pyplot as plt
 
 
@@ -62,6 +63,7 @@ def main():
     p.add_argument('--wall-seconds',type=float,default=2700)
     a=p.parse_args();scan=json.loads(resolve(a.config).read_text())
     layout=scan['layouts'][a.index]
+    seed=scan['seed']
     run=(f"{scan['task']}_hardtao_{scan['leaf_mode']}_d{layout['depth']}_n{layout['trees']}"
          f"_sa{scan['split_alpha']:g}_la{scan['leaf_alpha']:g}_seed{scan['seed']}_{scan.get('run_suffix','full_training_v1')}")
     latest=resolve('models/'+run+'_latest.pkl')
@@ -80,28 +82,49 @@ def main():
     else:
         marker=resolve(f"results/{scan['source_scan']}_member_{a.index}.json")
         source_run=None;source_sha=None;source_seconds=0
-        if scan.get('source_scan') and marker.exists():
-            member=json.loads(marker.read_text());assert member['layout']==layout
-            source_run=member['selected_run'];source_cfg=load_config('configs/'+source_run+'.yaml')
+        initial_started=time.perf_counter()
+        initialization_records=[]
+        if scan.get('source_models'):
+            source_run=scan['source_models'][a.index]
+            source_cfg=load_config('configs/'+source_run+'.yaml')
+            with resolve(source_cfg['model']['output_model_path']).open('rb') as f:source=pickle.load(f)
+            assert source['training_converged'] and source_cfg['data']==reference['data']
+            model=copy.deepcopy(source['model']);source_sha=sha(resolve(source_cfg['model']['output_model_path']))
+            source_seconds=source_cfg['source_training_seconds']+source['history'][-1]['cumulative_training_seconds']
+            if scan.get('initialization')=='append_tree':append_zero_tree(model,layout['trees'],seed)
+        elif scan.get('source_scan') and marker.exists():
+            member=json.loads(marker.read_text())
+            if 'layout' in member:assert member['layout']==layout
+            source_run=member.get('selected_run',member.get('run_name'));source_cfg=load_config('configs/'+source_run+'.yaml')
             with resolve(source_cfg['model']['output_model_path']).open('rb') as f:source=pickle.load(f)
             model=copy.deepcopy(source['model']);assert source_cfg['data']==reference['data']
             source_sha=sha(resolve(source_cfg['model']['output_model_path']))
-            base=json.loads(resolve('results/'+member['base_run']+'_history.json').read_text())
-            refit=json.loads(resolve('results/'+source_run+'_history.json').read_text())
-            source_seconds=sum(r['profile']['seconds'] for r in base)+sum(r['seconds'] for r in refit)
+            if 'base_run' in member:
+                base=json.loads(resolve('results/'+member['base_run']+'_history.json').read_text())
+                refit=json.loads(resolve('results/'+source_run+'_history.json').read_text())
+                source_seconds=sum(r['profile']['seconds'] for r in base)+sum(r['seconds'] for r in refit)
+            else:
+                source_seconds=member['training_seconds']+member.get('source_training_seconds',0.)
         else:
             model=HardTAOClassifier(depth=layout['depth'],trees=layout['trees'],leaf_mode=scan['leaf_mode'],
                 seed=scan['seed'],split_alpha=scan['split_alpha'],leaf_alpha=scan['leaf_alpha'],
                 indexed='dense').initialize(x.shape[1],len(metadata['class_names']))
+            if scan.get('initialization')=='cart':initialization_records=initialize_cart(model,x,y)
+        initialization_seconds=time.perf_counter()-initial_started
         config=dict(run_name=run,seed=scan['seed'],data=reference['data'],dataset_sha256=audit['dataset_sha256'],
             implementation_sha256=sha(resolve('src/tao/hard.py')),full_training_policy=scan,
+            split_search_sha256=sha(resolve('src/tao/split_search.py')),
+            initialization=scan.get('initialization','random' if source_run is None else 'checkpoint'),
+            initialization_records=initialization_records,initialization_seconds=initialization_seconds,
             source_run=source_run,source_model_sha256=source_sha,source_training_seconds=source_seconds,
             model=dict(type='hard_tao_cross_entropy',output_model_path='models/'+run+'.pkl',
                 tao=dict(**layout,leaf_mode=scan['leaf_mode'],split_alpha=scan['split_alpha'],leaf_alpha=scan['leaf_alpha'])),
             evaluation=dict(output_prefix='results/'+run,fixed_fpr=.01))
         state=dict(phase='initial_refit',history=[],stable_epochs=0,converged=False,
-            training_seconds=0.,local_leaf_max_iter=scan['local_leaf_max_iter'],split_max_iter=scan['split_max_iter'],
+            training_seconds=initialization_seconds,local_leaf_max_iter=scan['local_leaf_max_iter'],split_max_iter=scan['split_max_iter'],
             initial_refits=[],best_validation_auc=-float('inf'),step_seconds_estimate=600.)
+    model.split_alpha=scan['split_alpha'];model.leaf_alpha=scan['leaf_alpha']
+    model.split_search=scan.get('split_search','surrogate')
     model.leaf_ftol=scan['leaf_ftol'];model.leaf_gtol=scan['leaf_gtol'];model.indexed='dense'
     assert model.depth==layout['depth'] and model.ntrees==layout['trees']
     assert model.leaf_mode==scan['leaf_mode']

@@ -19,6 +19,7 @@ class FullTrainingResume(unittest.TestCase):
             root=Path(temporary)
             for folder in ['configs','data','results','src/tao']:(root/folder).mkdir(parents=True)
             (root/'src/tao/hard.py').write_bytes((real_root/'src/tao/hard.py').read_bytes())
+            (root/'src/tao/split_search.py').write_bytes((real_root/'src/tao/split_search.py').read_bytes())
             rng=np.random.default_rng(42)
             x=rng.normal(size=(200,2));xv=rng.normal(size=(80,2))
             y=(rng.random(200)<1/(1+np.exp(-x[:,0]))).astype(int)
@@ -50,6 +51,25 @@ class FullTrainingResume(unittest.TestCase):
             self.assertGreaterEqual(len(payload['history']),5)
             self.assertGreaterEqual(payload['convergence']['stable_epochs'],3)
             self.assertLessEqual(payload['convergence']['leaf_kkt_residual'],1e-6)
+            # Reuse a converged source, change penalties, append one tree, and
+            # verify the warm-start path obeys the new policy and preserves splits.
+            if leaf_mode=='linear':
+                scan.update(source_scan=None,source_models=[marker['run_name']],
+                    initialization='append_tree',run_suffix='warm_fixture',scan_name='warm_fixture',
+                    split_alpha=2e-5,leaf_alpha=2e-4,split_search='hard_threshold',
+                    layouts=[dict(trees=2,depth=0)])
+                (root/'configs/warm.json').write_text(json.dumps(scan))
+                with patch.object(data_utils,'ROOT',root),patch.object(worker,'plots',lambda *args:None):
+                    with patch.object(sys,'argv',['worker','--config','configs/warm.json','--index','0','--wall-seconds','1200']):
+                        self.assertEqual(worker.main(),0)
+                warm=json.loads((root/'results/warm_fixture_member_0.json').read_text())
+                with (root/'models'/str(warm['run_name']+'.pkl')).open('rb') as f:grown=pickle.load(f)
+                self.assertEqual(grown['model'].ntrees,2)
+                self.assertEqual(grown['model'].leaf_alpha,2e-4)
+                self.assertEqual(grown['model'].split_alpha,2e-5)
+                self.assertEqual(grown['config']['source_run'],marker['run_name'])
+                self.assertTrue(grown['training_converged'])
+
 
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,87 @@
+{
+  "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hard_search_v1",
+  "seed": 42,
+  "data": {
+    "dataset_path": "data/qg_vs_wzt_standardized.npz",
+    "metadata_path": "data/qg_vs_wzt_metadata.json",
+    "input_representation": "standardized"
+  },
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "implementation_sha256": "1405ff146f6799d3e2c936c46994d4ef48cbd8e15e2ab732dea30bab4ce8a372",
+  "full_training_policy": {
+    "scan_name": "tao_hard_search_v1",
+    "source_scan": "tao_full_training_v1",
+    "task": "qg_vs_wzt",
+    "seed": 42,
+    "split_alpha": 1e-05,
+    "leaf_alpha": 1e-05,
+    "leaf_mode": "linear",
+    "local_leaf_max_iter": 1000,
+    "global_leaf_chunk_iter": 1000,
+    "split_max_iter": 1000,
+    "leaf_ftol": 1e-12,
+    "leaf_gtol": 1e-08,
+    "convergence": {
+      "loss_rtol": 1e-05,
+      "kkt_tol": 1e-06,
+      "route_tol": 0.0001,
+      "patience": 3
+    },
+    "minimum_continuation_epochs": 5,
+    "layouts": [
+      {
+        "trees": 1,
+        "depth": 2
+      },
+      {
+        "trees": 1,
+        "depth": 3
+      },
+      {
+        "trees": 1,
+        "depth": 4
+      },
+      {
+        "trees": 1,
+        "depth": 5
+      },
+      {
+        "trees": 2,
+        "depth": 3
+      },
+      {
+        "trees": 3,
+        "depth": 2
+      },
+      {
+        "trees": 3,
+        "depth": 3
+      }
+    ],
+    "split_search": "hard_threshold",
+    "run_suffix": "hard_search_v1",
+    "publication_prefix": "hard_search"
+  },
+  "split_search_sha256": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+  "initialization": "checkpoint",
+  "initialization_records": [],
+  "initialization_seconds": 0.011714727152138948,
+  "source_run": "qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_full_training_v1",
+  "source_model_sha256": "5a5891cf918495ec8bec2996a1bfc39d34f4213500a708f3cb00f130dddd7ab4",
+  "source_training_seconds": 3595.3577421267983,
+  "model": {
+    "type": "hard_tao_cross_entropy",
+    "output_model_path": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hard_search_v1.pkl",
+    "tao": {
+      "trees": 1,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "split_alpha": 1e-05,
+      "leaf_alpha": 1e-05
+    }
+  },
+  "evaluation": {
+    "output_prefix": "results/qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hard_search_v1",
+    "fixed_fpr": 0.01
+  }
+}
