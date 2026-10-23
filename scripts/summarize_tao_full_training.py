@@ -131,9 +131,9 @@ def main():
         ranked_models=[item['run_name'] for item in ranking],scan=scan,split_audit=audit,models=[{k:v for k,v in item.items() if k not in ['model','roc','color','history']} for item in items],
         completed_layouts=len(items)-1,scans=scans,all_training_converged=True,partition='validation',test_evaluated=False,
         host=platform.node(),cpu=next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),''),
-        caveats=['Numerical coordinate convergence of hard TAO, not a proof of a global optimum.',
+        caveats=['Fixed-routing leaf optimality and stable hard updates do not certify a local or global tree optimum.',
             'Terminal converged models are compared. Best-efficiency and best-AUC checkpoints are separate archives when saved; ranking does not change the numerical stopping rule.',
-            'One seed; CPU timings are current implementations, not FPGA latency.'])
+            'Training seeds: '+', '.join(map(str,sorted({item['config']['seed'] for item in items[1:]})))+'. CPU timings compare the current implementations, not FPGA latency.'])
     write_json(root/(prefix+'_summary.json'),result)
     lines=['# Fully trained TAO comparison','',
         'All terminal checkpoints pass the recorded convergence criteria. Exact exported partitions match XGBoost; test data remain unused. Models are ranked by signal efficiency at 1% background acceptance, with AUC as a secondary metric.','',
