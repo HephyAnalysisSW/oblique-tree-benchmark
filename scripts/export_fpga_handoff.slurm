@@ -5,7 +5,7 @@
 #SBATCH --account=cms
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=6G
-#SBATCH --time=00:30:00
+#SBATCH --time=00:10:00
 #SBATCH --chdir=/users/robert.schoefbeck/CMS/tree_benchmark
 #SBATCH --output=results/tao-fpga-handoff-%j.log
 set -eo pipefail

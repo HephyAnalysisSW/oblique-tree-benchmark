@@ -1,0 +1,116 @@
+{
+  "id": "runnerup_2t_d3",
+  "run_name": "qg_vs_wzt_hardtao_linear_d3_n2_sa1e-05_la1e-05_seed42_hard_search_v1",
+  "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d3_n2_sa1e-05_la1e-05_seed42_hard_search_v1_best_efficiency.pkl",
+  "checkpoint_sha256": "91a1813e28fabd44d2b1d55fd2ac5d3c851d08fc1d7abd2e266139e54796b865",
+  "selected_epoch": 6,
+  "training_run_converged": true,
+  "selected_checkpoint_converged": false,
+  "metrics": {
+    "accuracy": 0.8530572289156626,
+    "macro_auc": 0.9262353310941651,
+    "per_class_auc": {
+      "quark/gluon": 0.9262353316278393,
+      "W/Z/top": 0.926235330560491
+    },
+    "macro_average_precision": 0.9150695878678266,
+    "per_class_average_precision": {
+      "quark/gluon": 0.8751661326163349,
+      "W/Z/top": 0.9549730431193182
+    },
+    "cross_entropy": 0.3318410966838985,
+    "multiclass_brier_score": 0.20980502665042877,
+    "expected_calibration_error": 0.0023122734172516695,
+    "confidence_coverage": {
+      "0.5": {
+        "coverage": 1.0,
+        "accuracy": 0.8530572289156626
+      },
+      "0.7": {
+        "coverage": 0.8125225903614458,
+        "accuracy": 0.9081675208288926
+      },
+      "0.8": {
+        "coverage": 0.6622740963855421,
+        "accuracy": 0.9428197839681637
+      },
+      "0.9": {
+        "coverage": 0.4951882530120482,
+        "accuracy": 0.9732516233025653
+      },
+      "0.95": {
+        "coverage": 0.39216114457831325,
+        "accuracy": 0.9843698995756447
+      }
+    },
+    "confusion_matrix": [
+      [
+        45857,
+        6654
+      ],
+      [
+        12860,
+        67429
+      ]
+    ],
+    "fixed_fpr": 0.01,
+    "fixed_fpr_points": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "signal_efficiency_at_fixed_fpr": 0.5360634707120527,
+    "per_class_efficiency_at_fixed_fpr": {
+      "quark/gluon": 0.25516558435375447,
+      "W/Z/top": 0.5360634707120527
+    },
+    "per_class_efficiency_points": {
+      "quark/gluon": {
+        "0.001": 0.07526042162594504,
+        "0.01": 0.25516558435375447,
+        "0.1": 0.7420350021900173
+      },
+      "W/Z/top": {
+        "0.001": 0.2156708889137989,
+        "0.01": 0.5360634707120527,
+        "0.1": 0.8184931933390627
+      }
+    },
+    "signal_auc": 0.926235330560491
+  },
+  "deterministic_working_point": {
+    "signal_margin_threshold": 3.1023658021515867,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5360634707120527
+  },
+  "arithmetic": {
+    "stored_scalar_parameters": 510,
+    "selected_path_multiplications": 128,
+    "selected_path_additions": 129,
+    "selected_path_comparisons": 6,
+    "all_node_multiplications": 480,
+    "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+  },
+  "complexity": {
+    "trees": 2,
+    "maximum_depth": 3,
+    "leaf_mode": "linear",
+    "classes": 2,
+    "logits_per_leaf": 1,
+    "internal_nodes": 14,
+    "leaves": 16,
+    "split_nonzeros": 217,
+    "leaf_nonzeros": 199,
+    "split_biases": 14,
+    "leaf_biases": 16,
+    "hard_routing": true,
+    "quantized": false
+  },
+  "golden_vector_count": 200,
+  "raw_fold_max_margin_difference": 2.6423307986078726e-14,
+  "native_max_margin_difference": 0.0
+}

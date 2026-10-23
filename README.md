@@ -5,6 +5,59 @@ jet-classification splits from the low-precision FPGA benchmark. GOLLUM hard and
 soft tree sources are archived under `vendor/gollum/`; the hard TAO adapter is
 under `src/tao/`. Neural-network training and FPGA synthesis are not yet included.
 
+## Current winning strategy and FPGA handoff
+
+**Use the three-tree, depth-3 hard oblique forest with linear leaves as the
+current implementation baseline.** Its saved best-efficiency checkpoint reaches
+**54.28% signal efficiency at 1% background acceptance**, validation AUC
+**0.92740**, with **765 scalar parameters**. XGBoost's 100 depth-4 trees reach
+55.48% at the same working point with 3,099 scalar parameters.
+
+The authoritative selection and artifact paths are in
+[`fpga_handoff/CURRENT_MODEL.json`](fpga_handoff/CURRENT_MODEL.json).
+The frozen implementation contract and reproducibility instructions are in
+[`fpga_handoff/README.md`](fpga_handoff/README.md), with portable models and
+vectors under [`fpga_handoff/v1/`](fpga_handoff/v1/).
+
+| Setting | Current winning strategy |
+|---|---|
+| Task | `qg_vs_wzt`: quark/gluon background vs W/Z/top signal |
+| Architecture | 3 hard binary oblique trees, depth 3, affine linear leaf logits |
+| Initialization | Warm-started from the earlier random-seed-42 TAO model |
+| Forest output | Sum of tree logits; joint cross-entropy leaf refit |
+| Split search | Weighted logistic proposal plus exact hard-loss threshold scans along current/proposed directions and 25/50/75% blends; accept only objective improvements |
+| Regularization | Split L1 = leaf-feature L1 = `1e-5` in the **mean** cross-entropy convention; split bias penalized, leaf bias unpenalized |
+| Selection metric | Validation signal efficiency at **1% background acceptance**; AUC secondary |
+| Selected checkpoint | `qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1_best_efficiency.pkl`, continuation pass 6 |
+| Training completion | Run converged after 19 continuation passes; terminal efficiency 53.95%. The selected earlier checkpoint gives 54.28% |
+| Data | Immutable standardized arrays; seed-42 split: 531,200 train / 132,800 validation / 166,000 held-out test |
+| FPGA score | Increasing signal margin = **negative sum of selected leaf outputs**; no sigmoid is needed for threshold decisions |
+
+CART initialization belongs to the **ongoing 58-case scan**; the current winner
+uses the warm-start lineage described above. That scan explores tree count,
+depth, leaf type and L1 strength to reach XGBoost's working-point performance
+before compression. No held-out test selection or evaluation has been done.
+
+Frozen handoff comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/fpga_handoff_v1_comparison.png),
+[ROC comparison](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/fpga_handoff_v1_roc.png),
+and [versioned comparison data](fpga_handoff/v1/comparison.md).
+The package includes five oblique snapshots, the native XGBoost JSON model,
+standardized/raw-folded coefficients, C++ headers and golden vectors. Its ten
+compiled C++ variants passed 2,142 vector checks with exact leaf-route agreement
+and maximum signal-margin error below 1.8e-14. These are floating references;
+fixed-point precision and FPGA synthesis remain the implementation stage.
+
+Live comparisons: [winner ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/tao_3tree_depth3_linear/winner_roc.png),
+[winner metrics](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_report.md),
+and [ongoing scan](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/hyper_scan_v1_report.md).
+
+When running jobs produce a better **saved checkpoint** at the primary working
+point, verify its metrics, record its convergence/selection status, freeze a new
+handoff version and update this section plus `CURRENT_MODEL.json`. Keep old
+versioned coefficients and vectors intact so firmware results remain traceable.
+A transient log value without a saved, verified checkpoint is not sufficient to
+replace the implementation baseline.
+
 The methodological rule is:
 
 **BDT and oblique-tree models may differ only in the model/training algorithm.

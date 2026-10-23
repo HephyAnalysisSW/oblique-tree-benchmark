@@ -74,6 +74,9 @@ feature order in `input_contract.json`. Do not standardize twice. The training
 model's own input adapter is identity because it consumes exported standardized
 arrays directly.
 
+Raw means the 16 unstandardized high-level features, not detector or particle
+inputs. Upstream feature construction is outside this interface.
+
 The raw variant folds preprocessing algebraically into every split and linear
 leaf. For any affine function `w*x + b`:
 
