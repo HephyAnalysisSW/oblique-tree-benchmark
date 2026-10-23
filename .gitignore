@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+results/file_sync_storage.txt
+results/file_sync_storage.txt.lock
+
+# Generated experiment artifacts (existing tracked reference files remain tracked).
+/data/*.npz
+/models/
+/results/
+/plots/
+/artifacts/
+.venv/
+.DS_Store

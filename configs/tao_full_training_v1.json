@@ -1,0 +1,30 @@
+{
+  "scan_name": "tao_full_training_v1",
+  "source_scan": "tao_layout_scan_v1",
+  "task": "qg_vs_wzt",
+  "seed": 42,
+  "split_alpha": 0.00001,
+  "leaf_alpha": 0.00001,
+  "leaf_mode": "linear",
+  "local_leaf_max_iter": 1000,
+  "global_leaf_chunk_iter": 1000,
+  "split_max_iter": 1000,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-8,
+  "convergence": {
+    "loss_rtol": 0.00001,
+    "kkt_tol": 0.000001,
+    "route_tol": 0.0001,
+    "patience": 3
+  },
+  "minimum_continuation_epochs": 5,
+  "layouts": [
+    {"trees": 1, "depth": 2},
+    {"trees": 1, "depth": 3},
+    {"trees": 1, "depth": 4},
+    {"trees": 1, "depth": 5},
+    {"trees": 2, "depth": 3},
+    {"trees": 3, "depth": 2},
+    {"trees": 3, "depth": 3}
+  ]
+}

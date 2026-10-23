@@ -1,0 +1,41 @@
+{
+  "run_name": "qg_vs_wzt_hardtao_linear_d5_n1_sa1e-05_la1e-05_seed42_layout_scan_v1",
+  "seed": 42,
+  "data": {
+    "dataset_path": "data/qg_vs_wzt_standardized.npz",
+    "metadata_path": "data/qg_vs_wzt_metadata.json",
+    "input_representation": "standardized"
+  },
+  "implementation_sha256": "8a5d9fcd5ab03e813a78fd76f22c2c728f7070241be04583a5f41e23a03ca98d",
+  "model": {
+    "type": "hard_tao_cross_entropy",
+    "output_model_path": "models/qg_vs_wzt_hardtao_linear_d5_n1_sa1e-05_la1e-05_seed42_layout_scan_v1.pkl",
+    "tao": {
+      "task": "qg_vs_wzt",
+      "depth": 5,
+      "trees": 1,
+      "leaf_mode": "linear",
+      "split_alpha": 1e-05,
+      "leaf_alpha": 1e-05,
+      "leaf_max_iter": 100,
+      "split_max_iter": 100,
+      "split_solver": "liblinear",
+      "routing": "dense",
+      "epochs": 4,
+      "patience": 4,
+      "plot_every": 1,
+      "seed": 42,
+      "suffix": "layout_scan_v1"
+    },
+    "objective": "mean_cross_entropy_plus_l1",
+    "split_solver": "liblinear_l1",
+    "leaf_solver": "lbfgsb_exact_l1_parameterization",
+    "preprocessing": "identity_on_fixed_standardized_arrays",
+    "logits": "K-1 with last class reference",
+    "global_refit": "all_training_events"
+  },
+  "evaluation": {
+    "output_prefix": "results/qg_vs_wzt_hardtao_linear_d5_n1_sa1e-05_la1e-05_seed42_layout_scan_v1",
+    "fixed_fpr": 0.01
+  }
+}

@@ -10,6 +10,10 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Allow command-line entry points under src/ to import project common utilities.
+import sys
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def resolve(path: str | Path) -> Path:

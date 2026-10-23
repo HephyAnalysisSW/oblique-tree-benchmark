@@ -1,0 +1,25 @@
+{
+  "scan_name": "tao_layout_scan_v1",
+  "task": "qg_vs_wzt",
+  "shared": {
+    "epochs": 4,
+    "patience": 4,
+    "plot_every": 1,
+    "leaf_max_iter": 100,
+    "split_max_iter": 100,
+    "split_alpha": 0.00001,
+    "leaf_alpha": 0.00001,
+    "seed": 42,
+    "leaf_mode": "linear",
+    "routing": "dense",
+    "suffix": "layout_scan_v1"
+  },
+  "final_leaf_iteration_budget": 1000,
+  "layouts": [
+    {"trees": 1, "depth": 2},
+    {"trees": 1, "depth": 3},
+    {"trees": 1, "depth": 4},
+    {"trees": 1, "depth": 5},
+    {"trees": 2, "depth": 3}
+  ]
+}

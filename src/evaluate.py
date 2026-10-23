@@ -20,6 +20,7 @@ from sklearn.metrics import (
 )
 
 from data_utils import load_config, load_dataset, resolve, write_json
+import common.syncer  # register plotting outputs for certificate-authenticated EOS upload
 
 
 DEFAULT_FIXED_FPRS = (0.001, 0.01, 0.1)
