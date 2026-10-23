@@ -10,6 +10,7 @@ from evaluate import compute_metrics
 from tao.hard import HardTAOClassifier
 from tao.convergence import leaf_kkt_residual,convergence_check
 from tao.initialization import initialize_cart,append_zero_tree
+from tao.epoch import begin_epoch,step_epoch
 import matplotlib.pyplot as plt
 
 
@@ -53,6 +54,7 @@ def save(run,model,config,metadata,state):
         epochs=len(state['history']),stable_epochs=state['stable_epochs'],
         training_seconds=state['training_seconds'],leaf_max_iter=state['local_leaf_max_iter'],
         last_convergence=state['history'][-1]['convergence'] if state['history'] else None,
+        epoch_progress={k:v for k,v in state.get('epoch_work',{}).items() if k in ['stage','tree_index','leaf_index','node_index']},
         updated_utc=datetime.now(timezone.utc).isoformat(),test_evaluated=False))
 
 
@@ -123,6 +125,7 @@ def main():
         state=dict(phase='initial_refit',history=[],stable_epochs=0,converged=False,
             training_seconds=initialization_seconds,local_leaf_max_iter=scan['local_leaf_max_iter'],split_max_iter=scan['split_max_iter'],
             initial_refits=[],best_validation_auc=-float('inf'),step_seconds_estimate=600.)
+    if scan['scan_name'].startswith('tao_hyper_scan_v1'):config['epoch_checkpointing']='node'
     model.split_alpha=scan['split_alpha'];model.leaf_alpha=scan['leaf_alpha']
     model.split_solver=scan.get('split_solver','liblinear')
     model.split_search=scan.get('split_search','surrogate')
@@ -140,12 +143,24 @@ def main():
             return 75
         tick=time.perf_counter()
         if state['phase']=='epoch':
-            state['before_routes']=[t.leaf_indices(x,'dense') for t in model.trees]
             model.leaf_max_iter=state['local_leaf_max_iter'];model.split_max_iter=state['split_max_iter']
-            state['pending_profile']=model.fit_epoch(x,y,global_refit=False)
-            state['pending_global']=[];state['phase']='global_refit'
-            duration=time.perf_counter()-tick;state['training_seconds']+=duration
-            state['pending_profile']['seconds']=duration
+            if scan['scan_name'].startswith('tao_hyper_scan_v1'):
+                if 'epoch_work' not in state:
+                    state['before_routes']=[t.leaf_indices(x,'dense') for t in model.trees]
+                    state['epoch_work']=begin_epoch(model,x,y);state['epoch_compute_seconds']=0.
+                finished=step_epoch(model,state['epoch_work'],x,y)
+                duration=time.perf_counter()-tick;state['training_seconds']+=duration
+                state['epoch_compute_seconds']+=duration
+                if finished:
+                    state['pending_profile']=state.pop('epoch_work')['profile']
+                    state['pending_profile']['seconds']=state.pop('epoch_compute_seconds')
+                    state['pending_global']=[];state['phase']='global_refit'
+            else:
+                state['before_routes']=[t.leaf_indices(x,'dense') for t in model.trees]
+                state['pending_profile']=model.fit_epoch(x,y,global_refit=False)
+                state['pending_global']=[];state['phase']='global_refit'
+                duration=time.perf_counter()-tick;state['training_seconds']+=duration
+                state['pending_profile']['seconds']=duration
         else:
             model.leaf_max_iter=scan['global_leaf_chunk_iter']
             before=model.objective(x,y)

@@ -736,3 +736,22 @@ AUC tie-breaker) receive common CPU timings and ROC plots as `hyper_scan_top_*`.
 Zero-L1 split proposals use unpenalized L-BFGS because LIBLINEAR does not support
 that objective. Constant leaves contain no penalized feature weights, so their
 leaf L1 coefficient has no effect.
+
+Large scan cases now checkpoint after individual leaf and split updates, rather
+than only after a complete forest pass. `tao.epoch` serializes the original
+prediction/routing caches and preserves the original node order and numerical
+solvers. Tests pickle and resume between every node and reproduce an
+uninterrupted epoch for binary/multiclass, constant/linear leaves and multiple
+trees. This prevents a multi-tree epoch from repeatedly losing its work at the
+one-hour Slurm limit. Existing completed checkpoints and stopping criteria are
+unchanged. An inspected failed case can be explicitly approved for one recovery
+via `results/hyper_scan_v1/case_XX_recovery.json`, bound to the failed job ID;
+uninspected failures remain held. Recovery takes the next available scan slot.
+
+`sbatch scripts/publish_current_winner.slurm` publishes the selected checkpoint,
+its terminal model and XGBoost together at
+`plots/tao_3tree_depth3_linear/winner_roc.png` and
+`plots/comparisons/current_winner_report.md`. The report records the selected
+epoch, checkpoint SHA-256, parameter count and measured CPU timings, and
+explicitly distinguishes a converged training run from the earlier checkpoint
+selected by validation efficiency. The held-out test set remains unused.

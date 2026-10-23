@@ -55,14 +55,14 @@ class FullTrainingResume(unittest.TestCase):
             # verify the warm-start path obeys the new policy and preserves splits.
             if leaf_mode=='linear':
                 scan.update(source_scan=None,source_models=[marker['run_name']],
-                    initialization='append_tree',run_suffix='warm_fixture',scan_name='warm_fixture',
+                    initialization='append_tree',run_suffix='warm_fixture',scan_name='tao_hyper_scan_v1_fixture',
                     split_alpha=2e-5,leaf_alpha=2e-4,split_search='hard_threshold',
                     layouts=[dict(trees=2,depth=0)])
                 (root/'configs/warm.json').write_text(json.dumps(scan))
                 with patch.object(data_utils,'ROOT',root),patch.object(worker,'plots',lambda *args:None):
                     with patch.object(sys,'argv',['worker','--config','configs/warm.json','--index','0','--wall-seconds','1200']):
                         self.assertEqual(worker.main(),0)
-                warm=json.loads((root/'results/warm_fixture_member_0.json').read_text())
+                warm=json.loads((root/'results/tao_hyper_scan_v1_fixture_member_0.json').read_text())
                 with (root/'models'/str(warm['run_name']+'.pkl')).open('rb') as f:grown=pickle.load(f)
                 self.assertEqual(grown['model'].ntrees,2)
                 self.assertEqual(grown['model'].leaf_alpha,2e-4)

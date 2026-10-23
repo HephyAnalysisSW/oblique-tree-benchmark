@@ -46,15 +46,18 @@ def schedule(scan,state,rows,active):
         last=attempts[-1]
         if last['job_id'] in active_ids:continue
         ended=read(f"results/hyper_scan_v1/case_{row['index']:02d}_exit.json",{})
-        if ended.get('job_id')==last['job_id'] and ended.get('exit_code')==75:
+        recovery=read(f"results/hyper_scan_v1/case_{row['index']:02d}_recovery.json",{})
+        if recovery.get('job_id')==last['job_id'] and recovery.get('approved'):
+            row['_recovery']=recovery;eligible.append(row)
+        elif ended.get('job_id')==last['job_id'] and ended.get('exit_code')==75:
             eligible.append(row)
         else:attention.append(dict(index=row['index'],job_id=last['job_id'],reason='No active job or clean continuation exit; inspect Slurm/logs'))
     free=max(0,scan['concurrency']-len(active))
-    eligible.sort(key=lambda row:(len(state['attempts'].get(str(row['index']),[])),row.get('priority',row['index']),row['index']))
+    eligible.sort(key=lambda row:(0 if row.get('_recovery') else 1,len(state['attempts'].get(str(row['index']),[])),row.get('priority',row['index']),row['index']))
     launched=[]
     for row in eligible[:free]:
         job=command(['sbatch','--parsable','scripts/train_tao_hyper_scan.slurm',str(row['index'])]).split(';')[0]
-        state['attempts'].setdefault(str(row['index']),[]).append(dict(job_id=job,submitted_utc=datetime.now(timezone.utc).isoformat()))
+        state['attempts'].setdefault(str(row['index']),[]).append(dict(job_id=job,recovery_of=row.get('_recovery'),submitted_utc=datetime.now(timezone.utc).isoformat()))
         save_state(resolve('results/tao_hyper_scan_v1_scheduler.json'),state)
         launched.append(dict(index=row['index'],job_id=job))
         print('Submitted scan case',row['index'],'job',job,flush=True)

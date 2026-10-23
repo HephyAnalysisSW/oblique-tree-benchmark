@@ -33,3 +33,17 @@ class HyperScanSchedulerTests(unittest.TestCase):
                 launched,attention=monitor.schedule(dict(concurrency=4),state,rows,[])
             self.assertEqual([r['index'] for r in launched],[0])
             self.assertEqual([r['index'] for r in attention],[1])
+
+    def test_explicit_inspected_timeout_recovery_can_resume_once(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary);(root/'results').mkdir()
+            state=dict(attempts={'0':[dict(job_id='timed_out')]})
+            rows=[dict(index=0,converged=False),dict(index=1,converged=False)]
+            def read(path,default=None):
+                return dict(job_id='timed_out',approved=True,reason='Inspected checkpoint after timeout') if 'recovery' in path else {}
+            with patch.object(data_utils,'ROOT',root),patch.object(monitor,'read',read),patch.object(monitor,'command',return_value='new_job'):
+                launched,attention=monitor.schedule(dict(concurrency=1),state,rows,[])
+                self.assertEqual([r['index'] for r in launched],[0]);self.assertEqual(attention,[])
+                self.assertEqual(state['attempts']['0'][-1]['recovery_of']['job_id'],'timed_out')
+                launched,attention=monitor.schedule(dict(concurrency=1),state,[rows[0]],[])
+                self.assertEqual(launched,[]);self.assertEqual(len(attention),1)
