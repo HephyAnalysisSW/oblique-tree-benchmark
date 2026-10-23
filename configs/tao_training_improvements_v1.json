@@ -50,5 +50,8 @@
       "baseline": "configs/tao_hard_search_v1.json",
       "focus_layouts": "3:3"
     }
-  ]
+  ],
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "fixed_fpr": 0.01,
+  "secondary_metric": "signal_auc"
 }

@@ -23,8 +23,8 @@ def roc_figure(items, signal, path, title):
     for item in items:
         roc, metrics = item['roc'], item['metrics']
         bulk = item['timings'][-1]['median_microseconds_per_event']
-        label = (f"{item['label']} | AUC {metrics['signal_auc']:.5f}\n"
-                 f"eff@1% {metrics['signal_efficiency_at_fixed_fpr']:.2%} | {bulk:.3f} us/event")
+        label = (f"{item['label']} | eff@1% {metrics['signal_efficiency_at_fixed_fpr']:.2%}\n"
+                 f"AUC {metrics['signal_auc']:.5f} | {bulk:.3f} us/event")
         for ax in axes:
             line, = ax.plot(roc[signal+'_fpr'], roc[signal+'_tpr'],
                            color=item['color'], lw=1.7, label=label)

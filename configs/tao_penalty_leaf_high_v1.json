@@ -30,5 +30,6 @@
   "source_models": [
     "qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1"
   ],
-  "label": "L1 split=1e-05 leaf=0.0001"
+  "label": "L1 split=1e-05 leaf=0.0001",
+  "primary_metric": "signal_efficiency_at_fixed_fpr"
 }

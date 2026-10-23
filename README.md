@@ -686,3 +686,15 @@ assessment. Training and CPU inference times are retained in the figures and
 reports. The joint leaf KKT test certifies fixed-routing leaf optimization;
 unchanged hard routing indicates exhaustion of the configured proposals,
 not a proof of globally optimal hyperplanes.
+
+The primary benchmark and ranking metric is signal efficiency at **1% background
+acceptance**. AUC remains secondary. Reports rank terminal models by that
+working point and include `*_working_point.png` showing efficiency versus
+parameter count and measured CPU inference cost. This preference does not
+change cross-entropy training or the numerical stopping rule. Updated workers
+also retain `*_best_efficiency.pkl` with AUC as a tie-breaker, alongside the
+existing best-AUC archive. Workers already running use their loaded code until
+continuation; earlier unsaved checkpoints cannot be reconstructed from history
+metrics alone. Discrete scores (especially constant leaves) use the shared
+ROC interpolation convention; a deterministic threshold need not attain
+exactly 1% background acceptance.

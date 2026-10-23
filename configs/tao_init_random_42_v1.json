@@ -32,5 +32,6 @@
   "run_suffix": "init_random_42_v1",
   "publication_prefix": "initialization_study",
   "initialization": "random",
-  "label": "random seed 42"
+  "label": "random seed 42",
+  "primary_metric": "signal_efficiency_at_fixed_fpr"
 }

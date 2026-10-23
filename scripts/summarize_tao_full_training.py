@@ -110,21 +110,39 @@ def main():
     ax.set_xlabel('Batch size');ax.set_ylabel('CPU inference [microseconds/event]');ax.grid(alpha=.2);ax.legend(fontsize=7)
     ax.set_title('Converged models | one CPU thread | warmed probability APIs')
     fig.tight_layout();fig.savefig(root/(prefix+'_cpu.png'),dpi=180);plt.close(fig)
-    result=dict(scan=scan,split_audit=audit,models=[{k:v for k,v in item.items() if k not in ['model','roc','color','history']} for item in items],
+    ranking=sorted(items,key=lambda item:(item['metrics']['signal_efficiency_at_fixed_fpr'],item['metrics']['signal_auc']),reverse=True)
+    fig,axes=plt.subplots(1,2,figsize=(13,5))
+    for item in items:
+        eff=item['metrics']['signal_efficiency_at_fixed_fpr']
+        parameters=item['complexity']['parameter_count'];cpu=item['timings'][-1]['median_microseconds_per_event']
+        for ax,value in zip(axes,[parameters,cpu]):
+            ax.scatter(value,100*eff,color=item['color'],label=item['label'],s=35)
+            ax.axhline(100*items[0]['metrics']['signal_efficiency_at_fixed_fpr'],color='grey',ls=':',lw=.7)
+    axes[0].set_xlabel('Stored scalar parameters');axes[0].set_xscale('log')
+    axes[1].set_xlabel('CPU inference [microseconds/event, full batch]')
+    for ax in axes:ax.set_ylabel('Signal efficiency at 1% background [%]');ax.grid(alpha=.2)
+    handles,labels=axes[0].get_legend_handles_labels()
+    fig.legend(handles,labels,loc='lower center',ncol=2,fontsize=7)
+    fig.suptitle('Primary benchmark: signal efficiency at 1% background acceptance | validation')
+    fig.set_figheight(8 if len(items)>8 else 6.5)
+    fig.tight_layout(rect=(0,.35 if len(items)>8 else .25,1,.95))
+    fig.savefig(root/(prefix+'_working_point.png'),dpi=180);plt.close(fig)
+    result=dict(primary_metric='signal_efficiency_at_fixed_fpr',fixed_fpr=.01,secondary_metric='signal_auc',
+        ranked_models=[item['run_name'] for item in ranking],scan=scan,split_audit=audit,models=[{k:v for k,v in item.items() if k not in ['model','roc','color','history']} for item in items],
         completed_layouts=len(items)-1,scans=scans,all_training_converged=True,partition='validation',test_evaluated=False,
         host=platform.node(),cpu=next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),''),
         caveats=['Numerical coordinate convergence of hard TAO, not a proof of a global optimum.',
-            'Terminal converged models are compared. Best-validation checkpoints are retained separately.',
+            'Terminal converged models are compared. Best-efficiency and best-AUC checkpoints are separate archives when saved; ranking does not change the numerical stopping rule.',
             'One seed; CPU timings are current implementations, not FPGA latency.'])
     write_json(root/(prefix+'_summary.json'),result)
     lines=['# Fully trained TAO comparison','',
-        'All terminal checkpoints pass the recorded convergence criteria. Exact exported partitions match XGBoost; test data remain unused.','',
-        '| Model | Parameters | Nonzero weights | Split coefficients / thresholds | Leaf coefficients | AUC | Efficiency at 1% FPR | CPU us/event, batch 1 | CPU us/event, full batch | Total training min |',
+        'All terminal checkpoints pass the recorded convergence criteria. Exact exported partitions match XGBoost; test data remain unused. Models are ranked by signal efficiency at 1% background acceptance, with AUC as a secondary metric.','',
+        '| Model | Parameters | Nonzero weights | Split coefficients / thresholds | Leaf coefficients | Efficiency at 1% FPR | AUC | CPU us/event, batch 1 | CPU us/event, full batch | Total training min |',
         '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
-    for item in items:
+    for item in ranking:
         m=item['metrics'];c=item['complexity'];training='—' if item['training_seconds'] is None else f"{item['training_seconds']/60:.1f}"
         nonzeros='—' if item is items[0] else str(c['split_nonzeros']+c['leaf_nonzeros'])
-        lines.append(f"| {item['label']} | {c['parameter_count']} | {nonzeros} | {c['split_parameter_count']} | {c['leaf_parameter_count']} | {m['signal_auc']:.6f} | {m['signal_efficiency_at_fixed_fpr']:.6f} | {item['timings'][0]['median_microseconds_per_event']:.3f} | {item['timings'][-1]['median_microseconds_per_event']:.3f} | {training} |")
+        lines.append(f"| {item['label']} | {c['parameter_count']} | {nonzeros} | {c['split_parameter_count']} | {c['leaf_parameter_count']} | {m['signal_efficiency_at_fixed_fpr']:.6f} | {m['signal_auc']:.6f} | {item['timings'][0]['median_microseconds_per_event']:.3f} | {item['timings'][-1]['median_microseconds_per_event']:.3f} | {training} |")
     lines+=['', 'Parameter counts are stored scalar model coefficients, including biases and zeros. TAO splits include all 16 weights plus bias; each binary leaf has 17 coefficients (linear) or one (constant). XGBoost counts one threshold per split, one score per leaf and one global base score; integer feature IDs and topology are excluded. Shared input preprocessing is excluded. These are storage counts, not identifiable degrees of freedom. Nonzero weights count TAO feature weights in splits and leaves, excluding biases; they are reported separately to assess L1 sparsity.', '', '## Convergence and interpretation','']+['- '+s for s in result['caveats']]
     lines+=['- Stop after at least five additional full passes and three consecutive passes with relative training-objective gain <=1e-5, changed training routes <=1e-4, all local leaf/split fits converged, and leaf L1 KKT violation <=1e-6.',
         '- Inner leaf solver uses ftol=1e-12, gtol=1e-8. Iteration limits or scheduler time limits alone never mark a model converged.',

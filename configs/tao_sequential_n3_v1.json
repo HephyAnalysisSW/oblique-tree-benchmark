@@ -31,5 +31,6 @@
   "source_models": [
     "qg_vs_wzt_hardtao_linear_d3_n2_sa1e-05_la1e-05_seed42_sequential_n2_v1"
   ],
-  "label": "sequential 3 trees"
+  "label": "sequential 3 trees",
+  "primary_metric": "signal_efficiency_at_fixed_fpr"
 }

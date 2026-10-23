@@ -186,6 +186,15 @@ def main():
                         state['best_validation_auc']=metrics['signal_auc']
                         atomic_pickle('models/'+run+'_best_validation.pkl',dict(model=model,config=config,metadata=metadata,
                             validation=metrics,epoch=row['epoch'],training_converged_at_save=state['converged']))
+                    efficiency=metrics['signal_efficiency_at_fixed_fpr']
+                    if (efficiency,metrics['signal_auc'])>(state.get('best_validation_efficiency',-float('inf')),
+                                                          state.get('best_efficiency_auc',-float('inf'))):
+                        state['best_validation_efficiency']=efficiency
+                        state['best_efficiency_auc']=metrics['signal_auc']
+                        atomic_pickle('models/'+run+'_best_efficiency.pkl',dict(model=model,config=config,metadata=metadata,
+                            validation=metrics,epoch=row['epoch'],training_converged_at_save=state['converged'],
+                            selected_by='signal_efficiency_at_fixed_fpr',fixed_fpr=.01,
+                            secondary_metric='signal_auc'))
                     print(json.dumps(dict(run=run,epoch=row['epoch'],objective=after,auc=metrics['signal_auc'],
                         efficiency=metrics['signal_efficiency_at_fixed_fpr'],**check)),flush=True)
                     plots(run,state)
@@ -195,7 +204,9 @@ def main():
         history=state['history'],convergence=state['history'][-1]['convergence'],training_converged=True))
     atomic_json('results/'+run+'_validation.json',dict(run_name=run,validation=state['history'][-1]['validation'],
         training_converged=True,convergence=state['history'][-1]['convergence'],complexity=model.complexity(),
-        test_evaluated=False,best_validation_auc=state['best_validation_auc']))
+        test_evaluated=False,best_validation_auc=state['best_validation_auc'],
+        best_validation_efficiency=state.get('best_validation_efficiency'),
+        primary_metric='signal_efficiency_at_fixed_fpr'))
     atomic_json(f"results/{scan['scan_name']}_member_{a.index}.json",dict(index=a.index,run_name=run,complete=True,
         converged=True,training_seconds=state['training_seconds'],source_training_seconds=config['source_training_seconds']))
     return 0
