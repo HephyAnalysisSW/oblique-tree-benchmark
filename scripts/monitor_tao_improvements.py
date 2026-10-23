@@ -81,7 +81,7 @@ def advance():
         'Current phase: '+str(current),'', '| Study | Converged models | Measured |','|---|---:|---|']
     for row in progress:lines.append(f"| {row['name']} | {row['converged']}/{row['total']} | {row['measured']} |")
     if attention:lines+=['','Attention: '+json.dumps(attention)]
-    lines+=['','Studies run in order: split proposals, initialization, sequential growth to two then three trees, and L1 penalties.',
+    lines+=['',policy.get('strategy','Studies run in order: split proposals, initialization, sequential growth to two then three trees, and L1 penalties.'),
         'Each phase uses the same exported train/validation arrays and must converge and produce its comparison before the next starts. Test data remain unused.',
         '', 'Scheduler snapshot:', '', '```', queue, '```']
     (root/'training_improvements_status.md').write_text('\n'.join(lines)+'\n')

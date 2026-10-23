@@ -124,6 +124,7 @@ def main():
             training_seconds=initialization_seconds,local_leaf_max_iter=scan['local_leaf_max_iter'],split_max_iter=scan['split_max_iter'],
             initial_refits=[],best_validation_auc=-float('inf'),step_seconds_estimate=600.)
     model.split_alpha=scan['split_alpha'];model.leaf_alpha=scan['leaf_alpha']
+    model.split_solver=scan.get('split_solver','liblinear')
     model.split_search=scan.get('split_search','surrogate')
     model.leaf_ftol=scan['leaf_ftol'];model.leaf_gtol=scan['leaf_gtol'];model.indexed='dense'
     assert model.depth==layout['depth'] and model.ntrees==layout['trees']

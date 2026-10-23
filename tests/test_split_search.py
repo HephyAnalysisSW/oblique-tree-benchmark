@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from unittest.mock import patch
-from tao.hard import HardTAOClassifier
+from tao.hard import HardTAOClassifier,fit_l1_split
 from tao.split_search import best_threshold
 
 
@@ -49,3 +49,16 @@ class HardThresholdTests(unittest.TestCase):
                 m=HardTAOClassifier(depth=2,trees=2,leaf_mode=mode,leaf_max_iter=200,split_max_iter=300).initialize(3,classes)
                 m.split_search='hard_threshold';m.global_refit(x,y);before=m.objective(x,y)
                 m.fit_epoch(x,y);self.assertLessEqual(m.objective(x,y),before+1e-10)
+
+    def test_zero_l1_is_supported_without_a_hidden_positive_penalty(self):
+        rng=np.random.default_rng(32);x=rng.normal(size=(200,3));y=(x[:,0]+rng.normal(size=200)>0).astype(int)
+        w,b,stats=fit_l1_split(x,y,np.ones(200),200,0.,np.zeros(3),0.,max_iter=300)
+        self.assertEqual(stats['solver'],'lbfgsb');self.assertTrue(np.isfinite(w).all())
+        self.assertLess(stats['surrogate_objective'],np.log(2))
+        for mode in ['linear','constant']:
+            model=HardTAOClassifier(depth=2,trees=2,leaf_mode=mode,split_alpha=0,leaf_alpha=0,
+                leaf_max_iter=300,split_max_iter=300).initialize(3,2)
+            model.split_search='hard_threshold';before=model.objective(x,y)
+            model.fit_epoch(x,y)
+            self.assertEqual(model._penalty(),0.)
+            self.assertLessEqual(model.objective(x,y),before)

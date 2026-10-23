@@ -124,6 +124,8 @@ def fit_l1_split(x, targets, effective_weights, normalizer, alpha, initial_w,
                  initial_b, seed=42, max_iter=100, solver='liblinear'):
     """Two optimizers for the same weighted binary logistic + L1 split surrogate."""
     started = time.perf_counter()
+    if alpha==0 and solver=='liblinear':
+        solver='lbfgsb'  # LIBLINEAR does not support an unpenalized objective.
     if solver == 'liblinear':
         classifier = LogisticRegression(penalty='l1', solver='liblinear',
             C=1 / (alpha * normalizer), max_iter=max_iter, random_state=seed)
@@ -245,8 +247,8 @@ class HardTAOClassifier:
                  split_max_iter=100, indexed=False, split_solver='liblinear'):
         if depth < 0 or trees < 1 or leaf_mode not in ('linear', 'constant'):
             raise ValueError('Invalid forest architecture')
-        if split_alpha <= 0 or leaf_alpha < 0:
-            raise ValueError('Require split_alpha > 0 and leaf_alpha >= 0')
+        if split_alpha < 0 or leaf_alpha < 0:
+            raise ValueError('Require nonnegative split and leaf penalties')
         self.depth, self.ntrees, self.leaf_mode, self.seed = depth, trees, leaf_mode, seed
         self.split_alpha, self.leaf_alpha = split_alpha, leaf_alpha
         self.leaf_max_iter, self.split_max_iter = leaf_max_iter, split_max_iter

@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--include-linear',action='store_true')
     parser.add_argument('--extra-config',action='append',default=[])
     parser.add_argument('--output-prefix')
+    parser.add_argument('--top-n',type=int,help='Plot/time the best N converged TAO models by the primary metric')
     parser.add_argument('--focus-layouts',help='Comma-separated trees:depth pairs')
     args=parser.parse_args()
     scan=json.loads(resolve(args.config).read_text())
@@ -67,6 +68,8 @@ def main():
         item['metrics'],item['roc']=compute_metrics(y,item['model'].predict_proba(x),metadata['class_names'])
         item['timings']=[]
         item['model_sha256']=hashlib.sha256(resolve(item['config']['model']['output_model_path']).read_bytes()).hexdigest()
+    if args.top_n:
+        items=[items[0]]+sorted(items[1:],key=lambda item:(item['metrics']['signal_efficiency_at_fixed_fpr'],item['metrics']['signal_auc']),reverse=True)[:args.top_n]
     for j,size in enumerate([1,1024,len(x)]):
         for item in (items if j%2==0 else items[::-1]):
             row=benchmark(item['model'].predict_proba,x[:size]);item['timings'].append(row)
@@ -78,7 +81,7 @@ def main():
     roc_figure(items,signal,root/(prefix+'_roc.png'),title)
     for item in items[1:]:
         c=item['complexity'];folder=resolve(f"plots/tao_{c['trees']}tree_depth{c['maximum_depth']}_{c['leaf_mode']}")
-        roc_figure([items[0],item],signal,folder/('qg_vs_wzt_'+prefix+'_roc.png'),title)
+        roc_figure([items[0],item],signal,folder/((item['run_name']+'_' if args.extra_config else 'qg_vs_wzt_')+prefix+'_roc.png'),title)
     fig,axes=plt.subplots(1,2,figsize=(12,5))
     for item in items:
         timing=item['timings'][-1];latency=timing['median_microseconds_per_event']

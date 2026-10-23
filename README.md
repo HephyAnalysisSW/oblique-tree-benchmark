@@ -698,3 +698,41 @@ continuation; earlier unsaved checkpoints cannot be reconstructed from history
 metrics alone. Discrete scores (especially constant leaves) use the shared
 ROC interpolation convention; a deterministic threshold need not attain
 exactly 1% background acceptance.
+
+### Performance-first hyperparameter scan
+
+`configs/tao_hyper_scan_v1.json` defines a controlled 54-case factorial scan:
+1/3/5 trees, depths 2/3/4, linear/constant leaves, and split/leaf L1 penalties
+0, 1e-7 or 1e-5 in the mean-cross-entropy convention. Four additional linear
+three-tree cases at depths 3/4 turn off the split or leaf penalty separately.
+Every case uses CART initialization at seed 42, exactly the same exported
+train/validation arrays, and the same full-training convergence checks.
+All 58 cases train to those checks; none is labelled converged by an epoch cap.
+
+This replaces the previously queued initialization/growth/compression sequence
+as the next priority. The old queue policy is retained as
+`configs/tao_training_improvements_before_hyper_scan.json`; existing split-search
+jobs continue independently. The immediate target is XGBoost's signal efficiency
+at 1% background acceptance. Compression and stronger sparsity tuning follow a
+competitive performance baseline. The general oblique-forest class contains
+axis-aligned forests of the same structure; a tiny oblique forest is not
+guaranteed to represent a much larger boosted forest.
+
+Run `python scripts/monitor_tao_hyper_scan.py` on CLIP. Its rolling scheduler
+keeps at most four scan jobs pending/running, including continuation attempts.
+Each worker uses one CPU and 8 GB memory, checkpoints between optimizer stages,
+and records its exit status. Only a clean continuation exit (75) is restarted
+automatically. Failed or time-limited stages are flagged for inspection.
+Unstarted cases are prioritized before subsequent attempts to provide broad
+coverage, with larger models prioritized within that group; all cases remain subject to full convergence. The global leaf solver
+uses 250-iteration chunks to keep checkpoints frequent.
+
+Progress, a ranked table and architecture/regularization heatmaps are published
+as `plots/comparisons/hyper_scan_v1_*`. Unfinished cases are explicitly
+provisional; heatmaps show measured training compute time. The terminal scan
+report records whether any converged model reaches the XGBoost validation
+working point. After all cases converge, the best eight (ranked by efficiency,
+AUC tie-breaker) receive common CPU timings and ROC plots as `hyper_scan_top_*`.
+Zero-L1 split proposals use unpenalized L-BFGS because LIBLINEAR does not support
+that objective. Constant leaves contain no penalized feature weights, so their
+leaf L1 coefficient has no effect.

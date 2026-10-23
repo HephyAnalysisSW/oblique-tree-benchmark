@@ -1,0 +1,33 @@
+{
+  "scan_name": "tao_hyper_scan_v1_c57",
+  "source_scan": null,
+  "task": "qg_vs_wzt",
+  "seed": 42,
+  "split_alpha": 0.0,
+  "leaf_alpha": 1e-05,
+  "leaf_mode": "linear",
+  "local_leaf_max_iter": 300,
+  "global_leaf_chunk_iter": 250,
+  "split_max_iter": 300,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "convergence": {
+    "loss_rtol": 1e-05,
+    "kkt_tol": 1e-06,
+    "route_tol": 0.0001,
+    "patience": 3
+  },
+  "minimum_continuation_epochs": 5,
+  "layouts": [
+    {
+      "trees": 3,
+      "depth": 4
+    }
+  ],
+  "split_search": "hard_threshold",
+  "run_suffix": "hyper_scan_v1_c57",
+  "publication_prefix": "hyper_scan_v1",
+  "initialization": "cart",
+  "label": "CART sa=0 la=1e-05",
+  "primary_metric": "signal_efficiency_at_fixed_fpr"
+}
