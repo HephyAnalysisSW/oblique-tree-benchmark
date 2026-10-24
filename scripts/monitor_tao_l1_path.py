@@ -113,6 +113,8 @@ def publish(plan,rows,jobs,launched,attention):
         for ax in axes:ax.grid(alpha=.2)
         axes[0].legend(fontsize=7);fig.suptitle('L1 compression paths | validation | labels: additional training time; * converged')
         fig.tight_layout();fig.savefig(root/'l1_path_v1_tradeoffs.png',dpi=180);plt.close(fig)
+    from scripts.compression_frontier import publish as publish_frontier
+    publish_frontier()
     syncer.sync();print(json.dumps(dict(updated_utc=result['updated_utc'],complete=result['completed'],total=len(rows),launched=launched,attention=attention)),flush=True)
     return result['completed']==len(rows)
 

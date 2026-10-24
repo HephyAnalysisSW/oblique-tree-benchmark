@@ -63,7 +63,7 @@ Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/
 
 The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
 leaf-route agreement and maximum margin difference below **1.1e-14**. The
-Python suite passes 37 tests, including frozen-model warm starts and path scheduling. These are floating-point references: fixed-point
+Python suite passes 39 tests, including frozen-model warm starts, path scheduling and compression-frontier selection. These are floating-point references: fixed-point
 formats, the target FPGA and synthesis remain implementation choices.
 
 When a better **saved checkpoint** is verified at the primary working point,
@@ -76,6 +76,10 @@ The next active study is the [L1 compression path](#l1-compression-path-from-the
 It starts from this exact v2 snapshot (877 nonzero coefficients in 1,581 slots),
 then increases split/leaf penalties separately and together. The immutable FPGA
 handoff is unaffected. [Live compression report](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/l1_path_v1_report.md).
+The [efficiency–sparsity frontier](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/compression_frontier.png)
+and its [table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/compression_frontier_report.md)
+combine the architecture scan, frozen models and L1 paths to identify the
+smallest saved models that retain the reference efficiency.
 
 The methodological rule is:
 
@@ -884,3 +888,19 @@ same-penalty control are both retained so optimization changes are not mistaken
 for the effect of stronger regularization. Nonzero counts need not be monotonic
 along a nonconvex tree-training path; measure each point before choosing a
 compressed successor for a new handoff version.
+
+The controller also runs `scripts/compression_frontier.py`, combining the
+best-efficiency checkpoints from the architecture scan and L1 study with the
+frozen v2 candidates. Each point's validation efficiency and exact nonzero
+count come from the same saved coefficients. The frontier minimizes nonzero
+coefficients while maximizing signal efficiency at 1% background; its table
+also reports dense slots and sparse path MAC bounds. Descriptive loss bands
+of 0, 0.25, 0.5 and 1 percentage point relative to XGBoost and the frozen winner
+show nearby alternatives without selecting an acceptable degradation budget.
+Unfinished source runs are marked provisional. Frontier and band-winning
+pickle checkpoints are retained by SHA-256 under
+`models/compression_frontier/`, so subsequent training cannot overwrite the
+reported choices. Those model files remain outside Git, like other training
+artifacts. This comparison uses validation data only and does not change the
+implementation handoff. The aim is to find the efficiency–sparsity tradeoff
+before choosing an inference implementation that exploits the zeros.
