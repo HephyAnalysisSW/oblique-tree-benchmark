@@ -80,6 +80,11 @@ The [efficiency–sparsity frontier](https://schoef.web.cern.ch/schoef/tree_benc
 and its [table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/compression_frontier_report.md)
 combine the architecture scan, frozen models and L1 paths to identify the
 smallest saved models that retain the reference efficiency.
+For a focused comparison of the continuing three-tree control and frozen
+compact one-tree model, see the [ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/compression_pair_roc.png)
+and [table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/compression_pair_report.md).
+Regenerate them with `python scripts/publish_compression_pair.py`; the report
+records the exact checkpoint hashes used and includes XGBoost as a reference.
 
 The methodological rule is:
 
