@@ -871,6 +871,10 @@ AUC is secondary, and test data remain untouched. Reports distinguish:
   decisions permit input-independent branch elimination);
 - sparse selected-path multiplication/comparison bounds and training time.
 
+If all weights of a split are zero, preserve its constant routing decision
+before quantizing the bias: a tiny positive bias must not silently round to zero
+and switch its child. Such nodes can instead be collapsed algebraically.
+
 These are not synthesized FPGA resources or guaranteed latency improvements.
 Sparsity must be exploited by the inference/export implementation to realize
 savings. Counts do not silently treat small coefficients as zero. The latest
