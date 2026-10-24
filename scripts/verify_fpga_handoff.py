@@ -8,8 +8,12 @@ from pathlib import Path
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--bundle',default='fpga_handoff/v1');parser.add_argument('--compiler',default=os.environ.get('CXX','c++'))
-    args=parser.parse_args();bundle=Path(args.bundle).resolve();manifest=json.loads((bundle/'manifest.json').read_text())
+    parser.add_argument('--bundle',help='Default: bundle pinned by CURRENT_MODEL.json');parser.add_argument('--compiler',default=os.environ.get('CXX','c++'))
+    args=parser.parse_args()
+    repository=Path(__file__).resolve().parents[1]
+    selected=json.loads((repository/'fpga_handoff/CURRENT_MODEL.json').read_text())
+    bundle=Path(args.bundle).resolve() if args.bundle else (repository/selected['manifest']).parent
+    manifest=json.loads((bundle/'manifest.json').read_text())
     for relative,expected in manifest['files'].items():
         assert hashlib.sha256((bundle/relative).read_bytes()).hexdigest()==expected,'Checksum mismatch: '+relative
     compiler=shutil.which(args.compiler)

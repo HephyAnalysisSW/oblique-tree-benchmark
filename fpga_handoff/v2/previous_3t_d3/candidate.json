@@ -1,0 +1,170 @@
+{
+  "id": "previous_3t_d3",
+  "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1",
+  "training_policy": {
+    "scan_name": "tao_hard_search_v1",
+    "source_scan": "tao_full_training_v1",
+    "task": "qg_vs_wzt",
+    "seed": 42,
+    "split_alpha": 1e-05,
+    "leaf_alpha": 1e-05,
+    "leaf_mode": "linear",
+    "local_leaf_max_iter": 1000,
+    "global_leaf_chunk_iter": 1000,
+    "split_max_iter": 1000,
+    "leaf_ftol": 1e-12,
+    "leaf_gtol": 1e-08,
+    "convergence": {
+      "loss_rtol": 1e-05,
+      "kkt_tol": 1e-06,
+      "route_tol": 0.0001,
+      "patience": 3
+    },
+    "minimum_continuation_epochs": 5,
+    "layouts": [
+      {
+        "trees": 1,
+        "depth": 2
+      },
+      {
+        "trees": 1,
+        "depth": 3
+      },
+      {
+        "trees": 1,
+        "depth": 4
+      },
+      {
+        "trees": 1,
+        "depth": 5
+      },
+      {
+        "trees": 2,
+        "depth": 3
+      },
+      {
+        "trees": 3,
+        "depth": 2
+      },
+      {
+        "trees": 3,
+        "depth": 3
+      }
+    ],
+    "split_search": "hard_threshold",
+    "run_suffix": "hard_search_v1",
+    "publication_prefix": "hard_search"
+  },
+  "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1_best_efficiency.pkl",
+  "checkpoint_sha256": "739993d7a1a9d34a9291fbf3c5f67b31bcf1b0d536664695e5249753d0c59581",
+  "selected_epoch": 6,
+  "training_run_converged": true,
+  "selected_checkpoint_converged": false,
+  "metrics": {
+    "accuracy": 0.8537123493975903,
+    "macro_auc": 0.9273958291692666,
+    "per_class_auc": {
+      "quark/gluon": 0.927395828516998,
+      "W/Z/top": 0.927395829821535
+    },
+    "macro_average_precision": 0.9164733326143182,
+    "per_class_average_precision": {
+      "quark/gluon": 0.8766879007287518,
+      "W/Z/top": 0.9562587644998846
+    },
+    "cross_entropy": 0.32884772812096114,
+    "multiclass_brier_score": 0.20807881653308868,
+    "expected_calibration_error": 0.00225853534348039,
+    "confidence_coverage": {
+      "0.5": {
+        "coverage": 1.0,
+        "accuracy": 0.8537123493975903
+      },
+      "0.7": {
+        "coverage": 0.8129066265060241,
+        "accuracy": 0.9094336476647461
+      },
+      "0.8": {
+        "coverage": 0.668637048192771,
+        "accuracy": 0.9428458809617659
+      },
+      "0.9": {
+        "coverage": 0.5000903614457831,
+        "accuracy": 0.9735891104017347
+      },
+      "0.95": {
+        "coverage": 0.3962876506024096,
+        "accuracy": 0.9849506907100918
+      }
+    },
+    "confusion_matrix": [
+      [
+        45766,
+        6745
+      ],
+      [
+        12682,
+        67607
+      ]
+    ],
+    "fixed_fpr": 0.01,
+    "fixed_fpr_points": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "signal_efficiency_at_fixed_fpr": 0.5428140841211124,
+    "per_class_efficiency_at_fixed_fpr": {
+      "quark/gluon": 0.2659633219706347,
+      "W/Z/top": 0.5428140841211124
+    },
+    "per_class_efficiency_points": {
+      "quark/gluon": {
+        "0.001": 0.06695739940203005,
+        "0.01": 0.2659633219706347,
+        "0.1": 0.7451391137095085
+      },
+      "W/Z/top": {
+        "0.001": 0.2499221562106889,
+        "0.01": 0.5428140841211124,
+        "0.1": 0.8209468295781489
+      }
+    },
+    "signal_auc": 0.927395829821535
+  },
+  "deterministic_working_point": {
+    "signal_margin_threshold": 3.067880584946817,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5428140841211124
+  },
+  "arithmetic": {
+    "stored_scalar_parameters": 765,
+    "selected_path_multiplications": 192,
+    "selected_path_additions": 194,
+    "selected_path_comparisons": 9,
+    "all_node_multiplications": 720,
+    "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+  },
+  "complexity": {
+    "trees": 3,
+    "maximum_depth": 3,
+    "leaf_mode": "linear",
+    "classes": 2,
+    "logits_per_leaf": 1,
+    "internal_nodes": 21,
+    "leaves": 24,
+    "split_nonzeros": 309,
+    "leaf_nonzeros": 304,
+    "split_biases": 21,
+    "leaf_biases": 24,
+    "hard_routing": true,
+    "quantized": false
+  },
+  "golden_vector_count": 228,
+  "raw_fold_max_margin_difference": 1.63202784619898e-14,
+  "native_max_margin_difference": 0.0
+}

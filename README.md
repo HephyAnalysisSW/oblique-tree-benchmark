@@ -5,58 +5,72 @@ jet-classification splits from the low-precision FPGA benchmark. GOLLUM hard and
 soft tree sources are archived under `vendor/gollum/`; the hard TAO adapter is
 under `src/tao/`. Neural-network training and FPGA synthesis are not yet included.
 
-## Current winning strategy and FPGA handoff
+## Current winning strategy and finalized FPGA handoff — v2
 
-**Use the three-tree, depth-3 hard oblique forest with linear leaves as the
-current implementation baseline.** Its saved best-efficiency checkpoint reaches
-**54.28% signal efficiency at 1% background acceptance**, validation AUC
-**0.92740**, with **765 scalar parameters**. XGBoost's 100 depth-4 trees reach
-55.48% at the same working point with 3,099 scalar parameters.
+**Use the three-tree, depth-4 hard oblique forest with linear leaves as the
+current implementation baseline.** Its frozen saved checkpoint reaches
+**55.78% signal efficiency at 1% background acceptance**, validation AUC
+**0.92758**, with **1,581 scalar parameters**. XGBoost's 100 depth-4 trees reach
+55.48% with 3,099 parameters: the TAO snapshot matches/exceeds the reference
+working point on validation with approximately 49% fewer scalar parameters.
+This is a validation comparison, not a claim of statistically significant
+outperformance or a held-out test result.
 
-The authoritative selection and artifact paths are in
+The compact alternative is **one depth-4 tree with linear leaves**: **55.22%**
+efficiency, AUC **0.92683**, and **527 parameters**. It is only 0.26 percentage
+points below XGBoost at the working point, with approximately 83% fewer parameters.
+The v2 bundle also includes a five-tree depth-4 constant-leaf model (55.11%),
+a split-unpenalized three-tree alternative (55.57%), and the previous v1 winner.
+
+The authoritative selection and hashes are in
 [`fpga_handoff/CURRENT_MODEL.json`](fpga_handoff/CURRENT_MODEL.json).
-The frozen implementation contract and reproducibility instructions are in
-[`fpga_handoff/README.md`](fpga_handoff/README.md), with portable models and
-vectors under [`fpga_handoff/v1/`](fpga_handoff/v1/).
+Read [`fpga_handoff/README.md`](fpga_handoff/README.md) for the implementation
+contract. Current coefficients, vectors and comparison data are under
+[`fpga_handoff/v2/`](fpga_handoff/v2/); **v1 remains unchanged** for existing work.
 
 | Setting | Current winning strategy |
 |---|---|
 | Task | `qg_vs_wzt`: quark/gluon background vs W/Z/top signal |
-| Architecture | 3 hard binary oblique trees, depth 3, affine linear leaf logits |
-| Initialization | Warm-started from the earlier random-seed-42 TAO model |
+| Architecture | 3 hard binary oblique trees, depth 4, affine linear leaf logits |
+| Initialization | CART seed 42; bootstrap samples of the unchanged training partition for initial forest diversity |
 | Forest output | Sum of tree logits; joint cross-entropy leaf refit |
 | Split search | Weighted logistic proposal plus exact hard-loss threshold scans along current/proposed directions and 25/50/75% blends; accept only objective improvements |
 | Regularization | Split L1 = leaf-feature L1 = `1e-5` in the **mean** cross-entropy convention; split bias penalized, leaf bias unpenalized |
 | Selection metric | Validation signal efficiency at **1% background acceptance**; AUC secondary |
-| Selected checkpoint | `qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1_best_efficiency.pkl`, continuation pass 6 |
-| Training completion | Run converged after 19 continuation passes; terminal efficiency 53.95%. The selected earlier checkpoint gives 54.28% |
-| Data | Immutable standardized arrays; seed-42 split: 531,200 train / 132,800 validation / 166,000 held-out test |
+| Selected checkpoint | `qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_hyper_scan_v1_c32_best_efficiency.pkl`, pass 3 |
+| Training status | Still running at freeze; selected snapshot is immutable, but neither snapshot nor run is labelled numerically converged |
+| Data | Fixed standardized arrays; seed-42 split: 531,200 train / 132,800 validation / 166,000 held-out test |
 | FPGA score | Increasing signal margin = **negative sum of selected leaf outputs**; no sigmoid is needed for threshold decisions |
 
-CART initialization belongs to the **ongoing 58-case scan**; the current winner
-uses the warm-start lineage described above. That scan explores tree count,
-depth, leaf type and L1 strength to reach XGBoost's working-point performance
-before compression. No held-out test selection or evaluation has been done.
+**Finalization scope:** the floating-point FPGA handoff is finalized, not the
+entire research scan. At the status check on 2026-10-24, 11/58 scan cases were
+converged and the rolling scan remained active. No jobs were stopped and no
+held-out test selection/evaluation was performed. Coefficients in v2 will not
+change when those runs progress. A later winner requires a new bundle version.
 
-Frozen handoff comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/fpga_handoff_v1_comparison.png),
-[ROC comparison](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/fpga_handoff_v1_roc.png),
-and [versioned comparison data](fpga_handoff/v1/comparison.md).
-The package includes five oblique snapshots, the native XGBoost JSON model,
-standardized/raw-folded coefficients, C++ headers and golden vectors. Its ten
-compiled C++ variants passed 2,142 vector checks with exact leaf-route agreement
-and maximum signal-margin error below 1.8e-14. These are floating references;
-fixed-point precision and FPGA synthesis remain the implementation stage.
+The results do not support blaming the current L1 penalty for the original gap:
+the current `1e-5` split/leaf penalties already reach parity, and turning off
+split L1 also reaches it. These runs are not yet converged, so this is not a
+settled ranking of regularization strengths. CART initialization is promising:
+the compact single-tree result substantially improves the earlier warm-start
+strategy at the same architecture. The ongoing controlled scan will refine
+these conclusions; stronger compression is a subsequent study.
 
-Live comparisons: [winner ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/tao_3tree_depth3_linear/winner_roc.png),
-[winner metrics](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_report.md),
-and [ongoing scan](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/hyper_scan_v1_report.md).
+Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_comparison.png),
+[ROC comparison](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/fpga_handoff_v2_roc.png),
+[versioned data](fpga_handoff/v2/comparison.md), and
+[live scan](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/hyper_scan_v1_report.md).
 
-When running jobs produce a better **saved checkpoint** at the primary working
-point, verify its metrics, record its convergence/selection status, freeze a new
-handoff version and update this section plus `CURRENT_MODEL.json`. Keep old
-versioned coefficients and vectors intact so firmware results remain traceable.
-A transient log value without a saved, verified checkpoint is not sufficient to
-replace the implementation baseline.
+The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
+leaf-route agreement and maximum margin difference below **1.1e-14**. The
+Python suite passes 34 tests. These are floating-point references: fixed-point
+formats, the target FPGA and synthesis remain implementation choices.
+
+When a better **saved checkpoint** is verified at the primary working point,
+freeze a new version and update this section plus `CURRENT_MODEL.json`.
+Selection history is kept under `fpga_handoff/selections/`. Preserve previous
+coefficients and vectors so firmware results remain traceable. A transient log
+value alone is not sufficient to replace the implementation baseline.
 
 The methodological rule is:
 
@@ -710,7 +724,9 @@ studies and checkpoints. The new mode adds no inference parameters.
 using this update. Comparisons are published as `hard_search_*` and
 `hard_search_vs_baseline_*`. Warm starts and additional training time are recorded.
 
-`configs/tao_training_improvements_v1.json` defines the follow-up sequence:
+The initial controller policy, archived in
+`configs/tao_training_improvements_before_hyper_scan.json`, defined this
+follow-up sequence (subsequently superseded by the wider factorial scan):
 
 1. Finish and measure the split-search comparison.
 2. At one and three depth-3 trees, compare random seeds 42/43/44 with CART
@@ -801,10 +817,10 @@ unchanged. An inspected failed case can be explicitly approved for one recovery
 via `results/hyper_scan_v1/case_XX_recovery.json`, bound to the failed job ID;
 uninspected failures remain held. Recovery takes the next available scan slot.
 
-`sbatch scripts/publish_current_winner.slurm` publishes the selected checkpoint,
-its terminal model and XGBoost together at
-`plots/tao_3tree_depth3_linear/winner_roc.png` and
-`plots/comparisons/current_winner_report.md`. The report records the selected
-epoch, checkpoint SHA-256, parameter count and measured CPU timings, and
-explicitly distinguishes a converged training run from the earlier checkpoint
-selected by validation efficiency. The held-out test set remains unused.
+`sbatch scripts/publish_current_winner.slurm` now republishes the pinned frozen
+handoff via `CURRENT_MODEL.json`, rather than silently selecting a newer live
+checkpoint. Current aliases include `plots/comparisons/current_winner_report.md`
+and `current_winner_roc.png`, plus `winner_roc.png` in the selected layout's flat
+folder. An explicit `--run` retains the older live-run diagnostic for completed
+training runs. `scripts/verify_fpga_handoff.py` defaults to the current pinned
+bundle; use `--bundle` to check an older version explicitly.

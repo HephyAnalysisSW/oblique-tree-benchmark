@@ -1,20 +1,23 @@
 # FPGA implementation handoff
 
-The frozen `v1/` bundle is a floating-point specification of the current
-oblique candidates and the XGBoost reference. Start with `winner_3t_d3` and
-compare `compact_3t_d2` and `compact_single_1t_d4` for different layouts.
+The current frozen **`v2/`** bundle is a floating-point specification of the
+selected oblique candidates and XGBoost reference. Start with `winner_3t_d4`
+(55.78% efficiency at 1% background, 1,581 parameters). Compare `compact_1t_d4`
+(55.22%, 527 parameters) and `constant_5t_d4` (55.11%, 1,355 parameters).
+`CURRENT_MODEL.json` is authoritative; `v1/` remains available unchanged.
 The manifest identifies the exact checkpoints and selection epochs. This
 handoff can be implemented while the wider training scan continues; do not
 silently replace a versioned model with a newer training checkpoint.
 
 ## Frozen comparison
 
-See [comparison.md](v1/comparison.md) and [manifest.json](v1/manifest.json).
+See [comparison.md](v2/comparison.md) and [manifest.json](v2/manifest.json).
 The primary metric is signal efficiency at 1% background acceptance on the
 fixed validation partition. The held-out test set has not been evaluated.
 Snapshots were selected by validation efficiency, which may peak before the
-terminal training iterate. The three depth-2 tree training run was still
-ongoing when its saved checkpoint was frozen.
+terminal training iterate. The primary v2 checkpoint was saved at pass 3 while its run was still training.
+The handoff is finalized as an immutable snapshot; the full scan and numerical
+convergence of these runs are not claimed complete. Test data remain held out.
 
 Counts include scalar model coefficients and biases, including zeros. They
 exclude common input preprocessing and topology. CPU measurements compare
@@ -35,11 +38,11 @@ NumPy TAO and compiled XGBoost APIs; they are not FPGA latency measurements.
 - `xgboost_reference/model.json` is the native XGBoost model, with matching
   standardized golden inputs and expected signal probabilities.
 - `reference.cpp` is a standalone floating-point inference reference.
-  C++ verification results are recorded in `v1/cpp_verification.json`.
+  C++ verification results are recorded in `v2/cpp_verification.json`.
 
 ## Exact inference contract
 
-This v1 interface is **binary classification**: class 0 is quark/gluon
+The interchange-v1 interface is **binary classification**: class 0 is quark/gluon
 background; class 1 is W/Z/top signal. Training code also supports multiclass,
 but this firmware interface must not be used for multiclass without extending
 its score representation.
@@ -105,10 +108,12 @@ Choose feature, coefficient and accumulator formats and overflow policy before
 claiming bit-exact firmware behavior. There is no hidden saturation or clipping
 in the floating reference.
 
-For the 3-tree depth-3 linear winner, there are 21 internal nodes and 24 leaves:
-357 split coefficients plus 408 leaf coefficients = **765 scalars**. A selected
-path uses 192 dense scalar multiplications, 194 additions and 9 comparisons
-across the forest. Evaluating every node and leaf uses 720 multiplications.
+For the v2 three-tree depth-4 linear winner, there are 45 internal nodes and
+48 leaves: 765 split coefficients plus 816 leaf coefficients = **1,581 scalars**.
+A selected path uses 240 dense scalar multiplications, 242 additions and 12
+comparisons across the forest. Evaluating every node and leaf uses 1,488
+multiplications. The compact single-tree alternative uses 80 selected-path
+multiplications and 4 comparisons.
 These counts do not specify DSP usage, multiplier sharing, pipeline placement,
 clock frequency, initiation interval, routing delay or synthesized latency.
 
@@ -119,12 +124,12 @@ reference checks. CLIP's default GCC 4.8 is too old; use a newer compiler or run
 this check on another machine.
 
 ```bash
-python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v1 --compiler c++
+python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v2 --compiler c++
 
 c++ -std=c++17 -O2 -ffp-contract=off \
-  -I fpga_handoff/v1/winner_3t_d3/standardized \
+  -I fpga_handoff/v2/winner_3t_d4/standardized \
   fpga_handoff/reference.cpp -o /tmp/tao_reference
-/tmp/tao_reference < fpga_handoff/v1/winner_3t_d3/standardized/vectors.tsv
+/tmp/tao_reference < fpga_handoff/v2/winner_3t_d4/standardized/vectors.tsv
 ```
 
 Each output line contains `signal_margin leaf_index_tree0 leaf_index_tree1 ...`.
@@ -137,12 +142,11 @@ absolute / 1e-10 relative. Fixed-point bit-exact tests are a subsequent step.
 The export requires the CLIP training environment and saved checkpoint pickles:
 
 ```bash
-sbatch scripts/export_fpga_handoff.slurm
-# Or select a new immutable version; existing manifest versions cannot be overwritten.
-python scripts/export_fpga_handoff.py --output fpga_handoff/v2
+# The original v2 freeze used scripts/export_fpga_handoff_v2.slurm.
+# To take a later snapshot, select a NEW version; existing versions cannot be overwritten.
+python scripts/export_fpga_handoff.py --selection configs/fpga_handoff_v2.json --output fpga_handoff/v3
 ```
 
-The exporter never trains or changes checkpoints. Candidate selection is defined
-in `scripts/export_fpga_handoff.py`; checkpoint bytes are read once, hashed and
+The exporter never trains or changes checkpoints. The v2 run selection is in `configs/fpga_handoff_v2.json`; checkpoint bytes are read once, hashed and
 converted to portable coefficients. The JSON/headers and golden vectors are
 sufficient for implementation; the Python pickles are not required by firmware.

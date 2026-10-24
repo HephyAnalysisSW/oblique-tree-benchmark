@@ -14,8 +14,12 @@ import common.syncer as syncer
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--run',default='qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1')
-    args=parser.parse_args();cfg=load_config('configs/'+args.run+'.yaml')
+    parser.add_argument('--run',help='Explicit live-run diagnostic; default publishes the frozen CURRENT_MODEL selection')
+    args=parser.parse_args()
+    if args.run is None:
+        from scripts.publish_handoff_aliases import main as publish_frozen
+        publish_frozen();return
+    cfg=load_config('configs/'+args.run+'.yaml')
     ref=load_config('configs/bdt_qg_vs_wzt_seed42.yaml');meta=load_metadata(ref['data']['metadata_path'])
     with np.load(resolve(ref['data']['dataset_path'])) as data:x,y=data['X_val'].astype(float),data['y_val']
     best_path=resolve('models/'+args.run+'_best_efficiency.pkl')

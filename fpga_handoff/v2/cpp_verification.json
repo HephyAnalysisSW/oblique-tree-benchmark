@@ -1,0 +1,66 @@
+{
+  "compiler": "Apple clang version 17.0.0 (clang-1700.0.13.5)",
+  "all_passed": true,
+  "checks": [
+    {
+      "candidate": "winner_3t_d4",
+      "input_space": "standardized",
+      "vectors": 324,
+      "max_absolute_margin_error": 3.552713678800501e-15
+    },
+    {
+      "candidate": "winner_3t_d4",
+      "input_space": "raw",
+      "vectors": 324,
+      "max_absolute_margin_error": 6.661338147750939e-15
+    },
+    {
+      "candidate": "compact_1t_d4",
+      "input_space": "standardized",
+      "vectors": 204,
+      "max_absolute_margin_error": 8.881784197001252e-15
+    },
+    {
+      "candidate": "compact_1t_d4",
+      "input_space": "raw",
+      "vectors": 204,
+      "max_absolute_margin_error": 1.0658141036401503e-14
+    },
+    {
+      "candidate": "constant_5t_d4",
+      "input_space": "standardized",
+      "vectors": 439,
+      "max_absolute_margin_error": 0.0
+    },
+    {
+      "candidate": "constant_5t_d4",
+      "input_space": "raw",
+      "vectors": 439,
+      "max_absolute_margin_error": 0.0
+    },
+    {
+      "candidate": "alternative_3t_d4",
+      "input_space": "standardized",
+      "vectors": 324,
+      "max_absolute_margin_error": 3.9968028886505635e-15
+    },
+    {
+      "candidate": "alternative_3t_d4",
+      "input_space": "raw",
+      "vectors": 324,
+      "max_absolute_margin_error": 7.105427357601002e-15
+    },
+    {
+      "candidate": "previous_3t_d3",
+      "input_space": "standardized",
+      "vectors": 228,
+      "max_absolute_margin_error": 4.440892098500626e-15
+    },
+    {
+      "candidate": "previous_3t_d3",
+      "input_space": "raw",
+      "vectors": 228,
+      "max_absolute_margin_error": 1.0658141036401503e-14
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "tree-benchmark.current-model.v1",
+  "as_of": "2026-10-24",
+  "handoff_version": "v2",
+  "candidate_id": "winner_3t_d4",
+  "compact_candidate_id": "compact_1t_d4",
+  "constant_leaf_candidate_id": "constant_5t_d4",
+  "manifest": "fpga_handoff/v2/manifest.json",
+  "standardized_model": "fpga_handoff/v2/winner_3t_d4/standardized/model.json",
+  "raw_model": "fpga_handoff/v2/winner_3t_d4/raw/model.json",
+  "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_hyper_scan_v1_c32",
+  "checkpoint_suffix": "_best_efficiency.pkl",
+  "selected_continuation_epoch": 3,
+  "training_run_converged": false,
+  "selected_checkpoint_converged": false,
+  "architecture": {
+    "trees": 3,
+    "depth": 4,
+    "leaf_mode": "linear",
+    "stored_scalar_parameters": 1581
+  },
+  "training": {
+    "seed": 42,
+    "initialization": "CART; training-partition bootstrap per tree",
+    "split_search": "hard_threshold",
+    "split_alpha": 1e-05,
+    "leaf_alpha": 1e-05,
+    "loss": "mean_cross_entropy_plus_L1",
+    "forest_aggregation": "sum_logits",
+    "joint_leaf_refit": true
+  },
+  "validation": {
+    "primary_metric": "signal_efficiency_at_fixed_fpr",
+    "fixed_fpr": 0.01,
+    "signal_efficiency": 0.5577850016814259,
+    "signal_auc": 0.9275755281124691
+  },
+  "test_evaluated": false,
+  "checkpoint_sha256": "2d642f3b4480e098b09cfc1f401a64df0065e7b23a45d4ac366c2408d07acfb5",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "standardized_model_sha256": "57d74ea13b85db34f2d3a51850602b8cbddbd0e80e784f070fbdf1f483c479be",
+  "raw_model_sha256": "7f96d6940b83256a11e23638be42c2564238be6907a03e65350f5b5b81d6b5d0",
+  "deterministic_validation_working_point": {
+    "signal_margin_threshold": 3.0910583410670536,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5577850016814259
+  },
+  "handoff_manifest_created_utc": "2026-10-24T14:34:52.585015+00:00",
+  "update_policy": "Verified frozen v2 snapshot; training continues. Promote only a newly frozen and verified version; preserve v1/v2."
+}

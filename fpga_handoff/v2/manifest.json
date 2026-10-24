@@ -1,0 +1,946 @@
+{
+  "schema": "tree-benchmark.fpga-handoff.v1",
+  "created_utc": "2026-10-24T14:34:52.585015+00:00",
+  "source_git_commit": "793ea7c94275c888d3e6b96311f64a75b1cd22b2",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "partition": "validation",
+  "validation_events": 132800,
+  "test_evaluated": false,
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "fixed_fpr": 0.01,
+  "candidates": [
+    {
+      "id": "winner_3t_d4",
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_hyper_scan_v1_c32",
+      "training_policy": {
+        "scan_name": "tao_hyper_scan_v1_c32",
+        "source_scan": null,
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 1e-05,
+        "leaf_alpha": 1e-05,
+        "leaf_mode": "linear",
+        "local_leaf_max_iter": 300,
+        "global_leaf_chunk_iter": 250,
+        "split_max_iter": 300,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 3,
+            "depth": 4
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hyper_scan_v1_c32",
+        "publication_prefix": "hyper_scan_v1",
+        "initialization": "cart",
+        "label": "CART sa=1e-05 la=1e-05",
+        "primary_metric": "signal_efficiency_at_fixed_fpr"
+      },
+      "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_hyper_scan_v1_c32_best_efficiency.pkl",
+      "checkpoint_sha256": "2d642f3b4480e098b09cfc1f401a64df0065e7b23a45d4ac366c2408d07acfb5",
+      "selected_epoch": 3,
+      "training_run_converged": false,
+      "selected_checkpoint_converged": false,
+      "metrics": {
+        "accuracy": 0.8545105421686747,
+        "macro_auc": 0.9275755284089549,
+        "per_class_auc": {
+          "quark/gluon": 0.9275755287054407,
+          "W/Z/top": 0.9275755281124691
+        },
+        "macro_average_precision": 0.9165695466469526,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8767858329505247,
+          "W/Z/top": 0.9563532603433803
+        },
+        "cross_entropy": 0.32759943201906744,
+        "multiclass_brier_score": 0.20762905478477478,
+        "expected_calibration_error": 0.003584546439618929,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8545105421686747
+          },
+          "0.7": {
+            "coverage": 0.8127786144578313,
+            "accuracy": 0.9101976152755774
+          },
+          "0.8": {
+            "coverage": 0.6593900602409638,
+            "accuracy": 0.9449564333595989
+          },
+          "0.9": {
+            "coverage": 0.500519578313253,
+            "accuracy": 0.9736568926868164
+          },
+          "0.95": {
+            "coverage": 0.4011219879518072,
+            "accuracy": 0.9860894704236985
+          }
+        },
+        "confusion_matrix": [
+          [
+            46087,
+            6424
+          ],
+          [
+            12897,
+            67392
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5577850016814259,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.25771743063358155,
+          "W/Z/top": 0.5577850016814259
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.08699129706156805,
+            "0.01": 0.25771743063358155,
+            "0.1": 0.7446820666146141
+          },
+          "W/Z/top": {
+            "0.001": 0.21548406381945223,
+            "0.01": 0.5577850016814259,
+            "0.1": 0.8220802351505188
+          }
+        },
+        "signal_auc": 0.9275755281124691
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.0910583410670536,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5577850016814259
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 1581,
+        "selected_path_multiplications": 240,
+        "selected_path_additions": 242,
+        "selected_path_comparisons": 12,
+        "all_node_multiplications": 1488,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "complexity": {
+        "trees": 3,
+        "maximum_depth": 4,
+        "leaf_mode": "linear",
+        "classes": 2,
+        "logits_per_leaf": 1,
+        "internal_nodes": 45,
+        "leaves": 48,
+        "split_nonzeros": 384,
+        "leaf_nonzeros": 400,
+        "split_biases": 45,
+        "leaf_biases": 48,
+        "hard_routing": true,
+        "quantized": false
+      },
+      "golden_vector_count": 324,
+      "raw_fold_max_margin_difference": 1.4654943925052066e-14,
+      "native_max_margin_difference": 0.0
+    },
+    {
+      "id": "compact_1t_d4",
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hyper_scan_v1_c14",
+      "training_policy": {
+        "scan_name": "tao_hyper_scan_v1_c14",
+        "source_scan": null,
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 1e-05,
+        "leaf_alpha": 1e-05,
+        "leaf_mode": "linear",
+        "local_leaf_max_iter": 300,
+        "global_leaf_chunk_iter": 250,
+        "split_max_iter": 300,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 1,
+            "depth": 4
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hyper_scan_v1_c14",
+        "publication_prefix": "hyper_scan_v1",
+        "initialization": "cart",
+        "label": "CART sa=1e-05 la=1e-05",
+        "primary_metric": "signal_efficiency_at_fixed_fpr"
+      },
+      "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hyper_scan_v1_c14_best_efficiency.pkl",
+      "checkpoint_sha256": "8a0f2c65ab870798ff89675a298ee57b0261b044fc203482f92a8a121350b979",
+      "selected_epoch": 10,
+      "training_run_converged": false,
+      "selected_checkpoint_converged": false,
+      "metrics": {
+        "accuracy": 0.8534563253012049,
+        "macro_auc": 0.9268349080904061,
+        "per_class_auc": {
+          "quark/gluon": 0.9268349082682976,
+          "W/Z/top": 0.9268349079125148
+        },
+        "macro_average_precision": 0.915976626231815,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8761726346407753,
+          "W/Z/top": 0.9557806178228546
+        },
+        "cross_entropy": 0.3300233772439678,
+        "multiclass_brier_score": 0.209142804145813,
+        "expected_calibration_error": 0.0039423152220895525,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8534563253012049
+          },
+          "0.7": {
+            "coverage": 0.8026731927710843,
+            "accuracy": 0.9111027721750551
+          },
+          "0.8": {
+            "coverage": 0.6560993975903614,
+            "accuracy": 0.9442212785492942
+          },
+          "0.9": {
+            "coverage": 0.498019578313253,
+            "accuracy": 0.974023617642167
+          },
+          "0.95": {
+            "coverage": 0.4014081325301205,
+            "accuracy": 0.9851239049280582
+          }
+        },
+        "confusion_matrix": [
+          [
+            46093,
+            6418
+          ],
+          [
+            13043,
+            67246
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5522300688761848,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2662489764049437,
+          "W/Z/top": 0.5522300688761848
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07628877758945744,
+            "0.01": 0.2662489764049437,
+            "0.1": 0.7428919654929443
+          },
+          "W/Z/top": {
+            "0.001": 0.2196689459328177,
+            "0.01": 0.5522300688761848,
+            "0.1": 0.8195020488485346
+          }
+        },
+        "signal_auc": 0.9268349079125148
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.1043544101193055,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5522300688761848
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 527,
+        "selected_path_multiplications": 80,
+        "selected_path_additions": 80,
+        "selected_path_comparisons": 4,
+        "all_node_multiplications": 496,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "complexity": {
+        "trees": 1,
+        "maximum_depth": 4,
+        "leaf_mode": "linear",
+        "classes": 2,
+        "logits_per_leaf": 1,
+        "internal_nodes": 15,
+        "leaves": 16,
+        "split_nonzeros": 178,
+        "leaf_nonzeros": 199,
+        "split_biases": 15,
+        "leaf_biases": 16,
+        "hard_routing": true,
+        "quantized": false
+      },
+      "golden_vector_count": 204,
+      "raw_fold_max_margin_difference": 3.197442310920451e-14,
+      "native_max_margin_difference": 0.0
+    },
+    {
+      "id": "constant_5t_d4",
+      "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51",
+      "training_policy": {
+        "scan_name": "tao_hyper_scan_v1_c51",
+        "source_scan": null,
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 0.0,
+        "leaf_alpha": 0.0,
+        "leaf_mode": "constant",
+        "local_leaf_max_iter": 300,
+        "global_leaf_chunk_iter": 250,
+        "split_max_iter": 300,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 5,
+            "depth": 4
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hyper_scan_v1_c51",
+        "publication_prefix": "hyper_scan_v1",
+        "initialization": "cart",
+        "label": "CART sa=0 la=0",
+        "primary_metric": "signal_efficiency_at_fixed_fpr"
+      },
+      "checkpoint_path": "models/qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51_best_efficiency.pkl",
+      "checkpoint_sha256": "1059b8b71ca96e1ec0a0fa7a10a530c5026ebe97601eece6c86b2a3efb09a65f",
+      "selected_epoch": 6,
+      "training_run_converged": false,
+      "selected_checkpoint_converged": false,
+      "metrics": {
+        "accuracy": 0.8529066265060241,
+        "macro_auc": 0.9252932357917278,
+        "per_class_auc": {
+          "quark/gluon": 0.9252932357917278,
+          "W/Z/top": 0.9252932357917277
+        },
+        "macro_average_precision": 0.9134863841227355,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8725877813314502,
+          "W/Z/top": 0.9543849869140208
+        },
+        "cross_entropy": 0.3317776782162761,
+        "multiclass_brier_score": 0.21039587259292603,
+        "expected_calibration_error": 0.0029534352938812964,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8529066265060241
+          },
+          "0.7": {
+            "coverage": 0.8075225903614458,
+            "accuracy": 0.9087738602560635
+          },
+          "0.8": {
+            "coverage": 0.6645481927710843,
+            "accuracy": 0.9414064270498119
+          },
+          "0.9": {
+            "coverage": 0.5093222891566265,
+            "accuracy": 0.9719536355303232
+          },
+          "0.95": {
+            "coverage": 0.40582831325301205,
+            "accuracy": 0.9837087616432256
+          }
+        },
+        "confusion_matrix": [
+          [
+            46173,
+            6338
+          ],
+          [
+            13196,
+            67093
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5510709259229605,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.26064964166238186,
+          "W/Z/top": 0.5510709259229605
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07966782769324524,
+            "0.01": 0.26064964166238186,
+            "0.1": 0.7301221014009763
+          },
+          "W/Z/top": {
+            "0.001": 0.19128519688143822,
+            "0.01": 0.5510709259229605,
+            "0.1": 0.819420616831221
+          }
+        },
+        "signal_auc": 0.9252932357917277
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.2155404489629813,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 512,
+        "achieved_background_efficiency": 0.009750338024413932,
+        "signal_efficiency": 0.5483067418949047
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 1355,
+        "selected_path_multiplications": 320,
+        "selected_path_additions": 324,
+        "selected_path_comparisons": 20,
+        "all_node_multiplications": 1200,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "complexity": {
+        "trees": 5,
+        "maximum_depth": 4,
+        "leaf_mode": "constant",
+        "classes": 2,
+        "logits_per_leaf": 1,
+        "internal_nodes": 75,
+        "leaves": 80,
+        "split_nonzeros": 1080,
+        "leaf_nonzeros": 0,
+        "split_biases": 75,
+        "leaf_biases": 80,
+        "hard_routing": true,
+        "quantized": false
+      },
+      "golden_vector_count": 439,
+      "raw_fold_max_margin_difference": 0.0,
+      "native_max_margin_difference": 0.0
+    },
+    {
+      "id": "alternative_3t_d4",
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa0_la1e-05_seed42_hyper_scan_v1_c57",
+      "training_policy": {
+        "scan_name": "tao_hyper_scan_v1_c57",
+        "source_scan": null,
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 0.0,
+        "leaf_alpha": 1e-05,
+        "leaf_mode": "linear",
+        "local_leaf_max_iter": 300,
+        "global_leaf_chunk_iter": 250,
+        "split_max_iter": 300,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 3,
+            "depth": 4
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hyper_scan_v1_c57",
+        "publication_prefix": "hyper_scan_v1",
+        "initialization": "cart",
+        "label": "CART sa=0 la=1e-05",
+        "primary_metric": "signal_efficiency_at_fixed_fpr"
+      },
+      "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d4_n3_sa0_la1e-05_seed42_hyper_scan_v1_c57_best_efficiency.pkl",
+      "checkpoint_sha256": "33b200403ee9f862e552933cfd6fe7e2957e7903a09ca8ea7f46033b406dc603",
+      "selected_epoch": 1,
+      "training_run_converged": false,
+      "selected_checkpoint_converged": false,
+      "metrics": {
+        "accuracy": 0.8516867469879518,
+        "macro_auc": 0.9249838499345872,
+        "per_class_auc": {
+          "quark/gluon": 0.924983850764747,
+          "W/Z/top": 0.9249838491044273
+        },
+        "macro_average_precision": 0.9131901107107631,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8713703682571367,
+          "W/Z/top": 0.9550098531643895
+        },
+        "cross_entropy": 0.3321456777770103,
+        "multiclass_brier_score": 0.21101289987564087,
+        "expected_calibration_error": 0.0025112221345125665,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8516867469879518
+          },
+          "0.7": {
+            "coverage": 0.8105496987951807,
+            "accuracy": 0.9066526695218364
+          },
+          "0.8": {
+            "coverage": 0.645828313253012,
+            "accuracy": 0.9458526688897698
+          },
+          "0.9": {
+            "coverage": 0.49688253012048195,
+            "accuracy": 0.9742066498954324
+          },
+          "0.95": {
+            "coverage": 0.39971385542168675,
+            "accuracy": 0.9856448513620436
+          }
+        },
+        "confusion_matrix": [
+          [
+            46067,
+            6444
+          ],
+          [
+            13252,
+            67037
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5556551956058737,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.25223077069566374,
+          "W/Z/top": 0.5556551956058737
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.06497686199082098,
+            "0.01": 0.25223077069566374,
+            "0.1": 0.72752375692712
+          },
+          "W/Z/top": {
+            "0.001": 0.22042870131649417,
+            "0.01": 0.5556551956058737,
+            "0.1": 0.8174345178044314
+          }
+        },
+        "signal_auc": 0.9249838491044273
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.067600183827182,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5556551956058737
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 1581,
+        "selected_path_multiplications": 240,
+        "selected_path_additions": 242,
+        "selected_path_comparisons": 12,
+        "all_node_multiplications": 1488,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "complexity": {
+        "trees": 3,
+        "maximum_depth": 4,
+        "leaf_mode": "linear",
+        "classes": 2,
+        "logits_per_leaf": 1,
+        "internal_nodes": 45,
+        "leaves": 48,
+        "split_nonzeros": 450,
+        "leaf_nonzeros": 427,
+        "split_biases": 45,
+        "leaf_biases": 48,
+        "hard_routing": true,
+        "quantized": false
+      },
+      "golden_vector_count": 324,
+      "raw_fold_max_margin_difference": 1.509903313490213e-14,
+      "native_max_margin_difference": 0.0
+    },
+    {
+      "id": "previous_3t_d3",
+      "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1",
+      "training_policy": {
+        "scan_name": "tao_hard_search_v1",
+        "source_scan": "tao_full_training_v1",
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 1e-05,
+        "leaf_alpha": 1e-05,
+        "leaf_mode": "linear",
+        "local_leaf_max_iter": 1000,
+        "global_leaf_chunk_iter": 1000,
+        "split_max_iter": 1000,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 1,
+            "depth": 2
+          },
+          {
+            "trees": 1,
+            "depth": 3
+          },
+          {
+            "trees": 1,
+            "depth": 4
+          },
+          {
+            "trees": 1,
+            "depth": 5
+          },
+          {
+            "trees": 2,
+            "depth": 3
+          },
+          {
+            "trees": 3,
+            "depth": 2
+          },
+          {
+            "trees": 3,
+            "depth": 3
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hard_search_v1",
+        "publication_prefix": "hard_search"
+      },
+      "checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1_best_efficiency.pkl",
+      "checkpoint_sha256": "739993d7a1a9d34a9291fbf3c5f67b31bcf1b0d536664695e5249753d0c59581",
+      "selected_epoch": 6,
+      "training_run_converged": true,
+      "selected_checkpoint_converged": false,
+      "metrics": {
+        "accuracy": 0.8537123493975903,
+        "macro_auc": 0.9273958291692666,
+        "per_class_auc": {
+          "quark/gluon": 0.927395828516998,
+          "W/Z/top": 0.927395829821535
+        },
+        "macro_average_precision": 0.9164733326143182,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8766879007287518,
+          "W/Z/top": 0.9562587644998846
+        },
+        "cross_entropy": 0.32884772812096114,
+        "multiclass_brier_score": 0.20807881653308868,
+        "expected_calibration_error": 0.00225853534348039,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8537123493975903
+          },
+          "0.7": {
+            "coverage": 0.8129066265060241,
+            "accuracy": 0.9094336476647461
+          },
+          "0.8": {
+            "coverage": 0.668637048192771,
+            "accuracy": 0.9428458809617659
+          },
+          "0.9": {
+            "coverage": 0.5000903614457831,
+            "accuracy": 0.9735891104017347
+          },
+          "0.95": {
+            "coverage": 0.3962876506024096,
+            "accuracy": 0.9849506907100918
+          }
+        },
+        "confusion_matrix": [
+          [
+            45766,
+            6745
+          ],
+          [
+            12682,
+            67607
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5428140841211124,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2659633219706347,
+          "W/Z/top": 0.5428140841211124
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.06695739940203005,
+            "0.01": 0.2659633219706347,
+            "0.1": 0.7451391137095085
+          },
+          "W/Z/top": {
+            "0.001": 0.2499221562106889,
+            "0.01": 0.5428140841211124,
+            "0.1": 0.8209468295781489
+          }
+        },
+        "signal_auc": 0.927395829821535
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.067880584946817,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5428140841211124
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 765,
+        "selected_path_multiplications": 192,
+        "selected_path_additions": 194,
+        "selected_path_comparisons": 9,
+        "all_node_multiplications": 720,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "complexity": {
+        "trees": 3,
+        "maximum_depth": 3,
+        "leaf_mode": "linear",
+        "classes": 2,
+        "logits_per_leaf": 1,
+        "internal_nodes": 21,
+        "leaves": 24,
+        "split_nonzeros": 309,
+        "leaf_nonzeros": 304,
+        "split_biases": 21,
+        "leaf_biases": 24,
+        "hard_routing": true,
+        "quantized": false
+      },
+      "golden_vector_count": 228,
+      "raw_fold_max_margin_difference": 1.63202784619898e-14,
+      "native_max_margin_difference": 0.0
+    }
+  ],
+  "primary_candidate": "winner_3t_d4",
+  "xgboost": {
+    "parameters": 3099,
+    "metrics": {
+      "accuracy": 0.8474774096385542,
+      "macro_auc": 0.9205588064412277,
+      "per_class_auc": {
+        "quark/gluon": 0.9205588065005248,
+        "W/Z/top": 0.9205588063819305
+      },
+      "macro_average_precision": 0.9073761128198716,
+      "per_class_average_precision": {
+        "quark/gluon": 0.861815459351182,
+        "W/Z/top": 0.9529367662885613
+      },
+      "cross_entropy": 0.3412569733417134,
+      "multiclass_brier_score": 0.21719273924827576,
+      "expected_calibration_error": 0.012385367149689111,
+      "confidence_coverage": {
+        "0.5": {
+          "coverage": 1.0,
+          "accuracy": 0.8474774096385542
+        },
+        "0.7": {
+          "coverage": 0.8133509036144578,
+          "accuracy": 0.9022895392221306
+        },
+        "0.8": {
+          "coverage": 0.6069352409638554,
+          "accuracy": 0.9494547214054416
+        },
+        "0.9": {
+          "coverage": 0.45354668674698795,
+          "accuracy": 0.9776693065032956
+        },
+        "0.95": {
+          "coverage": 0.34332831325301205,
+          "accuracy": 0.9889678466464886
+        }
+      },
+      "confusion_matrix": [
+        [
+          46098,
+          6413
+        ],
+        [
+          13842,
+          66447
+        ]
+      ],
+      "fixed_fpr": 0.01,
+      "fixed_fpr_points": [
+        0.001,
+        0.01,
+        0.1
+      ],
+      "signal_efficiency_at_fixed_fpr": 0.5548207101844587,
+      "per_class_efficiency_at_fixed_fpr": {
+        "quark/gluon": 0.2255908285882958,
+        "W/Z/top": 0.5548207101844587
+      },
+      "per_class_efficiency_points": {
+        "quark/gluon": {
+          "0.001": 0.05979699491535107,
+          "0.01": 0.2255908285882958,
+          "0.1": 0.708956218697035
+        },
+        "W/Z/top": {
+          "0.001": 0.22255241689397054,
+          "0.01": 0.5548207101844587,
+          "0.1": 0.812128685124986
+        }
+      },
+      "signal_auc": 0.9205588063819305
+    },
+    "source_checkpoint_sha256": "13d265203229309d36cf510467a5c3b09412817085383b323d1b1969b9eb4db5",
+    "native_json": "xgboost_reference/model.json"
+  },
+  "hardware": {
+    "quantized": false,
+    "synthesized": false,
+    "target_device": null,
+    "clock_target": null
+  },
+  "files": {
+    "alternative_3t_d4/candidate.json": "a30e665f017dacf3c8199470602bf3edf96f55a1a9933671eafaa27146e4f9dc",
+    "alternative_3t_d4/labels.tsv": "24d193f73ce8a583d8c4b08231a79d39a9d3ca05960e4ba1eda9ad529530a045",
+    "alternative_3t_d4/raw/expected.tsv": "d497990c8711d21ae27e405f8cc999f6cf1fa16c1cbcc3d98fbd99ce947d64b1",
+    "alternative_3t_d4/raw/model.json": "f05df3b045aa0aabc5894a044204b9051cce2938c59e9e9d23c3a687200957fb",
+    "alternative_3t_d4/raw/model_coefficients.h": "ac74f26cff808c797c75a82b3b244c37da4b20108905f6bf98864f9404b46d64",
+    "alternative_3t_d4/raw/ranges.json": "f63dd648b6c506777288bd559057e2764165a3507cf9c6698024634ccd240c71",
+    "alternative_3t_d4/raw/tree_free_logits.tsv": "5c795244c851be1f1a553ee13614a19b030274e424d7490638c813a5306974c9",
+    "alternative_3t_d4/raw/vectors.tsv": "826e7289e0e98ca21f97374fb297983d606c8c566f66cb58b350489e736cc84b",
+    "alternative_3t_d4/standardized/expected.tsv": "2adac3b694ac1f5eb02718fa6861381f2216b4796f496a7bc81ee879e4d22345",
+    "alternative_3t_d4/standardized/model.json": "bebe42b686ac008cb2b0eafa0f0814592507e92f6d109a213aa9776a978cbc4e",
+    "alternative_3t_d4/standardized/model_coefficients.h": "15e617344c708db77449a3c0ea2015d1380b3da9f2f8c52510e5df7b49e6cfa9",
+    "alternative_3t_d4/standardized/ranges.json": "595c41ed9a74b0b9f5d4a92785064e3c005725462475e7e84c0f087157d42c22",
+    "alternative_3t_d4/standardized/tree_free_logits.tsv": "a9fb8896d6a361a422307e98012c8e3ec7e9e1c1c87de00712168fc0469dca6c",
+    "alternative_3t_d4/standardized/vectors.tsv": "b3996b11f2ad5e6baa79074f0bf320dcb67ebb7fe65575450b57ae2f1cb9a149",
+    "alternative_3t_d4/validation_row_indices.tsv": "487207d9f292489dc191078fc636082987ef7a7f5bd1e78f9a66cb6895264f86",
+    "compact_1t_d4/candidate.json": "7c2ba818f5c08fe3587f672d944a42678e3ca37223b93cef91ffeef84c8d5184",
+    "compact_1t_d4/labels.tsv": "7ef7ebc5b55376dda1857389fffbfc04819e5d5aa895e2b91aa88097b9ed59c8",
+    "compact_1t_d4/raw/expected.tsv": "8e852a57612c91336dc9e2053e4b93daa745eaac2ace49772ce98aafbc047540",
+    "compact_1t_d4/raw/model.json": "239e593b5f0a6fcdcd82500f8e0b0287d4fc477ceddb930ceff5390ac95c18a6",
+    "compact_1t_d4/raw/model_coefficients.h": "2c31d526362b8be9360f374eb98ce2cd408cabca0daafd42bf3854a1e4d2bd71",
+    "compact_1t_d4/raw/ranges.json": "8a03fe0847905b9850e83b28c56a0e880811c3fd409851bee4f850ed396f48b4",
+    "compact_1t_d4/raw/tree_free_logits.tsv": "7d19a41722ba217600376899f57d1a398de76607647b363f9ec7e555bfe29d11",
+    "compact_1t_d4/raw/vectors.tsv": "81c961506189bb5e7b095fae71df76aebccb10cb182e472d9353b65839a19e25",
+    "compact_1t_d4/standardized/expected.tsv": "9089bb6230f1d62615dabb56584feff45841759e42058490ec97109c23588162",
+    "compact_1t_d4/standardized/model.json": "657822de8d6c0697cf56f54e85b65d05352ceb63389a03d9cf473b8b786ceccd",
+    "compact_1t_d4/standardized/model_coefficients.h": "d499a151446fef3bf5bfbc550e4ff2bbe628598d1fe12c06b966fe2f46631dd4",
+    "compact_1t_d4/standardized/ranges.json": "88c0479b821d5868bf9f9f84c2a604a619751d1e4b50cd6d1bd39bcdc371cdc6",
+    "compact_1t_d4/standardized/tree_free_logits.tsv": "db84ff83881ef822ccfdf75ac9418220dc1f2c6b5d5bf977ee9ccef54b99aa45",
+    "compact_1t_d4/standardized/vectors.tsv": "7fc3de8351f7db2abf0a496f0e9a0a068d9892b048c388798179894d9b35c321",
+    "compact_1t_d4/validation_row_indices.tsv": "b26afcb490ecca8659f16a8d35b9c833b2c626fc32592c9c7cdf8ec5b42d4a5f",
+    "comparison.json": "1193193ab3df6ed20bcac4ee2d9b322bee96d97eef55e1ff07351c08cdf683bc",
+    "comparison.md": "73e918b45cf95822c4d6844a374c412ad36a8fc321b37188e76c30d394eddbe9",
+    "constant_5t_d4/candidate.json": "8cfcd4d1c06757ee1be06d7c5e8daf1e581fcc966178a5b87f1558d269854939",
+    "constant_5t_d4/labels.tsv": "4a53c502f623945cab949b554c800d23ed49c2e1517dc8b7689fe3e4dc9f660e",
+    "constant_5t_d4/raw/expected.tsv": "bfa6fb3a3c95b7e8f6d018a8e6f3afb84cbab4789ff1bcd528d79e83428b358b",
+    "constant_5t_d4/raw/model.json": "1d2f574b7baedddaef6ffce5ef1219ca37aec368d3c475cf515f0401743f358e",
+    "constant_5t_d4/raw/model_coefficients.h": "59958134304362b53810501dd8b671ba38d57f001b7a81591482dd40fe57792b",
+    "constant_5t_d4/raw/ranges.json": "d281e4b92b21c7523e1942144b9fe9eff8a29e6c88d9d3c7e8fad05d3806020f",
+    "constant_5t_d4/raw/tree_free_logits.tsv": "e1092ed5f9f819f650aeea1a89da0def1043ba61ac5fa750625dc0eedeb1fe4d",
+    "constant_5t_d4/raw/vectors.tsv": "ef5ea8a7b1c3917b6ecef0edcca5977548556aacee77d3983d1da2dc2637cb2f",
+    "constant_5t_d4/standardized/expected.tsv": "bfa6fb3a3c95b7e8f6d018a8e6f3afb84cbab4789ff1bcd528d79e83428b358b",
+    "constant_5t_d4/standardized/model.json": "db630684068951d087d1ece76b8facf5fa1240ac7f942f4a0cc337a28689f2ef",
+    "constant_5t_d4/standardized/model_coefficients.h": "67ddee3a78b2c5408e8ac8c0568a13b0801ce14f73b4741c8d457c2e41f95cde",
+    "constant_5t_d4/standardized/ranges.json": "8cb992c2659a843cc78c04b410e6ef220042e6a064128f3651b89013e6500730",
+    "constant_5t_d4/standardized/tree_free_logits.tsv": "e1092ed5f9f819f650aeea1a89da0def1043ba61ac5fa750625dc0eedeb1fe4d",
+    "constant_5t_d4/standardized/vectors.tsv": "1a9b59e1ac8d445ed3099923fcfc12ea435762d1c52d62ee014dfa4cd58d6463",
+    "constant_5t_d4/validation_row_indices.tsv": "394fb9302fc4edc5fa5248532437220e6b28e03706d11c1305c5af42f0a607f8",
+    "input_contract.json": "0ed23d932db75034ba90604e848c56e41681dab7cfdf15fb29873ef602bb0702",
+    "previous_3t_d3/candidate.json": "335daa08f122b7454c884fd006db104c7dba8d7f46d2185f1534753b207d266e",
+    "previous_3t_d3/labels.tsv": "ebdc609061636f34b020d51ef241a74d819ef2ae0c3149d1b33bbd247c262efd",
+    "previous_3t_d3/raw/expected.tsv": "fe3b6bfd88631d4d49797439398d6b6ef295539aefb3c657787e3d6109a0a7c4",
+    "previous_3t_d3/raw/model.json": "8a11ca92c881b258706815fe676450e637793cbf856a1c8f06ace043504e1abd",
+    "previous_3t_d3/raw/model_coefficients.h": "985440a1f717da89f0d928108a6a210e94f145716cb236cd8dad5d8b7430540f",
+    "previous_3t_d3/raw/ranges.json": "47b4c2c304717bba8440d3d5c9f78922ea40dcbbca6e5dbbd2b0ba671e138ae6",
+    "previous_3t_d3/raw/tree_free_logits.tsv": "22e856d665be36e8682c9079fe49da45a6e18dc5d2fb4e62914aec25eedbf588",
+    "previous_3t_d3/raw/vectors.tsv": "7f74c57d9772d16a2f7d132d17d6c3fbe3dac25b4fd29b101bd942b3ac278b78",
+    "previous_3t_d3/standardized/expected.tsv": "ae0fca6b04dcc00f002216419826b6b65d854643dfd2806a7feba25b6e9d9069",
+    "previous_3t_d3/standardized/model.json": "d377a48f64007608684cd5139f4c562b7b840c52df837938583463d239330cfa",
+    "previous_3t_d3/standardized/model_coefficients.h": "dca216e34cd522eb266bf5f3994d8a23aa6dd5dba50f0d65cb033d17bd22c2b3",
+    "previous_3t_d3/standardized/ranges.json": "209febd4642d448ee4860e1c090bf6723e76ed0fa5969ed2c1198f14fb925717",
+    "previous_3t_d3/standardized/tree_free_logits.tsv": "626959fba0d4a64c726e3d66908ac1b9dd4bf4a8258b1fd1cc0db67384737506",
+    "previous_3t_d3/standardized/vectors.tsv": "c401eb0d9fc0f975eb48b0d75e78952ef28a510c57f2999a29584a85a006686f",
+    "previous_3t_d3/validation_row_indices.tsv": "d5dc77e01bd862929c177555e15fbb3734b056a0e38618a58854a44fd937cb98",
+    "winner_3t_d4/candidate.json": "360a9ed3aca07bdb04166f7a2f75ea5ab0006787f29de0fd6abcb866b30d2c2c",
+    "winner_3t_d4/labels.tsv": "1eaa8bb9a39d3f0ef9c0ccd0618d518185805e81f2a4074f677753a0e3c1bd49",
+    "winner_3t_d4/raw/expected.tsv": "00b0df69062d160ab11c8f54be4f0bb7f91e04db1885dc5cc9aead067293c98f",
+    "winner_3t_d4/raw/model.json": "7f96d6940b83256a11e23638be42c2564238be6907a03e65350f5b5b81d6b5d0",
+    "winner_3t_d4/raw/model_coefficients.h": "0ec68afe6967f4d1251153f7bcdcb2de13cac89562fa32ae4a9f473970f773cd",
+    "winner_3t_d4/raw/ranges.json": "13ced72f3e9d7698b6e3d87d136f658851ba93c6edf055d180bce96ba2e4e1cb",
+    "winner_3t_d4/raw/tree_free_logits.tsv": "e0312f40652211dec1a0cec23b11abc57602fc9989142da0e8539a2d403fab7f",
+    "winner_3t_d4/raw/vectors.tsv": "6d9c102cb3398b903e07a37bd82828e8e09e79dead5e300afe30881e9208369f",
+    "winner_3t_d4/standardized/expected.tsv": "a3fd39efecadc5efd1b4a1763c746e741d6be3644c5c39968a77a09e9454f0c1",
+    "winner_3t_d4/standardized/model.json": "57d74ea13b85db34f2d3a51850602b8cbddbd0e80e784f070fbdf1f483c479be",
+    "winner_3t_d4/standardized/model_coefficients.h": "415ca29255d3f68e9057a78ad1e940288f44aef3b86d164bf6ceb07aa178f3d9",
+    "winner_3t_d4/standardized/ranges.json": "37ae14caf6cda9a41e6a2fed266d30b44443bafb8c60bc30d4dc0a52342720e4",
+    "winner_3t_d4/standardized/tree_free_logits.tsv": "262ea1cb24ffe8e664a481c061636b686c078b7387287e11e32f7d815380da18",
+    "winner_3t_d4/standardized/vectors.tsv": "74062982ac8f0567eb9f26bb255981b4d65653e08e0ca79f5ab87d1ad9fdbc28",
+    "winner_3t_d4/validation_row_indices.tsv": "f21b6aa5256f3b947d50c20818493d468030fc6403890f132e1086ff64b9ecbc",
+    "xgboost_reference/expected_signal_probability.tsv": "0a1de2f3a3da0ef748b7c5ac837269ec81f69b50f79331718c96a4a7a3089a32",
+    "xgboost_reference/model.json": "8d9315c22b260c52f4f22d631a84a37fcc31bab10af116c93d48d9cf877e030a",
+    "xgboost_reference/vectors.tsv": "74062982ac8f0567eb9f26bb255981b4d65653e08e0ca79f5ab87d1ad9fdbc28"
+  }
+}

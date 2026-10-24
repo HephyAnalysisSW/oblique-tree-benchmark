@@ -1,0 +1,52 @@
+{
+  "schema": "tree-benchmark.current-model.v1",
+  "as_of": "2026-10-23",
+  "handoff_version": "v1",
+  "candidate_id": "winner_3t_d3",
+  "manifest": "fpga_handoff/v1/manifest.json",
+  "standardized_model": "fpga_handoff/v1/winner_3t_d3/standardized/model.json",
+  "raw_model": "fpga_handoff/v1/winner_3t_d3/raw/model.json",
+  "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa1e-05_la1e-05_seed42_hard_search_v1",
+  "checkpoint_suffix": "_best_efficiency.pkl",
+  "selected_continuation_epoch": 6,
+  "training_run_converged": true,
+  "terminal_continuation_epochs": 19,
+  "architecture": {
+    "trees": 3,
+    "depth": 3,
+    "leaf_mode": "linear",
+    "stored_scalar_parameters": 765
+  },
+  "training": {
+    "seed": 42,
+    "initialization": "earlier random-seed-42 TAO checkpoint",
+    "split_search": "hard_threshold",
+    "split_alpha": 1e-05,
+    "leaf_alpha": 1e-05,
+    "loss": "mean_cross_entropy_plus_L1",
+    "forest_aggregation": "sum_logits",
+    "joint_leaf_refit": true
+  },
+  "validation": {
+    "primary_metric": "signal_efficiency_at_fixed_fpr",
+    "fixed_fpr": 0.01,
+    "signal_efficiency": 0.5428140841211124,
+    "signal_auc": 0.927395829821535
+  },
+  "test_evaluated": false,
+  "update_policy": "Verify saved checkpoint and metrics; freeze a new version before changing this pointer. Preserve older handoff bundles.",
+  "checkpoint_sha256": "739993d7a1a9d34a9291fbf3c5f67b31bcf1b0d536664695e5249753d0c59581",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "standardized_model_sha256": "d377a48f64007608684cd5139f4c562b7b840c52df837938583463d239330cfa",
+  "raw_model_sha256": "8a11ca92c881b258706815fe676450e637793cbf856a1c8f06ace043504e1abd",
+  "deterministic_validation_working_point": {
+    "signal_margin_threshold": 3.067880584946817,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5428140841211124
+  },
+  "handoff_manifest_created_utc": "2026-10-23T13:47:31.078189+00:00"
+}
