@@ -1,0 +1,80 @@
+{
+  "name": "tao_l1_path_v1",
+  "frozen_model": "fpga_handoff/v2/winner_3t_d4/standardized/model.json",
+  "frozen_model_sha256": "57d74ea13b85db34f2d3a51850602b8cbddbd0e80e784f070fbdf1f483c479be",
+  "frozen_manifest": "fpga_handoff/v2/manifest.json",
+  "candidate_id": "winner_3t_d4",
+  "control_config": "configs/l1_path_v1/control.json",
+  "paths": {
+    "split": [
+      {
+        "config": "configs/l1_path_v1/split_01.json",
+        "multiplier": 3
+      },
+      {
+        "config": "configs/l1_path_v1/split_02.json",
+        "multiplier": 10
+      },
+      {
+        "config": "configs/l1_path_v1/split_03.json",
+        "multiplier": 30
+      },
+      {
+        "config": "configs/l1_path_v1/split_04.json",
+        "multiplier": 100
+      },
+      {
+        "config": "configs/l1_path_v1/split_05.json",
+        "multiplier": 300
+      }
+    ],
+    "leaf": [
+      {
+        "config": "configs/l1_path_v1/leaf_01.json",
+        "multiplier": 3
+      },
+      {
+        "config": "configs/l1_path_v1/leaf_02.json",
+        "multiplier": 10
+      },
+      {
+        "config": "configs/l1_path_v1/leaf_03.json",
+        "multiplier": 30
+      },
+      {
+        "config": "configs/l1_path_v1/leaf_04.json",
+        "multiplier": 100
+      },
+      {
+        "config": "configs/l1_path_v1/leaf_05.json",
+        "multiplier": 300
+      }
+    ],
+    "both": [
+      {
+        "config": "configs/l1_path_v1/both_01.json",
+        "multiplier": 3
+      },
+      {
+        "config": "configs/l1_path_v1/both_02.json",
+        "multiplier": 10
+      },
+      {
+        "config": "configs/l1_path_v1/both_03.json",
+        "multiplier": 30
+      },
+      {
+        "config": "configs/l1_path_v1/both_04.json",
+        "multiplier": 100
+      },
+      {
+        "config": "configs/l1_path_v1/both_05.json",
+        "multiplier": 300
+      }
+    ]
+  },
+  "concurrency": 3,
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "fixed_fpr": 0.01,
+  "zero_counting": "Exact zeros only; bias coefficients included in nonzero totals"
+}

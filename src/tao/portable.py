@@ -88,3 +88,20 @@ def cpp_header(spec):
     for name,key,dims in [('SPLIT_W','split_weights',f'[{n}][{i}][{f}]'),('SPLIT_B','split_bias',f'[{n}][{i}]'),('LEAF','leaf_parameters',f'[{n}][{l}][{width}]')]:
         text.append(f'constexpr double {name}{dims}='+value([tree[key] for tree in spec['trees']])+';')
     return '\n'.join(text+['}',''])
+
+
+def restore_model(spec,seed=42,split_alpha=1e-5,leaf_alpha=1e-5):
+    """Restore a training model from an immutable standardized binary export."""
+    from .hard import HardTAOClassifier
+    if spec['schema']!='tree-benchmark.binary-hard-oblique.v1' or spec['input_space']!='standardized':
+        raise ValueError('Warm starts require a standardized binary export')
+    if len(spec['trees'])!=spec['tree_count']:raise ValueError('Tree count mismatch')
+    model=HardTAOClassifier(depth=spec['depth'],trees=spec['tree_count'],leaf_mode=spec['leaf_mode'],seed=seed,
+        split_alpha=split_alpha,leaf_alpha=leaf_alpha,indexed='dense').initialize(spec['feature_count'],2)
+    for tree,record in zip(model.trees,spec['trees']):
+        tree.split_w[:]=np.asarray(record['split_weights']).reshape(tree.internal,model.n_features_in_)
+        tree.split_b[:]=np.asarray(record['split_bias']).reshape(tree.internal)
+        tree.leaf_parameters[:,:,0]=np.asarray(record['leaf_parameters']).reshape(tree.leaves,tree.leaf_width)
+    if not all(np.isfinite(a).all() for tree in model.trees for a in [tree.split_w,tree.split_b,tree.leaf_parameters]):
+        raise ValueError('Nonfinite warm-start coefficients')
+    return model

@@ -69,6 +69,24 @@ class FullTrainingResume(unittest.TestCase):
                 self.assertEqual(grown['model'].split_alpha,2e-5)
                 self.assertEqual(grown['config']['source_run'],marker['run_name'])
                 self.assertTrue(grown['training_converged'])
+                from tao.portable import export_model
+                specification=export_model(payload['model'],['a','b'],['background','signal'],[0,0],[1,1])
+                source=root/'data/frozen.json';source.write_text(json.dumps(specification))
+                portable=dict(scan);portable.pop('source_models')
+                portable.update(source_portable='data/frozen.json',source_portable_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+                    scan_name='portable_fixture',run_suffix='portable_fixture',epoch_checkpointing='node',layouts=[dict(trees=1,depth=0)])
+                (root/'configs/portable.json').write_text(json.dumps(portable))
+                with patch.object(data_utils,'ROOT',root),patch.object(worker,'plots',lambda *args:None):
+                    with patch.object(sys,'argv',['worker','--config','configs/portable.json','--index','0','--wall-seconds','0']):
+                        self.assertEqual(worker.main(),75)
+                    latest=next((root/'models').glob('*portable_fixture_latest.pkl'))
+                    with latest.open('rb') as f:initial=pickle.load(f)
+                    np.testing.assert_array_equal(initial['model'].decision_function(x),payload['model'].decision_function(x))
+                    self.assertEqual(initial['config']['source_model_sha256'],portable['source_portable_sha256'])
+                    with patch.object(sys,'argv',['worker','--config','configs/portable.json','--index','0','--wall-seconds','1200']):
+                        self.assertEqual(worker.main(),0)
+                self.assertTrue(json.loads((root/'results/portable_fixture_member_0.json').read_text())['converged'])
+
 
 
 

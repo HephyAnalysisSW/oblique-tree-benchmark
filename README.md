@@ -63,7 +63,7 @@ Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/
 
 The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
 leaf-route agreement and maximum margin difference below **1.1e-14**. The
-Python suite passes 34 tests. These are floating-point references: fixed-point
+Python suite passes 37 tests, including frozen-model warm starts and path scheduling. These are floating-point references: fixed-point
 formats, the target FPGA and synthesis remain implementation choices.
 
 When a better **saved checkpoint** is verified at the primary working point,
@@ -71,6 +71,11 @@ freeze a new version and update this section plus `CURRENT_MODEL.json`.
 Selection history is kept under `fpga_handoff/selections/`. Preserve previous
 coefficients and vectors so firmware results remain traceable. A transient log
 value alone is not sufficient to replace the implementation baseline.
+
+The next active study is the [L1 compression path](#l1-compression-path-from-the-handed-over-winner).
+It starts from this exact v2 snapshot (877 nonzero coefficients in 1,581 slots),
+then increases split/leaf penalties separately and together. The immutable FPGA
+handoff is unaffected. [Live compression report](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/l1_path_v1_report.md).
 
 The methodological rule is:
 
@@ -824,3 +829,54 @@ and `current_winner_roc.png`, plus `winner_roc.png` in the selected layout's fla
 folder. An explicit `--run` retains the older live-run diagnostic for completed
 training runs. `scripts/verify_fpga_handoff.py` defaults to the current pinned
 bundle; use `--bundle` to check an older version explicitly.
+
+### L1 compression path from the handed-over winner
+
+The v2 implementation baseline is handed over and remains pinned by
+`fpga_handoff/CURRENT_MODEL.json`. The next study is separate and does not
+modify any frozen coefficients: `configs/tao_l1_path_v1.json` starts from the
+**exact standardized v2 JSON**, checked by SHA-256, rather than the live model
+checkpoint that may continue changing.
+
+A same-penalty control first continues this snapshot to numerical convergence
+at split L1 = leaf L1 = 1e-5. This matters because the frozen selected snapshot
+was saved before its training run converged. Three independent paths then
+increase split-only, leaf-only, or both penalties by 3, 10, 30, 100 and 300,
+warm-starting each point from its own previous **converged terminal** model.
+The other penalty stays at 1e-5 in the one-penalty paths. There are 16 runs in
+all (control plus 15 path points), with at most three path-study jobs active.
+The existing broad architecture scan continues independently.
+
+This is Lasso-style **L1 sparsity**, implemented for classification using
+mean cross-entropy plus L1. Linear leaves use an exact positive/negative-part
+L1 parameterization with L-BFGS-B; oblique split proposals use L1-regularized
+weighted logistic regression, with actual hard-tree objective acceptance.
+Replacing these with `sklearn.linear_model.Lasso` would introduce a squared-error
+regression objective, which is not the classifier's current loss. The warm-started
+sparsity path follows the idea in the
+[original TAO paper, section 4](https://proceedings.neurips.cc/paper/2018/file/185c29dc24325934ee377cfda20e414c-Paper.pdf).
+
+Run `python scripts/monitor_tao_l1_path.py` on CLIP. Submission receipts and a
+file lock prevent duplicate controllers/jobs. Workers use resumable node-level
+checkpoints and the existing numerical stopping rule; no epoch limit labels a
+model converged. Failures remain visible for inspection. The monitor publishes
+`plots/comparisons/l1_path_v1_report.md`, `_summary.json` and `_tradeoffs.png`.
+
+The primary comparison remains signal efficiency at 1% background acceptance;
+AUC is secondary, and test data remain untouched. Reports distinguish:
+
+- 1,581 dense coefficient slots, which do not change while topology is fixed;
+- exact nonzero coefficients, including biases;
+- nonzeros in structurally reachable branches (only identically constant split
+  decisions permit input-independent branch elimination);
+- sparse selected-path multiplication/comparison bounds and training time.
+
+These are not synthesized FPGA resources or guaranteed latency improvements.
+Sparsity must be exploited by the inference/export implementation to realize
+savings. Counts do not silently treat small coefficients as zero. The latest
+metrics and sparsity belong to the same evaluated checkpoint; best-efficiency
+checkpoint sparsity is reported separately. The frozen winner and the completed
+same-penalty control are both retained so optimization changes are not mistaken
+for the effect of stronger regularization. Nonzero counts need not be monotonic
+along a nonconvex tree-training path; measure each point before choosing a
+compressed successor for a new handoff version.

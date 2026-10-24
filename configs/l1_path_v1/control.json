@@ -1,0 +1,36 @@
+{
+  "scan_name": "tao_l1_path_v1_control",
+  "source_scan": null,
+  "task": "qg_vs_wzt",
+  "seed": 42,
+  "split_alpha": 1e-05,
+  "leaf_alpha": 1e-05,
+  "leaf_mode": "linear",
+  "local_leaf_max_iter": 300,
+  "global_leaf_chunk_iter": 250,
+  "split_max_iter": 300,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "convergence": {
+    "loss_rtol": 1e-05,
+    "kkt_tol": 1e-06,
+    "route_tol": 0.0001,
+    "patience": 3
+  },
+  "minimum_continuation_epochs": 5,
+  "layouts": [
+    {
+      "trees": 3,
+      "depth": 4
+    }
+  ],
+  "split_search": "hard_threshold",
+  "run_suffix": "l1_path_v1_control",
+  "publication_prefix": "l1_path_v1",
+  "initialization": "portable_snapshot",
+  "label": "same-penalty control",
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "source_portable": "fpga_handoff/v2/winner_3t_d4/standardized/model.json",
+  "source_portable_sha256": "57d74ea13b85db34f2d3a51850602b8cbddbd0e80e784f070fbdf1f483c479be",
+  "epoch_checkpointing": "node"
+}

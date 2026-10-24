@@ -11,6 +11,8 @@ from tao.hard import HardTAOClassifier
 from tao.convergence import leaf_kkt_residual,convergence_check
 from tao.initialization import initialize_cart,append_zero_tree
 from tao.epoch import begin_epoch,step_epoch
+from tao.portable import restore_model
+from tao.sparsity import sparsity_profile
 import matplotlib.pyplot as plt
 
 
@@ -86,7 +88,15 @@ def main():
         source_run=None;source_sha=None;source_seconds=0
         initial_started=time.perf_counter()
         initialization_records=[]
-        if scan.get('source_models'):
+        if scan.get('source_portable'):
+            source_path=resolve(scan['source_portable']);source_sha=sha(source_path)
+            assert source_sha==scan['source_portable_sha256'], 'Frozen warm-start changed'
+            specification=json.loads(source_path.read_text())
+            assert specification['classes']==metadata['class_names']
+            if 'feature_names' in metadata:assert specification['features']==metadata['feature_names']
+            model=restore_model(specification,seed=seed,split_alpha=scan['split_alpha'],leaf_alpha=scan['leaf_alpha'])
+            source_run='portable:'+scan['source_portable']
+        elif scan.get('source_models'):
             source_run=scan['source_models'][a.index]
             source_cfg=load_config('configs/'+source_run+'.yaml')
             with resolve(source_cfg['model']['output_model_path']).open('rb') as f:source=pickle.load(f)
@@ -116,6 +126,7 @@ def main():
         config=dict(run_name=run,seed=scan['seed'],data=reference['data'],dataset_sha256=audit['dataset_sha256'],
             implementation_sha256=sha(resolve('src/tao/hard.py')),full_training_policy=scan,
             split_search_sha256=sha(resolve('src/tao/split_search.py')),
+            source_portable=scan.get('source_portable'),
             initialization=scan.get('initialization','random' if source_run is None else 'checkpoint'),
             initialization_records=initialization_records,initialization_seconds=initialization_seconds,
             source_run=source_run,source_model_sha256=source_sha,source_training_seconds=source_seconds,
@@ -125,7 +136,8 @@ def main():
         state=dict(phase='initial_refit',history=[],stable_epochs=0,converged=False,
             training_seconds=initialization_seconds,local_leaf_max_iter=scan['local_leaf_max_iter'],split_max_iter=scan['split_max_iter'],
             initial_refits=[],best_validation_auc=-float('inf'),step_seconds_estimate=600.)
-    if scan['scan_name'].startswith('tao_hyper_scan_v1'):config['epoch_checkpointing']='node'
+    incremental_epoch=scan.get('epoch_checkpointing')=='node' or scan['scan_name'].startswith('tao_hyper_scan_v1')
+    if incremental_epoch:config['epoch_checkpointing']='node'
     model.split_alpha=scan['split_alpha'];model.leaf_alpha=scan['leaf_alpha']
     model.split_solver=scan.get('split_solver','liblinear')
     model.split_search=scan.get('split_search','surrogate')
@@ -144,7 +156,7 @@ def main():
         tick=time.perf_counter()
         if state['phase']=='epoch':
             model.leaf_max_iter=state['local_leaf_max_iter'];model.split_max_iter=state['split_max_iter']
-            if scan['scan_name'].startswith('tao_hyper_scan_v1'):
+            if incremental_epoch:
                 if 'epoch_work' not in state:
                     state['before_routes']=[t.leaf_indices(x,'dense') for t in model.trees]
                     state['epoch_work']=begin_epoch(model,x,y);state['epoch_compute_seconds']=0.
@@ -190,7 +202,7 @@ def main():
                     check=convergence_check(profile,kkt,float(changed.mean()),state['stable_epochs'],**scan['convergence'])
                     metrics,_=compute_metrics(yv,model.predict_proba(xv),metadata['class_names'])
                     row=dict(epoch=len(state['history'])+1,profile=profile,convergence=check,validation=metrics,
-                             cumulative_training_seconds=state['training_seconds'])
+                             cumulative_training_seconds=state['training_seconds'],sparsity=sparsity_profile(model))
                     state['history'].append(row);state['stable_epochs']=check['stable_epochs']
                     state['converged']=bool(check['converged'] and len(state['history'])>=scan['minimum_continuation_epochs'])
                     state['phase']='complete' if state['converged'] else 'epoch'
@@ -208,7 +220,7 @@ def main():
                         state['best_validation_efficiency']=efficiency
                         state['best_efficiency_auc']=metrics['signal_auc']
                         atomic_pickle('models/'+run+'_best_efficiency.pkl',dict(model=model,config=config,metadata=metadata,
-                            validation=metrics,epoch=row['epoch'],training_converged_at_save=state['converged'],
+                            validation=metrics,epoch=row['epoch'],training_converged_at_save=state['converged'],sparsity=row['sparsity'],
                             selected_by='signal_efficiency_at_fixed_fpr',fixed_fpr=.01,
                             secondary_metric='signal_auc'))
                     print(json.dumps(dict(run=run,epoch=row['epoch'],objective=after,auc=metrics['signal_auc'],
@@ -220,7 +232,7 @@ def main():
         history=state['history'],convergence=state['history'][-1]['convergence'],training_converged=True))
     atomic_json('results/'+run+'_validation.json',dict(run_name=run,validation=state['history'][-1]['validation'],
         training_converged=True,convergence=state['history'][-1]['convergence'],complexity=model.complexity(),
-        test_evaluated=False,best_validation_auc=state['best_validation_auc'],
+        test_evaluated=False,sparsity=sparsity_profile(model),best_validation_auc=state['best_validation_auc'],
         best_validation_efficiency=state.get('best_validation_efficiency'),
         primary_metric='signal_efficiency_at_fixed_fpr'))
     atomic_json(f"results/{scan['scan_name']}_member_{a.index}.json",dict(index=a.index,run_name=run,complete=True,
