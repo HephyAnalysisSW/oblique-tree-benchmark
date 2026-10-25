@@ -21,7 +21,7 @@ Each independent case performs unpenalized leaf-only fitting with fixed splits, 
 
 ## Execution
 
-`monitor_support_refit_scan.py` maintains at most three pending/running refits, including the adopted pilot. Each allocation requests one CPU, 12 GiB RAM and one hour. The controller resumes only a worker's explicit scheduler-budget exit 75. Submission receipts and a singleton controller lock prevent duplicate jobs. Missing receipts and unexpected exits remain visible for inspection. Separated, inconclusive and stalled outcomes remain labelled as unsuccessful; they do not count as converged.
+`monitor_support_refit_scan.py` maintains at most three pending/running refits, including the adopted pilot. Each allocation requests one CPU, 12 GiB RAM and one hour. The controller resumes only a worker's explicit scheduler-budget exit 75. Submission receipts and a singleton controller lock prevent duplicate jobs. Allocations rotate across cases so a long continuation cannot indefinitely postpone an unstarted support budget. Missing receipts and unexpected exits remain visible for inspection. Separated, inconclusive and stalled outcomes remain labelled as unsuccessful; they do not count as converged.
 
 New cases allow up to 600 seconds for a separation LP, to avoid rejecting a larger support merely because the pilot's smaller LP took about 50 seconds. The pilot retains its original 120-second limit and checkpoint policy. Increasing this diagnostic time limit does not change the fitted model objective or constraints.
 
@@ -43,6 +43,6 @@ The controller calls `publish_support_refit_results.py` when every case is termi
 
 ## Validation
 
-**65 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+**66 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
 
 Final delivery also records coefficient JSON files and validation golden vectors under `research_handoff/support_refit_scan_v1/`, updates a bounded README section, and pushes only those explicit result paths. Delivery is checked end-to-end on a synthetic fixture with Git commands mocked; retained model margins and raw-folded routes must agree before the research candidates are recorded. The v2 FPGA baseline is not replaced automatically.

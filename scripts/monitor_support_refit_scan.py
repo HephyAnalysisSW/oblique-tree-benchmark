@@ -18,7 +18,7 @@ def read(path,default=None):
 
 def schedule(plan,state,status,jobs,receipt,submit):
     """Submit never-started cases or clean budget continuations; never auto-retry errors."""
-    active={j['name'] for j in jobs};slots=plan['concurrency']-len(jobs);launched=[];attention=[]
+    active={j['name'] for j in jobs};slots=plan['concurrency']-len(jobs);launched=[];attention=[];eligible=[]
     for case in plan['cases']:
         name=case['id'];phase=status[name].get('phase','not_started')
         if case['job_name'] in active or phase in TERMINAL:continue
@@ -31,9 +31,13 @@ def schedule(plan,state,status,jobs,receipt,submit):
                 attention.append(dict(case=name,job_id=prior['job_id'],reason='No active job or exit receipt; inspect Slurm accounting'));continue
             if result['exit_code']!=75:
                 attention.append(dict(case=name,job_id=prior['job_id'],reason='Non-budget exit without terminal worker status',exit_code=result['exit_code']));continue
-        if slots<=0:continue
+        eligible.append(case)
+    eligible.sort(key=lambda c:state['submissions'].get(c['id'],{}).get('allocations',1 if c['id'] in state['submissions'] else 0))
+    for case in eligible[:max(0,slots)]:
+        name=case['id'];prior=state['submissions'].get(name)
+        allocations=prior.get('allocations',1) if prior else 0
         job=submit(case)
-        state['submissions'][name]=dict(job_id=job,config=case['config'],submitted_utc=datetime.now(timezone.utc).isoformat())
+        state['submissions'][name]=dict(job_id=job,config=case['config'],allocations=allocations+1,submitted_utc=datetime.now(timezone.utc).isoformat())
         launched.append(dict(case=name,job_id=job));slots-=1
     return launched,attention
 
@@ -104,7 +108,9 @@ def main():
                 def submit(case):
                     job=subprocess.check_output(['sbatch','--parsable','--job-name='+case['job_name'],
                         'scripts/train_tao_support_refit_scan.slurm',case['config']],text=True).strip().split(';')[0]
-                    state['submissions'][case['id']]=dict(job_id=job,config=case['config'],submitted_utc=datetime.now(timezone.utc).isoformat())
+                    prior=state['submissions'].get(case['id'])
+                    allocations=prior.get('allocations',1) if prior else 0
+                    state['submissions'][case['id']]=dict(job_id=job,config=case['config'],allocations=allocations+1,submitted_utc=datetime.now(timezone.utc).isoformat())
                     atomic_json('results/support_refit_scan_v1_controller.json',state);return job
                 launched,attention=schedule(plan,state,status,jobs,receipt,submit)
                 atomic_json('results/support_refit_scan_v1_controller.json',state)

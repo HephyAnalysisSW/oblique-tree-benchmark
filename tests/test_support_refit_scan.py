@@ -31,6 +31,12 @@ class SupportScanTests(unittest.TestCase):
         _,attention=schedule(dict(concurrency=3,cases=cases[:2]),state,status,[],lambda *a:None,lambda c:self.fail('Must not submit'))
         self.assertEqual(len(attention),2)
 
+    def test_round_robin_gives_unstarted_case_a_slot_before_long_continuation(self):
+        cases=self.cases()[1:3];state=dict(submissions={'1':dict(job_id='12',allocations=2)})
+        status={c['id']:dict(phase='epoch') for c in cases};sent=[]
+        schedule(dict(concurrency=1,cases=cases),state,status,[],lambda *a:dict(exit_code=75),lambda c:sent.append(c['id']) or '20')
+        self.assertEqual(sent,['2']);self.assertEqual(state['submissions']['2']['allocations'],1)
+
     def test_archive_matches_evaluated_weights_and_never_pairs_partial_epoch_history(self):
         with tempfile.TemporaryDirectory() as tmp,patch.object(data_utils,'ROOT',Path(tmp)):
             root=Path(tmp);(root/'results').mkdir();(root/'models').mkdir()
