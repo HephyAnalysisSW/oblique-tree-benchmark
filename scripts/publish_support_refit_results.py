@@ -84,9 +84,19 @@ def main():
     compact_path=min(matches,key=lambda p:(p['record']['sparsity']['selected_path_multiplications_upper_bound'],
         p['record']['sparsity']['nonzero_coefficients'],-p['record']['metrics']['signal_efficiency_at_fixed_fpr'])) if matches else None
     chosen=[]
-    for p in [winner,compact,compact_path]+sorted(eligible,key=lambda p:p['record']['metrics']['signal_efficiency_at_fixed_fpr'],reverse=True):
+    for p in [winner,compact,compact_path]:
         if p and not any(q['case']['id']==p['case']['id'] for q in chosen):chosen.append(p)
-        if len(chosen)>=4:break
+    count=lambda p:p['record']['sparsity']['nonzero_coefficients']
+    efficiency=lambda p:p['record']['metrics']['signal_efficiency_at_fixed_fpr']
+    frontier=[p for p in matches if not any(count(q)<=count(p) and efficiency(q)>=efficiency(p)
+        and (count(q)<count(p) or efficiency(q)>efficiency(p)) for q in matches)]
+    while len(chosen)<5:
+        remaining=[p for p in frontier if not any(q['case']['id']==p['case']['id'] for q in chosen)]
+        if not remaining:break
+        # Cover the useful compression range, rather than plotting only several
+        # nearly identical high-parameter checkpoints.
+        selected=max(remaining,key=lambda p:(min(abs(np.log(max(1,count(p)))-np.log(max(1,count(q)))) for q in chosen),efficiency(p)))
+        chosen.append(selected)
     plot_candidates=list(chosen)
     if winner and winner['record']['stage'] not in ('parent','previous_best'):
         parent_point=next((p for p in eligible if p['case']['id']==winner['case']['id'] and p['record']['stage']=='parent'),None)
@@ -118,7 +128,9 @@ def main():
     ax.text(0,.04,'3 x D4 = 1,581 dense slots; 1 x D4 = 527. Support includes biases. CPU: one thread, NumPy vs compiled XGBoost; no FPGA latency claim.',transform=ax.transAxes,fontsize=9)
     fig.tight_layout();fig.savefig(root/'support_refit_scan_v1_final_table.png',dpi=180);plt.close(fig)
     selections={};bootstrap_scores={'XGBoost':reference.predict_proba(x)[:,1]}
-    recommendation_rows=[]
+    recommendation_rows=[['XGBoost reference',f"{bc.get('trees',100)} x D{bc.get('maximum_depth',4)} constant",str(reference_item['parameters']),
+        '—','—','—',f"{bm['signal_efficiency_at_fixed_fpr']:.2%}",f"{bm['signal_auc']:.5f}",
+        f"{reference_item['timings'][-1]['median_microseconds_per_event']:.3f}"]]
     for tag,p in [('winner',winner),('compact_match_xgb',compact),('compact_path_match_xgb',compact_path)]:
         if not p:continue
         record=p['record'];selections[tag]=dict(case=p['case'],record=record)
@@ -170,7 +182,8 @@ def main():
     uncertainty=paired_intervals(y,bootstrap_scores,comparisons=comparisons)
     for tag,selected in selections.items():assert abs(uncertainty['models'][tag]['efficiency']-selected['record']['metrics']['signal_efficiency_at_fixed_fpr'])<1e-7
     summary=dict(updated_utc=datetime.now(timezone.utc).isoformat(),models=results,selections=selections,reference_models=references,
-        xgboost_metrics=bm,dataset_sha256=audit['dataset_sha256'],test_evaluated=False,uncertainty=uncertainty)
+        xgboost_metrics=bm,xgboost_counts=bc,xgboost_parameters=reference_item['parameters'],xgboost_timing=reference_item['timings'][-1],
+        dataset_sha256=audit['dataset_sha256'],test_evaluated=False,uncertainty=uncertainty)
     write_json(root/'support_refit_scan_v1_final_summary.json',summary)
     lines=['# Frozen-support refit scan: coefficient-matched final comparison','',summary['updated_utc'],'',
         '| '+' | '.join(columns)+' |','|'+'|'.join(['---']*len(columns))+'|']+['| '+' | '.join(row)+' |' for row in cells]
