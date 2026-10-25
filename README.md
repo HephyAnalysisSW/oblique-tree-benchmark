@@ -1010,26 +1010,19 @@ exits; separation/numerical failures remain held for inspection.
 
 <a id="support-refit-current"></a>
 <!-- SUPPORT_REFIT_SCAN_CURRENT_BEGIN -->
-### Autonomous support-refit scan
+### Support-refit scan results
 
-The [ten-parent support-refit scan](docs/support_refit_scan.md) is active, with
-at most five refit jobs including the pilot (initially three). It compares mild and aggressive
-L1-selected supports at 889/837/777/675/561/520/418/394/317 coefficients for
-three D4 linear-leaf trees, plus a 403-coefficient single D4 tree. Every parent
-is a pinned converged terminal checkpoint. Each case removes L1, refits leaves
-with fixed splits, then refits the full model within exactly the same support.
+Completed **6/10** full refits; **4** cases have explicitly held outcomes. All results use validation; test data are untouched.
 
-[Live table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_report.md)
-and [tradeoff figure](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_tradeoffs.png).
-The controller will publish coefficient-verified final tables and ROCs once
-all cases have terminal outcomes, then update this section and push a detailed
-results record plus portable floating-point research candidates to GitHub. Separation/stall outcomes stay explicit.
-The pilot fully converged at **56.49%** efficiency at 1% background, versus
-its exact parent's **55.58%**, with the same **520** nonzero coefficients.
-Other refits continue. Test data are not used.
+- Highest efficiency: **3 x D4 linear**, 837 nonzero coefficients, **57.12%** signal efficiency at 1% background, AUC 0.92967. Selector `leaf3`; saved `leaf_only` checkpoint from a converged source stage. Support selected with split/leaf L1 **1e-05/3e-05**. Fixed sparse splits; surviving linear-leaf coefficients refitted without L1.
+- Fewest coefficients matching XGBoost: **3 x D4 linear**, 418 nonzero coefficients, **56.20%** signal efficiency at 1% background, AUC 0.92733. Selector `split300`; saved `full_best` checkpoint from a converged source stage. Support selected with split/leaf L1 **0.003/1e-05**. Surviving split and linear-leaf coefficients refitted without L1 inside immutable masks.
+- Fewest sparse path multiplications matching XGBoost: **1 x D4 linear**, 452 nonzero coefficients, **55.63%** signal efficiency at 1% background, AUC 0.92704. Selector `previous_1t_no_l1`; saved `previous_best` checkpoint from a converged source stage. Original trained reference checkpoint.
 
-Publishing automatically falls back to `results/publish_cache/www/tree_benchmark`
-if the shared `/groups` cache is full; public URLs do not change. The suite now
-passes **74 tests**, including scan scheduling, exact evaluated-checkpoint
-archiving, final-report metric checks and cache failover.
+XGBoost reference: **55.48%** at the same working point.
+
+[Final table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_final_report.md) · [ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_roc.png) · [Screenshot table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_recommendations.png).
+
+See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.
+
+Winner minus XGBoost: +1.63 percentage points; paired validation bootstrap 95% interval [+0.65, +2.55]. This conditions on selected trained models and does not correct for validation selection or training-seed variation.
 <!-- SUPPORT_REFIT_SCAN_CURRENT_END -->
