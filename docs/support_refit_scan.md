@@ -43,7 +43,7 @@ The controller calls `publish_support_refit_results.py` when every case is termi
 
 ## Validation
 
-**73 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+**74 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
 
 Final delivery also records coefficient JSON files and validation golden vectors under `research_handoff/support_refit_scan_v1/`, updates a bounded README section, and pushes only those explicit result paths. Delivery is checked end-to-end on a synthetic fixture with Git commands mocked; retained model margins and raw-folded routes must agree before the research candidates are recorded. The v2 FPGA baseline is not replaced automatically.
 
@@ -62,3 +62,5 @@ Parameter and operation counts in the comparison refer to standardized-input mod
 A control-run auxiliary router repeatedly reached its 800-iteration limit, including rejected proposals. A larger auxiliary budget can be applied with `scripts/amend_support_solver_budget.py` after a clean scheduler exit. Pause scan submissions (`concurrency=0`), wait for the worker lock to be released, then invoke the tool with the case config, a strictly larger `--split-max-iter`, and a measured `--reason`. Restore scan concurrency afterwards. This is an explicit checkpoint-policy migration, not an implicit resume override.
 
 The tool retains the original checkpoint by SHA-256 and records old/new policies, implementation and data hashes, coefficient and support hashes, the completed-history count and the reason. It changes only the auxiliary split iteration budget; coefficients, masks, history, objective and stopping tolerances are preserved. Active workers, held/completed runs, policy mismatches and smaller budgets are rejected. An interrupted migration fails closed at the worker's exact policy check; the archive and receipt permit recovery. The final summary and report disclose any applied amendments. Tests check bit-identical predictions and coefficients, active-worker exclusion, archive retention, policy guards and an actual resumed training run.
+
+A partially completed epoch retains its original per-node fit records across a budget amendment. The larger budget applies to subsequent auxiliary solves; an already evaluated 800-iteration proposal is not relabelled. A direct wrapped-solver test verifies that the next solve receives the new budget.

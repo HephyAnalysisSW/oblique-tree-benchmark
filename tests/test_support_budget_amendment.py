@@ -5,6 +5,7 @@ import numpy as np
 import data_utils
 from tao.hard import HardTAOClassifier
 from tao.support import freeze_support, continue_full_refit
+import tao.support as support
 from scripts import amend_support_solver_budget as amendment
 from scripts import train_tao_support_refit as worker
 import test_support_refit_worker as worker_tests
@@ -15,6 +16,7 @@ class BudgetAmendmentTests(unittest.TestCase):
         model = HardTAOClassifier(depth=1, trees=1, split_max_iter=800).initialize(2, 2)
         model.trees[0].leaf_parameters[:] = .1
         model.trees[0].leaf_parameters[:, 0, :] = 0
+        model.trees[0].leaf_parameters[1] *= -1
         model = continue_full_refit(freeze_support(model))
         plan = dict(run_name='fixture', split_max_iter=800, kkt_tol=1e-6, loss_rtol=1e-5)
         return dict(model=model, plan=plan, dataset_sha256='data', implementation_sha256={'code': 'sha'},
@@ -47,6 +49,18 @@ class BudgetAmendmentTests(unittest.TestCase):
         for phase in ('complete', 'separated', 'inconclusive', 'stalled'):
             p = self.fixture(); p['state']['phase'] = phase
             with self.assertRaises(ValueError): amendment.prepare(p, p['plan'], 4000, 'measured')
+
+    def test_subsequent_auxiliary_fit_receives_larger_budget(self):
+        payload = self.fixture()
+        payload['state']['work'] = dict(profile=dict(split_fits=[dict(iterations=800, converged=False)]))
+        updated, _ = amendment.prepare(payload, payload['plan'], 4000, 'measured')
+        self.assertEqual(updated['state']['work'], payload['state']['work'])
+        model = updated['model']; rng = np.random.default_rng(77)
+        x = rng.normal(size=(180, 2)); y = rng.integers(0, 2, 180)
+        with patch.object(support, 'fit_leaf_parameters', wraps=support.fit_leaf_parameters) as fit:
+            model._split_update(model.trees[0], 0, x, y, np.ones(len(y)), np.zeros((len(y), 2)), len(y))
+        self.assertTrue(fit.called)
+        self.assertEqual(fit.call_args.args[8], 4000)
 
     def test_quiescent_archive_and_actual_worker_resume(self):
         with tempfile.TemporaryDirectory() as temp:
