@@ -6,6 +6,7 @@ import hashlib,json,pickle,shutil,subprocess
 import numpy as np
 from data_utils import resolve,load_config,write_json
 from tao.portable import predict_margin
+from tao.support import freeze_support
 
 BEGIN='<!-- SUPPORT_REFIT_SCAN_CURRENT_BEGIN -->'
 END='<!-- SUPPORT_REFIT_SCAN_CURRENT_END -->'
@@ -15,13 +16,14 @@ BASE='https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/'
 def summary_text(summary):
     completed=sum(row['phase']=='complete' for row in summary['models']);held=len(summary['models'])-completed
     lines=['### Support-refit scan results','',f"Completed **{completed}/{len(summary['models'])}** full refits; **{held}** cases have explicitly held outcomes. All results use validation; test data are untouched.",'']
-    for tag in ['winner','compact_match_xgb']:
+    roles={'winner':'Highest efficiency','compact_match_xgb':'Fewest coefficients matching XGBoost','compact_path_match_xgb':'Fewest sparse path multiplications matching XGBoost'}
+    for tag in roles:
         selected=summary['selections'].get(tag)
         if selected:
             c,r=selected['case'],selected['record'];metric=r['metrics'];counts=r['sparsity']
-            lines.append(f"- {'Highest efficiency' if tag=='winner' else 'Smallest support matching XGBoost'}: **{c['trees']} x D{c['depth']} linear**, {counts['nonzero_coefficients']} nonzero coefficients, **{100*metric['signal_efficiency_at_fixed_fpr']:.2f}%** signal efficiency at 1% background, AUC {metric['signal_auc']:.5f}. Selector `{c['id']}`; saved `{r['stage']}` checkpoint from a converged source run.")
+            lines.append(f"- {roles[tag]}: **{c['trees']} x D{c['depth']} linear**, {counts['nonzero_coefficients']} nonzero coefficients, **{100*metric['signal_efficiency_at_fixed_fpr']:.2f}%** signal efficiency at 1% background, AUC {metric['signal_auc']:.5f}. Selector `{c['id']}`; saved `{r['stage']}` checkpoint from a converged source stage.")
     lines+=['',f"XGBoost reference: **{100*summary['xgboost_metrics']['signal_efficiency_at_fixed_fpr']:.2f}%** at the same working point.",'',
-        f"[Final table]({BASE}support_refit_scan_v1_final_report.md) · [ROC]({BASE}support_refit_scan_v1_roc.png) · [Screenshot table]({BASE}support_refit_scan_v1_final_table.png).",'',
+        f"[Final table]({BASE}support_refit_scan_v1_final_report.md) · [ROC]({BASE}support_refit_scan_v1_roc.png) · [Screenshot table]({BASE}support_refit_scan_v1_recommendations.png).",'',
         'See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.']
     return '\n'.join(lines)+'\n'
 
@@ -38,7 +40,9 @@ def main():
     records={}
     for tag,selection in summary['selections'].items():
         r=selection['record'];blob=resolve(r['immutable_snapshot']).read_bytes();assert hashlib.sha256(blob).hexdigest()==r['sha256']
-        payload=pickle.loads(blob);model=payload['model'];model.assert_support()
+        payload=pickle.loads(blob);model=payload['model']
+        if not hasattr(model,'assert_support'):model=freeze_support(model)  # Freeze coefficients for inference export, without training.
+        model.assert_support()
         folder=root/tag;folder.mkdir(exist_ok=True);cache=resolve('models/support_refit_scan_v1_selected')/tag
         spec=json.loads((cache/'standardized_model.json').read_text());margin,routes,_=predict_margin(spec,x)
         assert np.max(np.abs(margin+model.decision_function(x)[:,0]))<1e-9
@@ -61,7 +65,7 @@ def main():
     start=readme.index(BEGIN)+len(BEGIN);end=readme.index(END)
     resolve('README.md').write_text(readme[:start]+'\n'+text+readme[end:])
     detailed=resolve('plots/comparisons/support_refit_scan_v1_final_report.md').read_text()
-    for name in ['support_refit_scan_v1_final_table.png','support_refit_scan_v1_roc.png']:detailed=detailed.replace('('+name+')','('+BASE+name+')')
+    for name in ['support_refit_scan_v1_final_table.png','support_refit_scan_v1_recommendations.png','support_refit_scan_v1_roc.png']:detailed=detailed.replace('('+name+')','('+BASE+name+')')
     resolve('docs/support_refit_scan_results.md').write_text(text.replace('(docs/','(').replace('(research_handoff/','(../research_handoff/')+'\n'+detailed)
     def command(args):return subprocess.check_output(args,cwd=resolve('.'),text=True).strip()
     assert command(['git','symbolic-ref','--short','HEAD'])=='nn-bdt-comparison'

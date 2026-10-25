@@ -36,6 +36,12 @@ class SupportPublishTests(unittest.TestCase):
             case=dict(id='fixture',config='configs/case.json',run_name='fixture',parent_nonzeros=3,trees=1,depth=0)
             (root/'configs/tao_support_refit_scan_v1.json').write_text(json.dumps(dict(cases=[case])))
             metrics=publisher.compute_metrics(y,parent.predict_proba(x),['bkg','signal'])[0]
+            previous=HardTAOClassifier(depth=0).initialize(2,2);previous.trees[0].leaf_parameters[:]=.1;previous.trees[0].leaf_parameters[:,1]=0
+            previous_metrics=publisher.compute_metrics(y,previous.predict_proba(x),['bkg','signal'])[0]
+            dataset_sha=hashlib.sha256((root/'data/fixture.npz').read_bytes()).hexdigest()
+            (root/'models/reference_hyper_scan_v1_c12_best_efficiency.pkl').write_bytes(pickle.dumps(dict(model=previous,
+                config=dict(dataset_sha256=dataset_sha,run_name='previous'),validation=previous_metrics)))
+            previous_status=root/'results/previous_status.json';previous_status.write_text(json.dumps(dict(converged=True)))
             status=dict(phase='complete',parent=dict(metrics=dict(validation=metrics)),stages=dict(leaf_only={},full={}),training_seconds=2.)
             status_path=root/'results/fixture_status.json';status_path.write_text(json.dumps(status))
             for stage in ['leaf_only','full']:
@@ -48,6 +54,7 @@ class SupportPublishTests(unittest.TestCase):
                 publisher.main()
                 report=json.loads((root/'plots/comparisons/support_refit_scan_v1_final_summary.json').read_text())
                 self.assertFalse(report['test_evaluated']);self.assertIn('winner',report['selections'])
+                self.assertEqual(report['reference_models'][0]['case']['id'],'previous_1t_no_l1')
                 self.assertEqual(report['models'][0]['stages']['full']['metrics'],metrics)
                 record=report['selections']['winner']['record'];snapshot=root/record['immutable_snapshot']
                 self.assertEqual(hashlib.sha256(snapshot.read_bytes()).hexdigest(),record['sha256'])
@@ -64,5 +71,8 @@ class SupportPublishTests(unittest.TestCase):
                 self.assertLess(delivered['selections']['winner']['native_max_margin_difference'],1e-9)
                 readme=(root/'README.md').read_text();self.assertIn('keep before',readme);self.assertIn('keep after',readme)
                 self.assertIn('Completed **1/1**',readme)
+                previous_status.write_text(json.dumps(dict(converged=False)))
+                with self.assertRaises(AssertionError):publisher.main()
+                previous_status.write_text(json.dumps(dict(converged=True)))
                 status['parent']['metrics']['validation']['signal_auc']+=.01;status_path.write_text(json.dumps(status))
                 with self.assertRaises(AssertionError):publisher.main()

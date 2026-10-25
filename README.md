@@ -7,7 +7,7 @@ under `src/tao/`. Neural-network training and FPGA synthesis are not yet include
 
 For the latest support-refit research status and selected coefficients, see
 [the current research section](#support-refit-current). The v2 bundle below
-remains the pinned FPGA implementation baseline while that study proceeds.
+remains the pinned FPGA implementation baseline.
 
 ## Current winning strategy and finalized FPGA handoff — v2
 
@@ -1024,9 +1024,9 @@ and [tradeoff figure](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/com
 The controller will publish coefficient-verified final tables and ROCs once
 all cases have terminal outcomes, then update this section and push a detailed
 results record plus portable floating-point research candidates to GitHub. Separation/stall outcomes stay explicit.
-The pilot's leaf-only stage converged at 55.82% efficiency at 1% background,
-versus its exact parent's 55.58%, with all 520 retained coefficients unchanged
-in number. Full refitting remains provisional. Test data are not used.
+The pilot fully converged at **56.49%** efficiency at 1% background, versus
+its exact parent's **55.58%**, with the same **520** nonzero coefficients.
+Other refits continue. Test data are not used.
 
 Publishing automatically falls back to `results/publish_cache/www/tree_benchmark`
 if the shared `/groups` cache is full; public URLs do not change. The suite now

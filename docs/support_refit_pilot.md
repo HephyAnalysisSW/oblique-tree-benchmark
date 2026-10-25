@@ -23,7 +23,17 @@ The fixed-routing logistic recession-direction LP used all **531,200 training ev
 
 RSS includes the loaded dataset and model; it is not incremental LP allocation. This is a numerical check for the current fixed routes. Full refitting can change routes, in which case the check is repeated.
 
-Leaf-only training is in progress at this initial report. Neither refit stage is yet claimed converged, and no performance improvement is claimed.
+Both stages have now converged on 2026-10-25. All 520 retained coefficients remain nonzero, and the original support hash is unchanged.
+
+| Stage | Efficiency at 1% background | AUC | Training cross-entropy | Passes |
+|---|---:|---:|---:|---:|
+| Exact sparse terminal parent | 55.58% | 0.92732 | 0.32925146 | — |
+| Leaf-only refit | 55.82% | 0.92791 | 0.32795310 | 5 |
+| Full refit | **56.49%** | **0.92855** | **0.32649483** | 15 |
+
+Total training compute wall time was 89.0 minutes, including about 9.9 minutes through leaf-only convergence. Final full-stage leaf KKT residual was 7.55e-8, routing change zero, and three consecutive stable passes satisfied the configured numerical convergence rule. This is a 0.91 percentage-point validation efficiency improvement over the exact parent, without increasing the support. It is not a global-optimum or held-out-test claim.
+
+The final saved full checkpoint SHA-256 is `04ea8abde2b3c2546e91777a0b722a406e2e68d39bfb4780ff5af216c18da09d`. The pilot is adopted as the `both10` case in the wider support-refit scan.
 
 ## Monitoring and reproducibility
 

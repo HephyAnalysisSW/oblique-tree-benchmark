@@ -29,11 +29,11 @@ The existing architecture scan continues independently with its four-job bound. 
 
 ## Measurements and exact checkpoints
 
-The first pilot leaf-only refit converged in about 10 minutes: efficiency improved from 55.58% to 55.82% with the same 520 coefficients. Full refitting is still active; current progress is available in the live report.
+The first pilot leaf-only refit converged in about 10 minutes: efficiency improved from 55.58% to 55.82% with the same 520 coefficients. The pilot full stage subsequently converged at **56.49%** after 15 passes, with the same 520 coefficients. Other cases continue; current progress is available in the live report.
 
 Every new evaluated epoch can be archived as a best-efficiency checkpoint before another node modifies the model. Snapshot score and coefficients are saved together; old history on resume is not mistakenly archived with partially updated weights. Archiving for the already-running pilot begins at its next wrapper continuation; earlier unarchived history is diagnostic only.
 
-The live report labels unfinished results provisional. Final publication re-evaluates every saved candidate on validation data and checks its metrics against the archived record, measures one-thread CPU inference, retains selected files by SHA-256 and produces a ROC comparison and screenshot table. Best snapshots are eligible for final model selection only after the corresponding source stage converges. The frozen FPGA v2 baseline remains immutable during the study.
+The live report labels unfinished results provisional. Final publication re-evaluates every saved candidate on validation data and checks its metrics against the archived record, measures one-thread CPU inference, retains selected files by SHA-256 and produces a ROC comparison and screenshot table. Best snapshots are eligible for final model selection only after the corresponding source stage converges. Original converged parents, completed leaf-only stages and the previously established one-tree/high-efficiency references remain eligible; a harmful refit cannot displace a better established checkpoint merely because it is newer. The frozen FPGA v2 baseline remains immutable during the study.
 
 - [Live report](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_report.md)
 - [Live tradeoffs](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_tradeoffs.png)
