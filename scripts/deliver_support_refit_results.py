@@ -21,7 +21,14 @@ def summary_text(summary):
         selected=summary['selections'].get(tag)
         if selected:
             c,r=selected['case'],selected['record'];metric=r['metrics'];counts=r['sparsity']
-            lines.append(f"- {roles[tag]}: **{c['trees']} x D{c['depth']} linear**, {counts['nonzero_coefficients']} nonzero coefficients, **{100*metric['signal_efficiency_at_fixed_fpr']:.2f}%** signal efficiency at 1% background, AUC {metric['signal_auc']:.5f}. Selector `{c['id']}`; saved `{r['stage']}` checkpoint from a converged source stage.")
+            source=next((row for row in summary['models'] if row.get('case',{}).get('id')==c['id']),None)
+            penalty=''
+            if source and source.get('selection_penalties'):
+                p=source['selection_penalties'];penalty=f" Support selected with split/leaf L1 **{p['split_alpha']:g}/{p['leaf_alpha']:g}**."
+            strategy=('Fixed sparse splits; surviving linear-leaf coefficients refitted without L1.' if r['stage'].startswith('leaf_only') else
+                'Surviving split and linear-leaf coefficients refitted without L1 inside immutable masks.' if r['stage'].startswith('full') else
+                'Original trained reference checkpoint.')
+            lines.append(f"- {roles[tag]}: **{c['trees']} x D{c['depth']} linear**, {counts['nonzero_coefficients']} nonzero coefficients, **{100*metric['signal_efficiency_at_fixed_fpr']:.2f}%** signal efficiency at 1% background, AUC {metric['signal_auc']:.5f}. Selector `{c['id']}`; saved `{r['stage']}` checkpoint from a converged source stage.{penalty} {strategy}")
     lines+=['',f"XGBoost reference: **{100*summary['xgboost_metrics']['signal_efficiency_at_fixed_fpr']:.2f}%** at the same working point.",'',
         f"[Final table]({BASE}support_refit_scan_v1_final_report.md) · [ROC]({BASE}support_refit_scan_v1_roc.png) · [Screenshot table]({BASE}support_refit_scan_v1_recommendations.png).",'',
         'See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.']
