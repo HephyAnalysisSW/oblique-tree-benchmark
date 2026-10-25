@@ -43,7 +43,7 @@ The controller calls `publish_support_refit_results.py` when every case is termi
 
 ## Validation
 
-**69 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+**73 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
 
 Final delivery also records coefficient JSON files and validation golden vectors under `research_handoff/support_refit_scan_v1/`, updates a bounded README section, and pushes only those explicit result paths. Delivery is checked end-to-end on a synthetic fixture with Git commands mocked; retained model margins and raw-folded routes must agree before the research candidates are recorded. The v2 FPGA baseline is not replaced automatically.
 
@@ -56,3 +56,9 @@ The final report includes 1,000-replicate paired, class-stratified validation bo
 The portable research candidates include standardized and raw-folded coefficient JSONs and validation vectors selected randomly and near the working-point/split boundaries. Independent standardized inference is checked against native margins on all validation rows; raw-folded routes must agree. Each input-space JSON has a separately calibrated strict margin cut accepting at most floor(1% of validation background), distinct from the interpolated ROC metric. This avoids treating a last-bit raw-folding difference as a different operational background budget. The current closed-model probe passed all 132,800 rows for the pilot and both established references: native margin error zero, raw-folding error below 4.3e-14, with exact leaf-route agreement.
 
 Parameter and operation counts in the comparison refer to standardized-input models. Folding preprocessing into raw-input coefficients can change bias values and their zero counts; feature-weight sparsity is preserved by the nonzero feature scales. FPGA resource and latency measurements require the chosen input space and an actual implementation.
+
+## Explicit auxiliary solver budget continuation
+
+A control-run auxiliary router repeatedly reached its 800-iteration limit, including rejected proposals. A larger auxiliary budget can be applied with `scripts/amend_support_solver_budget.py` after a clean scheduler exit. Pause scan submissions (`concurrency=0`), wait for the worker lock to be released, then invoke the tool with the case config, a strictly larger `--split-max-iter`, and a measured `--reason`. Restore scan concurrency afterwards. This is an explicit checkpoint-policy migration, not an implicit resume override.
+
+The tool retains the original checkpoint by SHA-256 and records old/new policies, implementation and data hashes, coefficient and support hashes, the completed-history count and the reason. It changes only the auxiliary split iteration budget; coefficients, masks, history, objective and stopping tolerances are preserved. Active workers, held/completed runs, policy mismatches and smaller budgets are rejected. An interrupted migration fails closed at the worker's exact policy check; the archive and receipt permit recovery. The final summary and report disclose any applied amendments. Tests check bit-identical predictions and coefficients, active-worker exclusion, archive retention, policy guards and an actual resumed training run.

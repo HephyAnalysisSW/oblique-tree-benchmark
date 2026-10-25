@@ -44,6 +44,9 @@ class SupportPublishTests(unittest.TestCase):
             previous_status=root/'results/previous_status.json';previous_status.write_text(json.dumps(dict(converged=True)))
             status=dict(phase='complete',parent=dict(metrics=dict(validation=metrics)),stages=dict(leaf_only={},full={}),training_seconds=2.)
             status_path=root/'results/fixture_status.json';status_path.write_text(json.dumps(status))
+            amendment=dict(previous_split_max_iter=800,split_max_iter=4000,completed_history_rows=3,
+                reason='Measured auxiliary solver limit',previous_checkpoint_sha256='original-checkpoint-sha')
+            (root/'results/fixture_budget_amendments.json').write_text(json.dumps([amendment]))
             for stage in ['leaf_only','full']:
                 model=freeze_support(parent) if stage=='leaf_only' else continue_full_refit(freeze_support(parent))
                 (root/('models/fixture_'+stage+'.pkl')).write_bytes(pickle.dumps(dict(model=model,training_converged=True,metrics=dict(validation=metrics))))
@@ -56,6 +59,8 @@ class SupportPublishTests(unittest.TestCase):
                 self.assertFalse(report['test_evaluated']);self.assertIn('winner',report['selections'])
                 self.assertEqual(report['reference_models'][0]['case']['id'],'previous_1t_no_l1')
                 self.assertEqual(report['models'][0]['stages']['full']['metrics'],metrics)
+                self.assertEqual(report['models'][0]['solver_budget_amendments'],[amendment])
+                self.assertIn('original-checkpoint-sha',(root/'plots/comparisons/support_refit_scan_v1_final_report.md').read_text())
                 record=report['selections']['winner']['record'];snapshot=root/record['immutable_snapshot']
                 self.assertEqual(hashlib.sha256(snapshot.read_bytes()).hexdigest(),record['sha256'])
                 (root/'README.md').write_text('keep before\n'+delivery.BEGIN+'\nold status\n'+delivery.END+'\nkeep after\n')

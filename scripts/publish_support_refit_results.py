@@ -60,8 +60,10 @@ def main():
                 assert hashlib.sha256(target.read_bytes()).hexdigest()==digest
                 record['immutable_snapshot']=str(target.relative_to(resolve('.')))
                 eligible.append(dict(case=case,record=record,model=model,roc=roc))
+        amendment_path=resolve('results/'+case['run_name']+'_budget_amendments.json')
+        amendments=json.loads(amendment_path.read_text()) if amendment_path.exists() else []
         results.append(dict(case=case,phase=status['phase'],selection_penalties=parent['model'].__dict__.get('parent_penalties',dict(split_alpha=parent['model'].split_alpha,leaf_alpha=parent['model'].leaf_alpha)),
-            stages=stages,training_seconds=status['training_seconds']))
+            stages=stages,training_seconds=status['training_seconds'],solver_budget_amendments=amendments))
     references=[]
     for tag,pattern in [('previous_1t_no_l1','*_hyper_scan_v1_c12_best_efficiency.pkl'),('previous_3t_peak','*_l1_path_v1_leaf_01_best_efficiency.pkl')]:
         paths=list(resolve('models').glob(pattern))
@@ -197,6 +199,11 @@ def main():
     for tag,u in uncertainty['comparisons'].items():
         lo,hi=u['interval95'];lines+=['',f"{tag}: {100*u['difference']:+.2f} percentage points [{100*lo:+.2f}, {100*hi:+.2f}]."]
     lines+=['',uncertainty['note']]
+    amendments=[(row['case']['id'],a) for row in results for a in row['solver_budget_amendments']]
+    if amendments:
+        lines+=['','Recorded auxiliary solver budget continuations (all stopping tolerances unchanged):','']
+        for case,a in amendments:
+            lines.append(f"- `{case}`: split iterations {a['previous_split_max_iter']} -> {a['split_max_iter']}, after {a['completed_history_rows']} evaluated history rows. {a['reason']} Coefficients were bit-identical at the transition; original checkpoint SHA-256 `{a['previous_checkpoint_sha256']}` is retained in the policy archive.")
     if references:
         lines+=['','Previously established reference checkpoints (from completed runs):','', '| Model | Architecture | Nonzeros | Efficiency at 1% background | AUC |','|---|---|---:|---:|---:|']
         for r in references:

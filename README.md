@@ -67,7 +67,7 @@ Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/
 
 The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
 leaf-route agreement and maximum margin difference below **1.1e-14**. The
-Python suite passes 69 tests, including frozen-model warm starts, path scheduling, compression-frontier selection and support refitting. These are floating-point references: fixed-point
+Python suite passes 73 tests, including frozen-model warm starts, path scheduling, compression-frontier selection and support refitting. These are floating-point references: fixed-point
 formats, the target FPGA and synthesis remain implementation choices.
 
 When a better **saved checkpoint** is verified at the primary working point,
@@ -1030,6 +1030,6 @@ Other refits continue. Test data are not used.
 
 Publishing automatically falls back to `results/publish_cache/www/tree_benchmark`
 if the shared `/groups` cache is full; public URLs do not change. The suite now
-passes **69 tests**, including scan scheduling, exact evaluated-checkpoint
+passes **73 tests**, including scan scheduling, exact evaluated-checkpoint
 archiving, final-report metric checks and cache failover.
 <!-- SUPPORT_REFIT_SCAN_CURRENT_END -->
