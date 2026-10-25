@@ -1,6 +1,6 @@
 {
   "name": "support_refit_scan_v1",
-  "concurrency": 3,
+  "concurrency": 5,
   "cases": [
     {
       "id": "both10",

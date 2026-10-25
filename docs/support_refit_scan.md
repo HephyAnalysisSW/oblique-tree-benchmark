@@ -21,7 +21,7 @@ Each independent case performs unpenalized leaf-only fitting with fixed splits, 
 
 ## Execution
 
-`monitor_support_refit_scan.py` maintains at most three pending/running refits, including the adopted pilot. Each allocation requests one CPU, 12 GiB RAM and one hour. The controller resumes only a worker's explicit scheduler-budget exit 75. Submission receipts and a singleton controller lock prevent duplicate jobs. Allocations rotate across cases so a long continuation cannot indefinitely postpone an unstarted support budget. Missing receipts and unexpected exits remain visible for inspection. Separated, inconclusive and stalled outcomes remain labelled as unsuccessful; they do not count as converged.
+`monitor_support_refit_scan.py` maintains at most five pending/running refits, including the adopted pilot (initially three; expanded after all cases started). Each allocation requests one CPU, 12 GiB RAM and one hour. The controller resumes only a worker's explicit scheduler-budget exit 75. Submission receipts and a singleton controller lock prevent duplicate jobs. Allocations rotate across cases so a long continuation cannot indefinitely postpone an unstarted support budget. Missing receipts and unexpected exits remain visible for inspection. Separated, inconclusive and stalled outcomes remain labelled as unsuccessful; they do not count as converged.
 
 New cases allow up to 600 seconds for a separation LP, to avoid rejecting a larger support merely because the pilot's smaller LP took about 50 seconds. The pilot retains its original 120-second limit and checkpoint policy. Increasing this diagnostic time limit does not change the fitted model objective or constraints.
 

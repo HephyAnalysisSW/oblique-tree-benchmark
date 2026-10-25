@@ -1013,7 +1013,7 @@ exits; separation/numerical failures remain held for inspection.
 ### Autonomous support-refit scan
 
 The [ten-parent support-refit scan](docs/support_refit_scan.md) is active, with
-at most three refit jobs including the pilot. It compares mild and aggressive
+at most five refit jobs including the pilot (initially three). It compares mild and aggressive
 L1-selected supports at 889/837/777/675/561/520/418/394/317 coefficients for
 three D4 linear-leaf trees, plus a 403-coefficient single D4 tree. Every parent
 is a pinned converged terminal checkpoint. Each case removes L1, refits leaves
