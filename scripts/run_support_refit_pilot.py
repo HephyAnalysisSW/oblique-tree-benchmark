@@ -5,9 +5,12 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 import json,os,resource,time
 from data_utils import resolve
 from scripts import train_tao_support_refit as worker
+from scripts.support_refit_artifacts import install_archiver
 
 
 def main():
+    config=sys.argv[sys.argv.index('--config')+1]
+    install_archiver(worker,json.loads(resolve(config).read_text()))
     original=worker.separation_check
     def measured(*args,**kwargs):
         started=time.perf_counter()

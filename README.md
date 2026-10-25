@@ -63,7 +63,7 @@ Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/
 
 The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
 leaf-route agreement and maximum margin difference below **1.1e-14**. The
-Python suite passes 56 tests, including frozen-model warm starts, path scheduling, compression-frontier selection and support refitting. These are floating-point references: fixed-point
+Python suite passes 64 tests, including frozen-model warm starts, path scheduling, compression-frontier selection and support refitting. These are floating-point references: fixed-point
 formats, the target FPGA and synthesis remain implementation choices.
 
 When a better **saved checkpoint** is verified at the primary working point,
@@ -910,7 +910,7 @@ artifacts. This comparison uses validation data only and does not change the
 implementation handoff. The aim is to find the efficiency–sparsity tradeoff
 before choosing an inference implementation that exploits the zeros.
 
-### Frozen-support refitting: implemented, scan not launched
+### Frozen-support refitting
 
 `src/tao/support.py` implements **select → freeze → refit**. Start from a
 SHA-256-pinned **converged terminal parent**, freeze its exact nonzero support,
@@ -993,8 +993,8 @@ in a pilot before choosing the scan.
 [Validation record](docs/support_refit_validation.md): **56 tests pass**, including
 17 new support/refit checks and all existing tests. Freezing the saved real
 one-tree and three-tree terminal parents preserves logits and routes exactly
-on all 132,800 validation vectors each. Full production refits and a scan
-remain to be selected; these checks do not claim new physics performance.
+on all 132,800 validation vectors each. These correctness checks do not claim new physics performance; the full-data
+pilot and scan are documented below.
 
 The [full-data pilot](docs/support_refit_pilot.md) is now running from the
 converged 520-coefficient three-tree parent, using
@@ -1003,3 +1003,25 @@ converged 520-coefficient three-tree parent, using
 this is not yet a completed refit result or a broader scan. The pilot Slurm
 wrapper records per-allocation resource usage and resumes only scheduler-budget
 exits; separation/numerical failures remain held for inspection.
+
+### Autonomous support-refit scan
+
+The [ten-parent support-refit scan](docs/support_refit_scan.md) is active, with
+at most three refit jobs including the pilot. It compares mild and aggressive
+L1-selected supports at 889/837/777/675/561/520/418/394/317 coefficients for
+three D4 linear-leaf trees, plus a 403-coefficient single D4 tree. Every parent
+is a pinned converged terminal checkpoint. Each case removes L1, refits leaves
+with fixed splits, then refits the full model within exactly the same support.
+
+[Live table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_report.md)
+and [tradeoff figure](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_tradeoffs.png).
+The controller will publish coefficient-verified final tables and ROCs once
+all cases have terminal outcomes. Separation/stall outcomes stay explicit.
+The pilot's leaf-only stage converged at 55.82% efficiency at 1% background,
+versus its exact parent's 55.58%, with all 520 retained coefficients unchanged
+in number. Full refitting remains provisional. Test data are not used.
+
+Publishing automatically falls back to `results/publish_cache/www/tree_benchmark`
+if the shared `/groups` cache is full; public URLs do not change. The suite now
+passes **64 tests**, including scan scheduling, exact evaluated-checkpoint
+archiving, final-report metric checks and cache failover.

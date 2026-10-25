@@ -40,7 +40,7 @@ if _proxy.is_file():
 file_sync_storage = []
 PENDING = user.ROOT / "results" / "file_sync_storage.txt"
 
-def register_file(filename):
+def _register_file(filename):
     if not isinstance(filename, (str, bytes, os.PathLike)):
         return  # savefig also accepts BytesIO and other file objects
     source = Path(os.fsdecode(filename)).resolve()
@@ -69,6 +69,20 @@ def register_file(filename):
     for path in (destination, *indexes):
         if str(path) not in file_sync_storage:
             file_sync_storage.append(str(path))
+
+def register_file(filename):
+    try:
+        return _register_file(filename)
+    except OSError as error:
+        import errno
+        if error.errno not in (errno.ENOSPC, errno.EDQUOT):
+            raise
+        fallback = user.ROOT / 'results/publish_cache/www/tree_benchmark'
+        if Path(user.plot_directory) == fallback:
+            raise
+        user.plot_directory = str(fallback)
+        print(f'Plot staging filesystem full; using {fallback}', flush=True)
+        return _register_file(filename)
 
 try:
     import ROOT
@@ -266,14 +280,19 @@ def _sync_unlocked(gifs=False):
         files = list(dict.fromkeys(line.strip() for line in f if line.strip()))
 
     # Build copy plan and collect directories
-    plan = []            # (src_abs, dest_abs)
+    newest = {}          # One source per public URL, including fallback caches.
     dirs_needed = set()
     for src in files:
         src_abs = os.path.abspath(src)
         rel = _rel_under_www(src_abs)
         dest_abs = f"{eos_base}/{rel}"
-        plan.append((src_abs, dest_abs))
+        if not os.path.isfile(src_abs) or os.path.getsize(src_abs) == 0:
+            continue
+        prior = newest.get(dest_abs)
+        if prior is None or os.path.getmtime(src_abs) > os.path.getmtime(prior):
+            newest[dest_abs] = src_abs
         dirs_needed.add(os.path.dirname(dest_abs))
+    plan = [(source, destination) for destination, source in newest.items()]
 
     # Create directories on EOS (sequential)
     for d in sorted(dirs_needed):

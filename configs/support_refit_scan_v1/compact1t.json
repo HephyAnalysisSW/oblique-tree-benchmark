@@ -1,0 +1,23 @@
+{
+  "run_name": "qg_vs_wzt_support_scan_v1_compact1t",
+  "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa1e-05_la1e-05_seed42_hyper_scan_v1_c14.pkl",
+  "source_sha256": "ee79a5afe9f983a774d305d003537912ac991a1675deba2813a4654ce527e289",
+  "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+  "stages": [
+    "leaf_only",
+    "full"
+  ],
+  "exact_zero_support": true,
+  "minimum_epochs": 5,
+  "max_epochs": 200,
+  "local_leaf_max_iter": 400,
+  "global_leaf_chunk_iter": 400,
+  "max_global_chunks": 100,
+  "split_max_iter": 800,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "kkt_tol": 1e-06,
+  "loss_rtol": 1e-05,
+  "route_tol": 0.0001,
+  "separation_time_limit": 600
+}

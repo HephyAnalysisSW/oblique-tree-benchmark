@@ -1,0 +1,119 @@
+{
+  "name": "support_refit_scan_v1",
+  "concurrency": 3,
+  "cases": [
+    {
+      "id": "both10",
+      "config": "configs/tao_support_refit_pilot_v1.json",
+      "run_name": "qg_vs_wzt_support_refit_pilot_3t_d4_both1e4_v1",
+      "job_name": "tao-support-pilot",
+      "adopted_pilot": true,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 520
+    },
+    {
+      "id": "split30",
+      "config": "configs/support_refit_scan_v1/split30.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_split30",
+      "job_name": "tao-sref-split30",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 675
+    },
+    {
+      "id": "leaf3",
+      "config": "configs/support_refit_scan_v1/leaf3.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_leaf3",
+      "job_name": "tao-sref-leaf3",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 837
+    },
+    {
+      "id": "both30",
+      "config": "configs/support_refit_scan_v1/both30.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_both30",
+      "job_name": "tao-sref-both30",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 394
+    },
+    {
+      "id": "compact1t",
+      "config": "configs/support_refit_scan_v1/compact1t.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_compact1t",
+      "job_name": "tao-sref-compact1t",
+      "adopted_pilot": false,
+      "trees": 1,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 403
+    },
+    {
+      "id": "split100",
+      "config": "configs/support_refit_scan_v1/split100.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_split100",
+      "job_name": "tao-sref-split100",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 561
+    },
+    {
+      "id": "both3",
+      "config": "configs/support_refit_scan_v1/both3.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_both3",
+      "job_name": "tao-sref-both3",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 777
+    },
+    {
+      "id": "control",
+      "config": "configs/support_refit_scan_v1/control.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_control",
+      "job_name": "tao-sref-control",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 889
+    },
+    {
+      "id": "split300",
+      "config": "configs/support_refit_scan_v1/split300.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_split300",
+      "job_name": "tao-sref-split300",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 418
+    },
+    {
+      "id": "both100",
+      "config": "configs/support_refit_scan_v1/both100.json",
+      "run_name": "qg_vs_wzt_support_scan_v1_both100",
+      "job_name": "tao-sref-both100",
+      "adopted_pilot": false,
+      "trees": 3,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "parent_nonzeros": 317
+    }
+  ],
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "fixed_fpr": 0.01,
+  "note": "Terminal parents only; independent frozen support; leaf-only then full unpenalized refit. Test untouched."
+}
