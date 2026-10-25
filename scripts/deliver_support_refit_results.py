@@ -25,6 +25,10 @@ def summary_text(summary):
     lines+=['',f"XGBoost reference: **{100*summary['xgboost_metrics']['signal_efficiency_at_fixed_fpr']:.2f}%** at the same working point.",'',
         f"[Final table]({BASE}support_refit_scan_v1_final_report.md) · [ROC]({BASE}support_refit_scan_v1_roc.png) · [Screenshot table]({BASE}support_refit_scan_v1_recommendations.png).",'',
         'See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.']
+    u=summary.get('uncertainty',{}).get('models',{}).get('winner')
+    if u:
+        lo,hi=u['difference_interval95']
+        lines+=['',f"Winner minus XGBoost: {100*u['difference_vs_reference']:+.2f} percentage points; paired validation bootstrap 95% interval [{100*lo:+.2f}, {100*hi:+.2f}]. This conditions on selected trained models and does not correct for validation selection or training-seed variation."]
     return '\n'.join(lines)+'\n'
 
 
@@ -36,7 +40,7 @@ def main():
     root=resolve('research_handoff/support_refit_scan_v1');root.mkdir(parents=True,exist_ok=True)
     cfg=load_config('configs/bdt_qg_vs_wzt_seed42.yaml')
     with np.load(resolve(cfg['data']['dataset_path'])) as data:
-        x=data['X_val'][:128].astype(float);mean,scale=data['scaler_mean'],data['scaler_scale']
+        validation=data['X_val'].astype(float);mean,scale=data['scaler_mean'],data['scaler_scale']
     records={}
     for tag,selection in summary['selections'].items():
         r=selection['record'];blob=resolve(r['immutable_snapshot']).read_bytes();assert hashlib.sha256(blob).hexdigest()==r['sha256']
@@ -44,13 +48,17 @@ def main():
         if not hasattr(model,'assert_support'):model=freeze_support(model)  # Freeze coefficients for inference export, without training.
         model.assert_support()
         folder=root/tag;folder.mkdir(exist_ok=True);cache=resolve('models/support_refit_scan_v1_selected')/tag
+        indices=np.atleast_1d(np.loadtxt(cache/'validation_row_indices.tsv',dtype=int));x=validation[indices]
         spec=json.loads((cache/'standardized_model.json').read_text());margin,routes,_=predict_margin(spec,x)
         assert np.max(np.abs(margin+model.decision_function(x)[:,0]))<1e-9
         raw_spec=json.loads((cache/'raw_model.json').read_text())
         raw_margin,raw_routes,_=predict_margin(raw_spec,x*scale+mean)
         assert np.array_equal(routes,raw_routes) and np.max(np.abs(raw_margin-margin))<1e-8
         np.savetxt(folder/'validation_vectors.tsv',x,fmt='%.17g')
+        np.savetxt(folder/'validation_row_indices.tsv',indices,fmt='%d')
         np.savetxt(folder/'expected_margin_and_leaves.tsv',np.column_stack((margin,routes)),fmt=['%.17g']+['%d']*model.ntrees)
+        np.savetxt(folder/'raw_validation_vectors.tsv',x*scale+mean,fmt='%.17g')
+        np.savetxt(folder/'raw_expected_margin_and_leaves.tsv',np.column_stack((raw_margin,raw_routes)),fmt=['%.17g']+['%d']*model.ntrees)
         hashes={}
         for name in ['standardized_model.json','raw_model.json']:
             shutil.copyfile(cache/name,folder/name);hashes[name]=hashlib.sha256((folder/name).read_bytes()).hexdigest()
@@ -59,7 +67,7 @@ def main():
             raw_fold_max_margin_difference=float(np.max(np.abs(raw_margin-margin))),
             support_sha256=model.support_sha256)
     write_json(root/'selection.json',dict(dataset_sha256=summary['dataset_sha256'],selections=records,test_evaluated=False,
-        note='Floating-point research candidates. Saved checkpoint selection is distinct from terminal source-run convergence. v2 CURRENT_MODEL is unchanged.'))
+        note='Floating-point research candidates. Saved checkpoint selection is distinct from terminal source-run convergence. Each input-space JSON has its own strict margin cut accepting at most floor(1% of validation background), separately from interpolated ROC metrics. v2 CURRENT_MODEL is unchanged.'))
     text=summary_text(summary);readme=resolve('README.md').read_text()
     assert readme.count(BEGIN)==1 and readme.count(END)==1
     start=readme.index(BEGIN)+len(BEGIN);end=readme.index(END)

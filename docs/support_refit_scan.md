@@ -43,6 +43,14 @@ The controller calls `publish_support_refit_results.py` when every case is termi
 
 ## Validation
 
-**66 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+**69 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
 
 Final delivery also records coefficient JSON files and validation golden vectors under `research_handoff/support_refit_scan_v1/`, updates a bounded README section, and pushes only those explicit result paths. Delivery is checked end-to-end on a synthetic fixture with Git commands mocked; retained model margins and raw-folded routes must agree before the research candidates are recorded. The v2 FPGA baseline is not replaced automatically.
+
+## Statistical and interchange checks
+
+Final recommendations retain original parents and established references if a refit harms performance. A snapshot from an unsuccessful full stage remains diagnostic, with an asterisk, and is excluded from selection. Recommendations distinguish highest efficiency, fewest nonzero coefficients matching XGBoost, and fewest sparse path multiplications matching XGBoost; parameter count alone does not determine inference cost.
+
+The final report includes 1,000-replicate paired, class-stratified validation bootstrap intervals at the same interpolated ROC working point, seed 20261025. Tied scores and zero-weight resampled rows are checked against scikit-learn's weighted ROC. Intervals condition on the fitted/selected models and do not correct for training seeds or validation selection. The primary selection metric remains the predeclared point efficiency.
+
+The portable research candidates include standardized and raw-folded coefficient JSONs and validation vectors selected randomly and near the working-point/split boundaries. Independent standardized inference is checked against native margins on all validation rows; raw-folded routes must agree. Each input-space JSON has a separately calibrated strict margin cut accepting at most floor(1% of validation background), distinct from the interpolated ROC metric. This avoids treating a last-bit raw-folding difference as a different operational background budget. The current closed-model probe passed all 132,800 rows for the pilot and both established references: native margin error zero, raw-folding error below 4.3e-14, with exact leaf-route agreement.

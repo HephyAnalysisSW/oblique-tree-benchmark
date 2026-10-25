@@ -48,3 +48,14 @@ sbatch scripts/train_tao_support_refit_pilot.slurm configs/tao_support_refit_pil
 ```
 
 Do not submit a second copy while one is active. Worker locking prevents concurrent checkpoint writers. Continued jobs keep the same run name and resume policy. Only after this pilot's outcome and resource costs are understood should a wider support-selection/refit scan be chosen.
+
+## Conditional validation uncertainty
+
+A paired class-stratified bootstrap with 1,000 replicates, seed 20261025, gives:
+
+| Contrast | Observed change | 95% percentile interval |
+|---|---:|---:|
+| Full refit minus its exact parent | +0.91 percentage points | [+0.18, +1.29] points |
+| Full refit minus XGBoost | +1.01 percentage points | [-0.02, +1.74] points |
+
+The improvement over the parent is supported within this conditional calculation. The XGBoost contrast includes zero; the observed higher efficiency does not establish superiority from this pilot alone. These intervals condition on the trained/selected models and account only for validation row sampling, not training-seed variation or model-selection bias. Test data remain untouched. The calculation took 30.65 seconds and 134 MiB process peak RSS. Machine-readable output: `results/support_refit_pilot_uncertainty.json`.
