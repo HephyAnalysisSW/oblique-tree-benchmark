@@ -35,7 +35,8 @@ def step_epoch(model,work,x,y,sample_weight=None):
         else:
             fitted,stats=fit_leaf_parameters(tree.design(x[rows]),y[rows],work['offset'][rows],weights[rows],normalizer,
                 tree.leaf_parameters[leaf],tree.penalty_rows,model.leaf_alpha,model.leaf_max_iter,
-                ftol=getattr(model,'leaf_ftol',1e-10),gtol=getattr(model,'leaf_gtol',1e-7))
+                ftol=getattr(model,'leaf_ftol',1e-10),gtol=getattr(model,'leaf_gtol',1e-7),
+                trainable_mask=model._leaf_trainable_mask(tree,leaf))
             tree.leaf_parameters[leaf]=fitted;profile['leaf_fits'].append(stats)
         work['leaf_index']+=1
         if work['leaf_index']==tree.leaves:

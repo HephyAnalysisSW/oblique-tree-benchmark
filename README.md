@@ -63,7 +63,7 @@ Current comparisons: [screenshot-ready table](https://schoef.web.cern.ch/schoef/
 
 The ten compiled v2 C++ variants passed **3,038 vector checks** with exact
 leaf-route agreement and maximum margin difference below **1.1e-14**. The
-Python suite passes 39 tests, including frozen-model warm starts, path scheduling and compression-frontier selection. These are floating-point references: fixed-point
+Python suite passes 56 tests, including frozen-model warm starts, path scheduling, compression-frontier selection and support refitting. These are floating-point references: fixed-point
 formats, the target FPGA and synthesis remain implementation choices.
 
 When a better **saved checkpoint** is verified at the primary working point,
@@ -909,3 +909,89 @@ reported choices. Those model files remain outside Git, like other training
 artifacts. This comparison uses validation data only and does not change the
 implementation handoff. The aim is to find the efficiency–sparsity tradeoff
 before choosing an inference implementation that exploits the zeros.
+
+### Frozen-support refitting: implemented, scan not launched
+
+`src/tao/support.py` implements **select → freeze → refit**. Start from a
+SHA-256-pinned **converged terminal parent**, freeze its exact nonzero support,
+and remove both L1 penalties. The support covers every split weight, split
+bias, leaf feature coefficient and leaf bias, separately for each free class.
+Zeros remain zero; surviving values can change magnitude and sign. Small
+nonzero values are not silently discarded. An allowed value can become zero
+without changing the original mask, so reports distinguish the **allowed
+coefficient budget** from the current actual nonzero count.
+
+The two stages are sequential:
+
+| Stage | Fixed | Optimized |
+|---|---|---|
+| `leaf_only` | Original splits, routes and frozen-zero coordinates | All surviving leaf coefficients jointly, without L1 |
+| `full` | The original support and tree layout | Surviving split and leaf coefficients, without L1 |
+
+The full stage starts from the converged leaf-only result but keeps the
+**parent's original support mask**. It does not reselect support. Every local
+fit, joint fit, split proposal and threshold search enforces that mask.
+Original splits with no nonzero feature weights keep their entire decision
+fixed, including a tiny positive bias. The current implementation preserves
+these nodes in the stored layout; physical branch compaction is a separate
+export step. No branches are declared dead from validation or test events.
+
+The constrained leaf KKT check considers only allowed coordinates. A frozen
+zero may have a nonzero gradient because it is an equality constraint. The
+worker requires KKT <= 1e-6, at least five epochs per stage and three stable
+passes under the configured objective/routing/proposal checks. It rejects an
+increased training objective. This certifies numerical optimization within the
+support and configured split proposals, not global tree optimality. Lower
+training cross-entropy does not guarantee better validation efficiency.
+
+Removing L1 can expose complete or quasi separation, where logistic loss has
+no finite coefficient optimum. A sparse linear-programming recession-direction
+check runs before fitting a new routing configuration; its result is cached
+while routes stay unchanged. Separation or an inconclusive/time-limited LP
+blocks completion. No hidden L2 penalty or coefficient bound is substituted.
+A separating **router** is different: if a split already sends every active
+training event to its lower-loss child, its reduced hard objective is optimal,
+even if an auxiliary logistic surrogate would prefer infinite margin. This
+case is explicitly recorded as a pointwise-lower-bound certificate.
+
+Copy `configs/tao_support_refit_template.json` to a new config, fill its unique
+run name, terminal parent path and parent SHA-256, then run in `tree-benchmark`:
+
+```bash
+python scripts/train_tao_support_refit.py --config configs/your_refit.json --wall-seconds 2700
+```
+
+This runs one explicit parent study; it submits no jobs. Resume using the same
+command/config. The worker checks the audited dataset, parent provenance,
+feature/class metadata, identity preprocessing and implementation hashes.
+Changes to the resume policy or implementation require a new run name. A file
+lock prevents two CLI workers writing the same run. Both stages use the fixed
+training/validation arrays and do not load test arrays.
+
+Outputs are `models/<run>_latest.pkl`, converged `<run>_leaf_only.pkl` and
+`<run>_full.pkl`, and `results/<run>_status.json`. Status includes the exact
+parent's metrics and hash, selection penalties, immutable support hash,
+allowed/actual counts, stage histories and stopping diagnostics. Earlier
+best-efficiency parent snapshots are not interchangeable with terminal parents:
+for example the both-L1=1e-4 three-tree terminal has 520 nonzeros, whereas its
+previously reported best-efficiency snapshot has 577.
+
+| Exit code | Meaning |
+|---:|---|
+| 0 | All requested stages numerically converged |
+| 75 | Scheduler budget reached; checkpoint can resume |
+| 78 | Complete/quasi separation detected; incomplete refit |
+| 79 | Separation check inconclusive; incomplete refit |
+| 80 | Numerical/proposal iteration safeguard reached; incomplete refit |
+
+An inconclusive separation check can be retried explicitly with
+`--retry-separation`; other failed checks are not silently bypassed. The LP's
+box bounds only normalize its search direction; fitted coefficients themselves
+are unconstrained within the support. Large-data LP time/memory must be measured
+in a pilot before choosing the scan.
+
+[Validation record](docs/support_refit_validation.md): **56 tests pass**, including
+17 new support/refit checks and all existing tests. Freezing the saved real
+one-tree and three-tree terminal parents preserves logits and routes exactly
+on all 132,800 validation vectors each. Full production refits and a scan
+remain to be selected; these checks do not claim new physics performance.

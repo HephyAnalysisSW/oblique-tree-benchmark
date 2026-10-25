@@ -64,7 +64,8 @@ def ce_value_gradient(theta, design, y, offset, weights, normalizer):
 
 
 def fit_leaf_parameters(design, y, offset, weights, normalizer, initial,
-                        penalty_rows, alpha, max_iter, ftol=1e-10, gtol=1e-7):
+                        penalty_rows, alpha, max_iter, ftol=1e-10, gtol=1e-7,
+                        trainable_mask=None):
     """Exact L1 parameterization via nonnegative positive/negative coefficient parts.
 
     L-BFGS-B sees a smooth constrained objective, not an L2 approximation to L1.
@@ -72,10 +73,18 @@ def fit_leaf_parameters(design, y, offset, weights, normalizer, initial,
     """
     shape = initial.shape
     flat = initial.ravel()
+    allowed = np.ones(flat.shape, dtype=bool)
+    if trainable_mask is not None:
+        trainable_mask = np.asarray(trainable_mask)
+        if trainable_mask.dtype != bool or trainable_mask.shape != shape:
+            raise ValueError('Trainable mask must be boolean and match coefficients')
+        allowed = trainable_mask.ravel()
+        if np.any(flat[~allowed] != 0):
+            raise ValueError('Frozen-zero coefficients must already be exactly zero')
     mask = np.repeat(np.asarray(penalty_rows, dtype=bool), shape[1])
     if alpha == 0:
         mask[:] = False
-    penalized, free = np.flatnonzero(mask), np.flatnonzero(~mask)
+    penalized, free = np.flatnonzero(mask & allowed), np.flatnonzero(~mask & allowed)
     size = len(penalized)
     packed = np.concatenate((np.maximum(flat[penalized], 0),
                              np.maximum(-flat[penalized], 0), flat[free]))
@@ -97,6 +106,11 @@ def fit_leaf_parameters(design, y, offset, weights, normalizer, initial,
 
     started = time.perf_counter()
     start_value = objective(packed)[0]
+    if not len(packed):
+        return initial.copy(), dict(initial_objective=start_value, final_objective=start_value,
+            iterations=0, converged=True, optimizer_parameterized_objective=start_value,
+            l1_parameterization_gap=0., accepted=True, message='No trainable coefficients',
+            function_evaluations=1, seconds=time.perf_counter()-started)
     result = minimize(objective, packed, method='L-BFGS-B', jac=True,
                       bounds=[(0, None)] * (2 * size) + [(None, None)] * len(free),
                       options={'maxiter': max_iter, 'ftol': ftol, 'gtol': gtol,
@@ -322,16 +336,25 @@ class HardTAOClassifier:
             blocks.append(block)
         return sparse.hstack(blocks, format='csr')
 
+    def _leaf_trainable_mask(self, tree, leaf=None):
+        """Optional support constraint; ordinary training remains unconstrained."""
+        return None
+
     def _global_refit(self, x, y, weights):
         start = time.perf_counter()
         design = self._joint_design(x)
         initial = np.concatenate([t.leaf_parameters.reshape(-1, self.n_classes_ - 1)
                                   for t in self.trees])
         penalty = np.concatenate([np.tile(t.penalty_rows, t.leaves) for t in self.trees])
+        masks = [self._leaf_trainable_mask(t) for t in self.trees]
+        trainable = None if all(m is None for m in masks) else np.concatenate([
+            np.ones_like(t.leaf_parameters, dtype=bool).reshape(-1, self.n_classes_-1)
+            if m is None else m.reshape(-1, self.n_classes_-1) for t,m in zip(self.trees,masks)])
         fitted, stats = fit_leaf_parameters(design, y, None, weights, weights.sum(), initial,
                                             penalty, self.leaf_alpha, self.leaf_max_iter,
                                             ftol=getattr(self,'leaf_ftol',1e-10),
-                                            gtol=getattr(self,'leaf_gtol',1e-7))
+                                            gtol=getattr(self,'leaf_gtol',1e-7),
+                                            trainable_mask=trainable)
         cursor = 0
         for tree in self.trees:
             rows = tree.leaves * tree.leaf_width
@@ -442,7 +465,8 @@ class HardTAOClassifier:
                 fitted, stats = fit_leaf_parameters(tree.design(x[rows]), y[rows], offset[rows],
                     weights[rows], normalizer, tree.leaf_parameters[leaf], tree.penalty_rows,
                     self.leaf_alpha, self.leaf_max_iter,
-                    ftol=getattr(self,'leaf_ftol',1e-10),gtol=getattr(self,'leaf_gtol',1e-7))
+                    ftol=getattr(self,'leaf_ftol',1e-10),gtol=getattr(self,'leaf_gtol',1e-7),
+                    trainable_mask=self._leaf_trainable_mask(tree, leaf))
                 tree.leaf_parameters[leaf] = fitted
                 profile['leaf_fits'].append(stats)
             profile['leaf_seconds'] += time.perf_counter() - tick
