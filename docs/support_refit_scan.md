@@ -43,4 +43,6 @@ The controller calls `publish_support_refit_results.py` when every case is termi
 
 ## Validation
 
-**64 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+**65 tests pass**: all existing tests plus controller capacity/continuation checks, coefficient-matched checkpoint archiving, final-publication metric verification and publication-cache failover/deduplication. The worker's existing mask, convergence, separation and resume tests remain unchanged.
+
+Final delivery also records coefficient JSON files and validation golden vectors under `research_handoff/support_refit_scan_v1/`, updates a bounded README section, and pushes only those explicit result paths. Delivery is checked end-to-end on a synthetic fixture with Git commands mocked; retained model margins and raw-folded routes must agree before the research candidates are recorded. The v2 FPGA baseline is not replaced automatically.

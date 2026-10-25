@@ -112,7 +112,9 @@ def main():
                 print(json.dumps(dict(updated_utc=result['updated_utc'],completed=result['completed'],held=result['held'],launched=launched,attention=attention)),flush=True)
                 if all(s.get('phase') in TERMINAL for s in status.values()):
                     from scripts.publish_support_refit_results import main as finalize
-                    finalize();return
+                    finalize()
+                    from scripts.deliver_support_refit_results import main as deliver
+                    deliver();return
                 if args.once:return
             except Exception as exc:
                 print(datetime.now(timezone.utc).isoformat(),type(exc).__name__,str(exc),flush=True)

@@ -6,6 +6,7 @@ import data_utils
 from tao.hard import HardTAOClassifier
 from tao.support import freeze_support,continue_full_refit
 from scripts import publish_support_refit_results as publisher
+from scripts import deliver_support_refit_results as delivery
 
 
 class FakeBooster:
@@ -50,5 +51,18 @@ class SupportPublishTests(unittest.TestCase):
                 self.assertEqual(report['models'][0]['stages']['full']['metrics'],metrics)
                 record=report['selections']['winner']['record'];snapshot=root/record['immutable_snapshot']
                 self.assertEqual(hashlib.sha256(snapshot.read_bytes()).hexdigest(),record['sha256'])
+                (root/'README.md').write_text('keep before\n'+delivery.BEGIN+'\nold status\n'+delivery.END+'\nkeep after\n')
+                (root/'docs').mkdir()
+                def git_command(args,**kwargs):
+                    if args[:3]==['git','symbolic-ref','--short']:return 'nn-bdt-comparison\n'
+                    if args[:3]==['git','config','--get']:return 'git@github.com:HephyAnalysisSW/oblique-tree-benchmark.git\n'
+                    if args[:3]==['git','rev-parse','--short']:return 'fixture\n'
+                    return ''
+                with patch.object(delivery.subprocess,'check_output',side_effect=git_command):delivery.main()
+                delivered=json.loads((root/'research_handoff/support_refit_scan_v1/selection.json').read_text())
+                self.assertEqual(delivered['selections']['winner']['validation_vectors'],80)
+                self.assertLess(delivered['selections']['winner']['native_max_margin_difference'],1e-9)
+                readme=(root/'README.md').read_text();self.assertIn('keep before',readme);self.assertIn('keep after',readme)
+                self.assertIn('Completed **1/1**',readme)
                 status['parent']['metrics']['validation']['signal_auc']+=.01;status_path.write_text(json.dumps(status))
                 with self.assertRaises(AssertionError):publisher.main()
