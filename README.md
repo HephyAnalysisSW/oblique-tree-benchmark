@@ -5,6 +5,10 @@ jet-classification splits from the low-precision FPGA benchmark. GOLLUM hard and
 soft tree sources are archived under `vendor/gollum/`; the hard TAO adapter is
 under `src/tao/`. Neural-network training and FPGA synthesis are not yet included.
 
+For the latest support-refit research status and selected coefficients, see
+[the current research section](#support-refit-current). The v2 bundle below
+remains the pinned FPGA implementation baseline while that study proceeds.
+
 ## Current winning strategy and finalized FPGA handoff — v2
 
 **Use the three-tree, depth-4 hard oblique forest with linear leaves as the
@@ -1004,6 +1008,7 @@ this is not yet a completed refit result or a broader scan. The pilot Slurm
 wrapper records per-allocation resource usage and resumes only scheduler-budget
 exits; separation/numerical failures remain held for inspection.
 
+<a id="support-refit-current"></a>
 <!-- SUPPORT_REFIT_SCAN_CURRENT_BEGIN -->
 ### Autonomous support-refit scan
 
