@@ -1,0 +1,677 @@
+{
+  "schema": "tree-benchmark.fpga-handoff.v1",
+  "created_utc": "2026-10-25T22:49:46.815048+00:00",
+  "source_git_commit": "720493800102471b82eb7078cde9b31a349f42f4",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "partition": "validation",
+  "test_evaluated": false,
+  "primary_metric": "signal_efficiency_at_fixed_fpr",
+  "fixed_fpr": 0.01,
+  "research_selection": "research_handoff/support_refit_scan_v1/selection.json",
+  "research_selection_sha256": "d0e015dfa8627c088202d548ed4302fd017465d2db94248009182b656ea6832a",
+  "primary_candidate": "compact_refit_3t_d4",
+  "selection_reason": "Robert requests Compact refit for Dorian; alternatives retained for comparison.",
+  "candidates": [
+    {
+      "id": "compact_refit_3t_d4",
+      "research_role": "compact_match_xgb",
+      "label": "Compact refit (DEFAULT)",
+      "checkpoint_sha256": "e89b8923fba66f5df02046e04a1828a8ea4c56f60c1d7b201a2a2f92a0ab00fa",
+      "selected_epoch": 8,
+      "training_run_converged": true,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": false,
+      "architecture": {
+        "trees": 3,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 0.003,
+        "leaf_alpha": 1e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "run_name": "qg_vs_wzt_support_scan_v1_split300",
+      "checkpoint_path": "models/support_refit_scan_v1_selected/e89b8923fba66f5df02046e04a1828a8ea4c56f60c1d7b201a2a2f92a0ab00fa.pkl",
+      "original_checkpoint_path": "models/qg_vs_wzt_support_scan_v1_split300_full_best_efficiency.pkl",
+      "stage": "full_best",
+      "metrics": {
+        "accuracy": 0.8535918674698795,
+        "macro_auc": 0.927332525332619,
+        "per_class_auc": {
+          "quark/gluon": 0.9273325253919162,
+          "W/Z/top": 0.9273325252733219
+        },
+        "macro_average_precision": 0.9162258353220496,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8760164104430679,
+          "W/Z/top": 0.9564352602010314
+        },
+        "cross_entropy": 0.3284187210228559,
+        "multiclass_brier_score": 0.20835955440998077,
+        "expected_calibration_error": 0.0015230280820684396,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8535918674698795
+          },
+          "0.7": {
+            "coverage": 0.8129367469879518,
+            "accuracy": 0.9089090201745124
+          },
+          "0.8": {
+            "coverage": 0.6665361445783132,
+            "accuracy": 0.9430385467034208
+          },
+          "0.9": {
+            "coverage": 0.5005120481927711,
+            "accuracy": 0.974378648372149
+          },
+          "0.95": {
+            "coverage": 0.406460843373494,
+            "accuracy": 0.9854199859201898
+          }
+        },
+        "confusion_matrix": [
+          [
+            45838,
+            6673
+          ],
+          [
+            12770,
+            67519
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5620197038199505,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2617356363428615,
+          "W/Z/top": 0.5620197038199505
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07171830664051342,
+            "0.01": 0.2617356363428615,
+            "0.1": 0.7431014454114376
+          },
+          "W/Z/top": {
+            "0.001": 0.24549453847974192,
+            "0.01": 0.5620197038199505,
+            "0.1": 0.8196141439051426
+          }
+        },
+        "signal_auc": 0.9273325252733219
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 1581,
+        "selected_path_multiplications": 240,
+        "selected_path_additions": 242,
+        "selected_path_comparisons": 12,
+        "all_node_multiplications": 1488,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "sparsity": {
+        "dense_parameter_slots": 1581,
+        "nonzero_coefficients": 418,
+        "nonzero_split_feature_weights": 97,
+        "nonzero_leaf_feature_weights": 261,
+        "zero_coefficients": 1163,
+        "structurally_reachable_internal_nodes": 35,
+        "structurally_reachable_leaves": 26,
+        "reachable_nonzero_coefficients": 379,
+        "reachable_all_node_multiplications": 327,
+        "selected_path_multiplications_upper_bound": 80,
+        "selected_path_comparisons_upper_bound": 12,
+        "note": "Exact zeros only. Unreachable branches removed only for identically constant split decisions. Counts are not FPGA latency/DSP estimates."
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.1156953153105,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5620197038199505
+      },
+      "raw_deterministic_working_point": {
+        "signal_margin_threshold": 3.115695315310499,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5620197038199505
+      },
+      "golden_vector_count": 270,
+      "training_policy": {
+        "split_alpha": 0.003,
+        "leaf_alpha": 1e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "timing": {
+        "batch": 132800,
+        "calls_per_repeat": 1,
+        "repeats": 9,
+        "wall_seconds": [
+          0.1479699332267046,
+          0.13471581786870956,
+          0.1278180694207549,
+          0.12309182807803154,
+          0.12745315302163363,
+          0.13436473906040192,
+          0.12936434149742126,
+          0.12451059091836214,
+          0.13080387096852064
+        ],
+        "cpu_seconds": [
+          0.14793738399998801,
+          0.1347073850000129,
+          0.12781025900000031,
+          0.12308469699999591,
+          0.12744344500001148,
+          0.1343565449999744,
+          0.12935591699999804,
+          0.12450299299999301,
+          0.13079446399999028
+        ],
+        "median_wall_seconds": 0.12936434149742126,
+        "median_cpu_seconds": 0.12935591699999804,
+        "median_microseconds_per_event": 0.9741290775408228
+      }
+    },
+    {
+      "id": "highest_efficiency_3t_d4",
+      "research_role": "winner",
+      "label": "Highest efficiency (alternative)",
+      "checkpoint_sha256": "80b0cd6a23d0528a31a691b27d4b006cc9acd12dca4d56022f7f4e046f744700",
+      "selected_epoch": 5,
+      "training_run_converged": false,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": true,
+      "architecture": {
+        "trees": 3,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 1e-05,
+        "leaf_alpha": 3e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "run_name": "qg_vs_wzt_support_scan_v1_leaf3",
+      "checkpoint_path": "models/support_refit_scan_v1_selected/80b0cd6a23d0528a31a691b27d4b006cc9acd12dca4d56022f7f4e046f744700.pkl",
+      "original_checkpoint_path": "models/qg_vs_wzt_support_scan_v1_leaf3_leaf_only.pkl",
+      "stage": "leaf_only",
+      "metrics": {
+        "accuracy": 0.8562198795180723,
+        "macro_auc": 0.9296732687908129,
+        "per_class_auc": {
+          "quark/gluon": 0.9296732690280014,
+          "W/Z/top": 0.9296732685536243
+        },
+        "macro_average_precision": 0.9190594586200961,
+        "per_class_average_precision": {
+          "quark/gluon": 0.880509029474581,
+          "W/Z/top": 0.9576098877656112
+        },
+        "cross_entropy": 0.3235163490643586,
+        "multiclass_brier_score": 0.20474550127983093,
+        "expected_calibration_error": 0.003278233235679487,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8562198795180723
+          },
+          "0.7": {
+            "coverage": 0.8135240963855421,
+            "accuracy": 0.9122144470361732
+          },
+          "0.8": {
+            "coverage": 0.6689156626506024,
+            "accuracy": 0.9449410122478387
+          },
+          "0.9": {
+            "coverage": 0.5133057228915663,
+            "accuracy": 0.973036806665982
+          },
+          "0.95": {
+            "coverage": 0.4153840361445783,
+            "accuracy": 0.9856425502601381
+          }
+        },
+        "confusion_matrix": [
+          [
+            45930,
+            6581
+          ],
+          [
+            12513,
+            67776
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5711616784366476,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2672202014815943,
+          "W/Z/top": 0.5711616784366476
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.08569633029270057,
+            "0.01": 0.2672202014815943,
+            "0.1": 0.7547942335891528
+          },
+          "W/Z/top": {
+            "0.001": 0.22385382804618317,
+            "0.01": 0.5711616784366476,
+            "0.1": 0.825717096987134
+          }
+        },
+        "signal_auc": 0.9296732685536243
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 1581,
+        "selected_path_multiplications": 240,
+        "selected_path_additions": 242,
+        "selected_path_comparisons": 12,
+        "all_node_multiplications": 1488,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "sparsity": {
+        "dense_parameter_slots": 1581,
+        "nonzero_coefficients": 837,
+        "nonzero_split_feature_weights": 447,
+        "nonzero_leaf_feature_weights": 297,
+        "zero_coefficients": 744,
+        "structurally_reachable_internal_nodes": 45,
+        "structurally_reachable_leaves": 48,
+        "reachable_nonzero_coefficients": 837,
+        "reachable_all_node_multiplications": 744,
+        "selected_path_multiplications_upper_bound": 163,
+        "selected_path_comparisons_upper_bound": 12,
+        "note": "Exact zeros only. Unreachable branches removed only for identically constant split decisions. Counts are not FPGA latency/DSP estimates."
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.054366834442842,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5711616784366476
+      },
+      "raw_deterministic_working_point": {
+        "signal_margin_threshold": 3.054366834442841,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5711616784366476
+      },
+      "golden_vector_count": 323,
+      "training_policy": {
+        "split_alpha": 1e-05,
+        "leaf_alpha": 3e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "timing": {
+        "batch": 132800,
+        "calls_per_repeat": 1,
+        "repeats": 9,
+        "wall_seconds": [
+          0.1589006595313549,
+          0.160233773291111,
+          0.14900252502411604,
+          0.1410283586010337,
+          0.14153142739087343,
+          0.15168633311986923,
+          0.14177141059190035,
+          0.15595485549420118,
+          0.1501626055687666
+        ],
+        "cpu_seconds": [
+          0.15888616500001262,
+          0.1602251330000115,
+          0.14898339100000157,
+          0.14101946800002452,
+          0.1415225350000071,
+          0.15167784900000925,
+          0.14176284200001987,
+          0.1559464240000068,
+          0.1501536060000035
+        ],
+        "median_wall_seconds": 0.1501626055687666,
+        "median_cpu_seconds": 0.1501536060000035,
+        "median_microseconds_per_event": 1.1307425118130014
+      }
+    },
+    {
+      "id": "single_tree_1t_d4",
+      "research_role": "compact_path_match_xgb",
+      "label": "One-tree reference (alternative)",
+      "checkpoint_sha256": "a06140db35833c3ebae2d0f41fb1e87bb6b76005556173e903aa6994fe0f2c05",
+      "selected_epoch": 6,
+      "training_run_converged": true,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": false,
+      "architecture": {
+        "trees": 1,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 0,
+        "leaf_alpha": 0,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12",
+      "checkpoint_path": "models/support_refit_scan_v1_selected/a06140db35833c3ebae2d0f41fb1e87bb6b76005556173e903aa6994fe0f2c05.pkl",
+      "original_checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12_best_efficiency.pkl",
+      "stage": "previous_best",
+      "metrics": {
+        "accuracy": 0.8525828313253012,
+        "macro_auc": 0.9270417342844585,
+        "per_class_auc": {
+          "quark/gluon": 0.9270417339286756,
+          "W/Z/top": 0.9270417346402413
+        },
+        "macro_average_precision": 0.9161098444384267,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8762670610770109,
+          "W/Z/top": 0.9559526277998425
+        },
+        "cross_entropy": 0.32934392677614494,
+        "multiclass_brier_score": 0.2089250683784485,
+        "expected_calibration_error": 0.0022055163512747058,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8525828313253012
+          },
+          "0.7": {
+            "coverage": 0.8096536144578313,
+            "accuracy": 0.9098510072357285
+          },
+          "0.8": {
+            "coverage": 0.660527108433735,
+            "accuracy": 0.9440593720787067
+          },
+          "0.9": {
+            "coverage": 0.5012123493975904,
+            "accuracy": 0.9743693754601043
+          },
+          "0.95": {
+            "coverage": 0.40237198795180723,
+            "accuracy": 0.9856835407504445
+          }
+        },
+        "confusion_matrix": [
+          [
+            45933,
+            6578
+          ],
+          [
+            12999,
+            67290
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5563028559329423,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2636780864961627,
+          "W/Z/top": 0.5563028559329423
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07903106015882387,
+            "0.01": 0.2636780864961627,
+            "0.1": 0.7410256898554588
+          },
+          "W/Z/top": {
+            "0.001": 0.22456376340470052,
+            "0.01": 0.5563028559329423,
+            "0.1": 0.8182690032258466
+          }
+        },
+        "signal_auc": 0.9270417346402413
+      },
+      "arithmetic": {
+        "stored_scalar_parameters": 527,
+        "selected_path_multiplications": 80,
+        "selected_path_additions": 80,
+        "selected_path_comparisons": 4,
+        "all_node_multiplications": 496,
+        "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+      },
+      "sparsity": {
+        "dense_parameter_slots": 527,
+        "nonzero_coefficients": 452,
+        "nonzero_split_feature_weights": 165,
+        "nonzero_leaf_feature_weights": 256,
+        "zero_coefficients": 75,
+        "structurally_reachable_internal_nodes": 15,
+        "structurally_reachable_leaves": 16,
+        "reachable_nonzero_coefficients": 452,
+        "reachable_all_node_multiplications": 421,
+        "selected_path_multiplications_upper_bound": 65,
+        "selected_path_comparisons_upper_bound": 4,
+        "note": "Exact zeros only. Unreachable branches removed only for identically constant split decisions. Counts are not FPGA latency/DSP estimates."
+      },
+      "deterministic_working_point": {
+        "signal_margin_threshold": 3.108718446755887,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5563028559329423
+      },
+      "raw_deterministic_working_point": {
+        "signal_margin_threshold": 3.10871844675588,
+        "comparison": ">",
+        "background_count": 52511,
+        "maximum_false_positives": 525,
+        "false_positives": 525,
+        "achieved_background_efficiency": 0.009997905200815067,
+        "signal_efficiency": 0.5563028559329423
+      },
+      "golden_vector_count": 204,
+      "training_policy": {
+        "split_alpha": 0,
+        "leaf_alpha": 0,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      },
+      "timing": {
+        "batch": 132800,
+        "calls_per_repeat": 1,
+        "repeats": 9,
+        "wall_seconds": [
+          0.05455726105719805,
+          0.05468329880386591,
+          0.053834705613553524,
+          0.05561498645693064,
+          0.05441076122224331,
+          0.05426768399775028,
+          0.05905001424252987,
+          0.062153223901987076,
+          0.06205346342176199
+        ],
+        "cpu_seconds": [
+          0.05454704600001037,
+          0.0546690099999978,
+          0.05382707800001185,
+          0.05560849500000131,
+          0.054403530000001865,
+          0.05426056700000004,
+          0.059042949000001954,
+          0.06214597100000674,
+          0.062046016000010695
+        ],
+        "median_wall_seconds": 0.05468329880386591,
+        "median_cpu_seconds": 0.0546690099999978,
+        "median_microseconds_per_event": 0.41177182834236375
+      }
+    }
+  ],
+  "xgboost": {
+    "parameters": 3099,
+    "metrics": {
+      "accuracy": 0.8474774096385542,
+      "macro_auc": 0.9205588064412277,
+      "per_class_auc": {
+        "quark/gluon": 0.9205588065005248,
+        "W/Z/top": 0.9205588063819305
+      },
+      "macro_average_precision": 0.9073761128198716,
+      "per_class_average_precision": {
+        "quark/gluon": 0.861815459351182,
+        "W/Z/top": 0.9529367662885613
+      },
+      "cross_entropy": 0.3412569733417134,
+      "multiclass_brier_score": 0.21719273924827576,
+      "expected_calibration_error": 0.012385367149689111,
+      "confidence_coverage": {
+        "0.5": {
+          "coverage": 1.0,
+          "accuracy": 0.8474774096385542
+        },
+        "0.7": {
+          "coverage": 0.8133509036144578,
+          "accuracy": 0.9022895392221306
+        },
+        "0.8": {
+          "coverage": 0.6069352409638554,
+          "accuracy": 0.9494547214054416
+        },
+        "0.9": {
+          "coverage": 0.45354668674698795,
+          "accuracy": 0.9776693065032956
+        },
+        "0.95": {
+          "coverage": 0.34332831325301205,
+          "accuracy": 0.9889678466464886
+        }
+      },
+      "confusion_matrix": [
+        [
+          46098,
+          6413
+        ],
+        [
+          13842,
+          66447
+        ]
+      ],
+      "fixed_fpr": 0.01,
+      "fixed_fpr_points": [
+        0.001,
+        0.01,
+        0.1
+      ],
+      "signal_efficiency_at_fixed_fpr": 0.5548207101844587,
+      "per_class_efficiency_at_fixed_fpr": {
+        "quark/gluon": 0.2255908285882958,
+        "W/Z/top": 0.5548207101844587
+      },
+      "per_class_efficiency_points": {
+        "quark/gluon": {
+          "0.001": 0.05979699491535107,
+          "0.01": 0.2255908285882958,
+          "0.1": 0.708956218697035
+        },
+        "W/Z/top": {
+          "0.001": 0.22255241689397054,
+          "0.01": 0.5548207101844587,
+          "0.1": 0.812128685124986
+        }
+      },
+      "signal_auc": 0.9205588063819305
+    },
+    "source_checkpoint_sha256": "13d265203229309d36cf510467a5c3b09412817085383b323d1b1969b9eb4db5",
+    "native_json": "xgboost_reference/model.json"
+  },
+  "hardware": {
+    "quantized": false,
+    "synthesized": false,
+    "target_device": null,
+    "clock_target": null
+  },
+  "files": {
+    "compact_refit_3t_d4/candidate.json": "7bc65b5618aab28694fae3a3313fc26ce7a84558491f940b587e000485d0e6f3",
+    "compact_refit_3t_d4/raw/expected.tsv": "1cf06a4ad9ce8a2526198cb3122da9786ef9a57c2c79290281af42ff673760e4",
+    "compact_refit_3t_d4/raw/model.json": "f4d1f2157b17da7d360d2c43c7c59d2f7e3db92196c44959dd090ffe07bfd3f9",
+    "compact_refit_3t_d4/raw/model_coefficients.h": "a66103755dab4c1ba46572ca86c73cadfdefc91c284af7fc06c722be456b3f7d",
+    "compact_refit_3t_d4/raw/ranges.json": "f48450cbcb7e558312eebd38494a8abf23218f50398e5f42d9b3da1138838c96",
+    "compact_refit_3t_d4/raw/tree_free_logits.tsv": "e764d903d3a48fc4dbd73bf6cb1169b3494645366d0ea32fba6c01b2fb902600",
+    "compact_refit_3t_d4/raw/vectors.tsv": "01b276fb7d165c6b740480f8d3415819053580fc2630331978475fffb3db4c1c",
+    "compact_refit_3t_d4/standardized/expected.tsv": "bbd0220a4005614aa547982926085bdebaecd0f77d4f4fd1c37a382e37acd1fb",
+    "compact_refit_3t_d4/standardized/model.json": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+    "compact_refit_3t_d4/standardized/model_coefficients.h": "e86f532b15c26960348c0f839f23a0553bdcbd7d8f1b0d19333616f168b6b1c9",
+    "compact_refit_3t_d4/standardized/ranges.json": "b9ba3b3425f8d39613b47a6b9c3e64f80cffc7a11f76b55b7d11388e137a47b0",
+    "compact_refit_3t_d4/standardized/tree_free_logits.tsv": "fcef9965c5ea485f8877ece56c49b882adec02d2f8ba57480bde00e7573745f8",
+    "compact_refit_3t_d4/standardized/vectors.tsv": "6a20cafcda39cfb358360604258ed6caf6ccf322e9843608e6d04d14c5706db0",
+    "compact_refit_3t_d4/validation_row_indices.tsv": "26f808f9d6e3108091f19c235553e204561477bc1c2cebdf4a7b4408927e50aa",
+    "comparison.json": "d1ea8251bd5c47a40ee8e6bb556d52d40c66b91a83e57a260f99fabec7535ff5",
+    "comparison.md": "a0a3a2b4d50db13767bed011f15639832f921e2c60afcce136510f1946c016b9",
+    "highest_efficiency_3t_d4/candidate.json": "84825dbbb00983ccca3452dadb2c71e275e7091167eb0ee7579f3197f08a200a",
+    "highest_efficiency_3t_d4/raw/expected.tsv": "d527104a18cd2117a44b70e5dc553d686ecdce02063c38549b4562249dc9e454",
+    "highest_efficiency_3t_d4/raw/model.json": "dffdb5510f79cbec31851b16855de369cd85a5bb3a800af73ec9a3391e8ee1e9",
+    "highest_efficiency_3t_d4/raw/model_coefficients.h": "a7eb99109fbef7a99b044a4f60bbeb97bb1fadb4042446495ccc45f9e03ad617",
+    "highest_efficiency_3t_d4/raw/ranges.json": "5f48bed0841f528d15c1097c40724d3e515710e63989bf53a2348bf8a5bd600e",
+    "highest_efficiency_3t_d4/raw/tree_free_logits.tsv": "f7d4f70e683828c4a71e5c15707d1ed722e8979ab745064ce73a622b8f5d0c71",
+    "highest_efficiency_3t_d4/raw/vectors.tsv": "90fd6d8fbe1df82479ec3a07f6b60097f6472f778f1b32de33d1fb0a9485e1f1",
+    "highest_efficiency_3t_d4/standardized/expected.tsv": "78d699beb79639e4ca8e08ade33d46878f6562bc1d8594e8ce0c59472148dad8",
+    "highest_efficiency_3t_d4/standardized/model.json": "cc1a7f9b7291ff03478d95836d51775309238fc1faf7765e10f05a4a267c2cb6",
+    "highest_efficiency_3t_d4/standardized/model_coefficients.h": "9848814df38d2f9d53659b5da321ce24b4d017f94ac760aaf4bdcfc19bc92068",
+    "highest_efficiency_3t_d4/standardized/ranges.json": "c40df67c944238c3dd938a5ca102758cba05fb07a19b00eeff8edc7d547c8ff2",
+    "highest_efficiency_3t_d4/standardized/tree_free_logits.tsv": "7d4082769b1d482dc5588a7f072311092fab5a0c92805250114157121e496588",
+    "highest_efficiency_3t_d4/standardized/vectors.tsv": "abd8a0aa982147fb3a1e412015b59c13a891f9fd36f0dcc7a779e1212cea78c3",
+    "highest_efficiency_3t_d4/validation_row_indices.tsv": "685af0c5176871fdacdc03c909f557808f6c6a150586a5cfa5299e36f85e724e",
+    "input_contract.json": "0ed23d932db75034ba90604e848c56e41681dab7cfdf15fb29873ef602bb0702",
+    "single_tree_1t_d4/candidate.json": "7620386996862b4b4764ff9089805a32c9a80a708b999d4e8fc4e7246117fe96",
+    "single_tree_1t_d4/raw/expected.tsv": "afd01247b38c9966160fcd1962a57578f82dc1b31372c1f97af3b23b3282cce9",
+    "single_tree_1t_d4/raw/model.json": "73c31a7a7f827620733e13a34bf427f7ea39db47e7b789a39ede4eda3abd23d6",
+    "single_tree_1t_d4/raw/model_coefficients.h": "71b049edaf358441d1947be9628beec12cbe450c6d057f2149702f60c56c7621",
+    "single_tree_1t_d4/raw/ranges.json": "dd366f4312a20ec86f8256e1a9bdfb66586903a5180d7f7293988239cd4d56c7",
+    "single_tree_1t_d4/raw/tree_free_logits.tsv": "d0d46addee7b62c6ae16afb92a74dfe9c0de0175b0e43d5d40d7844acea819fa",
+    "single_tree_1t_d4/raw/vectors.tsv": "fd8b6a8957bfba7e3281eefaa9d0344ba76ad779d52349ea492e00df751a4bfd",
+    "single_tree_1t_d4/standardized/expected.tsv": "13f73c834554ef8b26336faf2357482ab41c93b090200392f777abd800bfed7b",
+    "single_tree_1t_d4/standardized/model.json": "e30f250d5d9b00eb16019282b6b2619df1c615934f53c997ca4e586441b274aa",
+    "single_tree_1t_d4/standardized/model_coefficients.h": "33e348fdb7183dcde42bc0547c45cd06d1717c8abea07b7e2b98d7c61f82c3ef",
+    "single_tree_1t_d4/standardized/ranges.json": "7b6c0742169138f80c9062e52bbf6a3051c19a437fc356ec825694366a60a038",
+    "single_tree_1t_d4/standardized/tree_free_logits.tsv": "88f39ee6d0ecda9ea3fac6c935903153c5f9fcad37ec0b7a9c1c8036d8a5bf3f",
+    "single_tree_1t_d4/standardized/vectors.tsv": "0ad88cca8df1484cde45e2473659e024c1d3b6cae0e9663172dbfeedc303e727",
+    "single_tree_1t_d4/validation_row_indices.tsv": "953c0b8f0ce90f25e9e89869592153def96ceccefe707070ce40c6cc1151e3c6",
+    "xgboost_reference/expected_signal_probability.tsv": "0a1de2f3a3da0ef748b7c5ac837269ec81f69b50f79331718c96a4a7a3089a32",
+    "xgboost_reference/model.json": "8d9315c22b260c52f4f22d631a84a37fcc31bab10af116c93d48d9cf877e030a",
+    "xgboost_reference/vectors.tsv": "74062982ac8f0567eb9f26bb255981b4d65653e08e0ca79f5ab87d1ad9fdbc28"
+  }
+}

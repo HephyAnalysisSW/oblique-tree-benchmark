@@ -1,44 +1,44 @@
-# FPGA implementation handoff
+# FPGA implementation handoff — v3 Compact refit
 
-The current frozen **`v2/`** bundle is a floating-point specification of the
-selected oblique candidates and XGBoost reference. Start with `winner_3t_d4`
-(55.78% efficiency at 1% background, 1,581 parameters). Compare `compact_1t_d4`
-(55.22%, 527 parameters) and `constant_5t_d4` (55.11%, 1,355 parameters).
-`CURRENT_MODEL.json` is authoritative; `v1/` remains available unchanged.
-The manifest identifies the exact checkpoints and selection epochs. This
-handoff can be implemented while the wider training scan continues; do not
-silently replace a versioned model with a newer training checkpoint.
+**Dorian: start with `v3/compact_refit_3t_d4/`.** This is the implementation
+default selected by Robert, even though the higher-efficiency alternative has a
+larger ROC value. `CURRENT_MODEL.json` is authoritative. v1/v2 are preserved
+historical bundles, not the default for new work.
 
-## Frozen comparison
+Read [Dorian's complete handover](../docs/DORIAN_HANDOVER.md) for exact training
+files, checkpoints, environments and reproduction commands.
 
-See [comparison.md](v2/comparison.md) and [manifest.json](v2/manifest.json).
-The primary metric is signal efficiency at 1% background acceptance on the
-fixed validation partition. The held-out test set has not been evaluated.
-Snapshots were selected by validation efficiency, which may peak before the
-terminal training iterate. The primary v2 checkpoint was saved at pass 3 while its run was still training.
-The handoff is finalized as an immutable snapshot; the full scan and numerical
-convergence of these runs are not claimed complete. Test data remain held out.
+| Role | Candidate | Layout | Dense / nonzero | Efficiency at 1% background |
+|---|---|---|---:|---:|
+| **DEFAULT: Compact refit** | `v3/compact_refit_3t_d4` | 3 x D4 linear | 1581 / 418 | **56.20%** |
+| Higher efficiency | `v3/highest_efficiency_3t_d4` | 3 x D4 linear | 1581 / 837 | 57.12% |
+| One-tree alternative | `v3/single_tree_1t_d4` | 1 x D4 linear | 527 / 452 | 55.63% |
+| XGBoost reference | `v3/xgboost_reference` | 100 x D4 constant | 3099 / not counted | 55.48% |
 
-Counts include scalar model coefficients and biases, including zeros. They
-exclude common input preprocessing and topology. CPU measurements compare
-NumPy TAO and compiled XGBoost APIs; they are not FPGA latency measurements.
+[Manifest](v3/manifest.json) · [comparison](v3/comparison.md) ·
+[C++ verification](v3/cpp_verification.json). Validation only; test untouched.
+The default is the saved full-refit pass 8 from a source stage converged at pass
+15; the selected pass itself is not labelled converged. The higher-efficiency
+alternative uses its converged leaf-only stage; its held full-refit snapshot is
+excluded. The one-tree reference is saved pass 6 from a completed source run.
 
 ## Bundle contents
 
-- `manifest.json`: dataset/source checkpoint hashes, code commit, selected
-  epochs, metrics, training status, parameter/operation counts and file hashes.
-- `input_contract.json`: the 16 features in exact order, class labels, saved
-  training scaler and observed training ranges. Inputs must be finite.
-- Each candidate has `standardized/` and `raw/` variants, each containing
+- `manifest.json`: exact checkpoint hashes, selection/stage status, metrics,
+  arithmetic counts and SHA-256 hashes of implementation files.
+- `input_contract.json`: ordered features, class labels, saved training scaler,
+  observed training ranges. Inputs must be finite.
+- Every oblique candidate has `standardized/` and `raw/` variants containing
   `model.json`, `model_coefficients.h`, `ranges.json`, `vectors.tsv`,
   `expected.tsv`, and `tree_free_logits.tsv`.
-- Candidate `validation_row_indices.tsv` and `labels.tsv` identify golden
-  examples. They mix random validation examples and examples near split or
-  working-point boundaries. No test examples are included.
-- `xgboost_reference/model.json` is the native XGBoost model, with matching
-  standardized golden inputs and expected signal probabilities.
-- `reference.cpp` is a standalone floating-point inference reference.
-  C++ verification results are recorded in `v2/cpp_verification.json`.
+- Candidate-level `validation_row_indices.tsv` identifies golden examples;
+  vectors mix random rows and rows near split/working-point boundaries. v3 does
+  not require labels for floating-point inference verification.
+- XGBoost has native `model.json`, standardized vectors and expected signal
+  probabilities, retained from the same verified reference dataset/model.
+- `reference.cpp` is the standalone floating-point evaluator. All six v3
+  variants pass 1,594 vector evaluations with exact routes, maximum margin
+  error below 2.5e-14. Coefficients are not quantized or synthesized.
 
 ## Exact inference contract
 
@@ -108,14 +108,13 @@ Choose feature, coefficient and accumulator formats and overflow policy before
 claiming bit-exact firmware behavior. There is no hidden saturation or clipping
 in the floating reference.
 
-For the v2 three-tree depth-4 linear winner, there are 45 internal nodes and
-48 leaves: 765 split coefficients plus 816 leaf coefficients = **1,581 scalars**.
-A selected path uses 240 dense scalar multiplications, 242 additions and 12
-comparisons across the forest. Evaluating every node and leaf uses 1,488
-multiplications. The compact single-tree alternative uses 80 selected-path
-multiplications and 4 comparisons.
-These counts do not specify DSP usage, multiplier sharing, pipeline placement,
-clock frequency, initiation interval, routing delay or synthesized latency.
+For the default Compact refit, 3 x D4 linear allocates 1,581 scalar slots,
+but only **418 coefficients are nonzero** (379 remain after algebraically
+constant routes are eliminated). Sparse selected-path multiplication bound: 80;
+the dense bound is 240. The one-tree alternative has 452 nonzero coefficients
+and bound 65; the higher-efficiency alternative has 837 and bound 163. These are
+standardized-input scalar arithmetic counts, not DSP usage, multiplier sharing,
+pipeline placement, frequency, initiation interval or synthesized latency.
 
 ## Compile and verify without the training stack
 
@@ -124,12 +123,12 @@ reference checks. CLIP's default GCC 4.8 is too old; use a newer compiler or run
 this check on another machine.
 
 ```bash
-python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v2 --compiler c++
+python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v3 --compiler c++
 
 c++ -std=c++17 -O2 -ffp-contract=off \
-  -I fpga_handoff/v2/winner_3t_d4/standardized \
+  -I fpga_handoff/v3/compact_refit_3t_d4/standardized \
   fpga_handoff/reference.cpp -o /tmp/tao_reference
-/tmp/tao_reference < fpga_handoff/v2/winner_3t_d4/standardized/vectors.tsv
+/tmp/tao_reference < fpga_handoff/v3/compact_refit_3t_d4/standardized/vectors.tsv
 ```
 
 Each output line contains `signal_margin leaf_index_tree0 leaf_index_tree1 ...`.
@@ -139,14 +138,18 @@ absolute / 1e-10 relative. Fixed-point bit-exact tests are a subsequent step.
 
 ## Reproduce the export
 
-The export requires the CLIP training environment and saved checkpoint pickles:
+See [Dorian's handover](../docs/DORIAN_HANDOVER.md) for the exact training chain,
+checkpoint hashes, Python 3.10 Conda setup and refit reproduction. The selection
+is pinned by `configs/fpga_handoff_v3.json`. To export again, use a new version:
 
 ```bash
-# The original v2 freeze used scripts/export_fpga_handoff_v2.slurm.
-# To take a later snapshot, select a NEW version; existing versions cannot be overwritten.
-python scripts/export_fpga_handoff.py --selection configs/fpga_handoff_v2.json --output fpga_handoff/v3
+python scripts/freeze_support_handoff.py --output fpga_handoff/v4
+python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v4 --compiler c++
+# Promotion is a separate intentional operation after verification:
+# python scripts/freeze_support_handoff.py --output fpga_handoff/v4 --promote
 ```
 
-The exporter never trains or changes checkpoints. The v2 run selection is in `configs/fpga_handoff_v2.json`; checkpoint bytes are read once, hashed and
-converted to portable coefficients. The JSON/headers and golden vectors are
-sufficient for implementation; the Python pickles are not required by firmware.
+The exporter consumes verified research JSON/vector files and does not train.
+The verifier needs only Python standard library plus a C++17 compiler. It
+preserves an existing frozen verification report; use `--report /tmp/check.json`
+for a separate report. Existing bundle directories cannot be overwritten.

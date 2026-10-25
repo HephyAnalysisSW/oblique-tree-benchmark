@@ -10,7 +10,7 @@ XGBoost reference: **55.48%** at the same working point.
 
 [Final table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_final_report.md) · [ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_roc.png) · [Screenshot table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_recommendations.png).
 
-See [full results](support_refit_scan_results.md) and the coefficient-pinned [research candidates](../research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.
+See [full results](support_refit_scan_results.md) and the coefficient-pinned [research candidates](../research_handoff/support_refit_scan_v1/selection.json). The FPGA implementation default is now the Compact refit in `fpga_handoff/v3/`; these candidates are floating-point references, not quantized or synthesized implementations.
 
 Winner minus XGBoost: +1.63 percentage points; paired validation bootstrap 95% interval [+0.65, +2.55]. This conditions on selected trained models and does not correct for validation selection or training-seed variation.
 

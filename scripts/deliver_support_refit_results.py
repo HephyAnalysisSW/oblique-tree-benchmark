@@ -31,7 +31,7 @@ def summary_text(summary):
             lines.append(f"- {roles[tag]}: **{c['trees']} x D{c['depth']} linear**, {counts['nonzero_coefficients']} nonzero coefficients, **{100*metric['signal_efficiency_at_fixed_fpr']:.2f}%** signal efficiency at 1% background, AUC {metric['signal_auc']:.5f}. Selector `{c['id']}`; saved `{r['stage']}` checkpoint from a converged source stage.{penalty} {strategy}")
     lines+=['',f"XGBoost reference: **{100*summary['xgboost_metrics']['signal_efficiency_at_fixed_fpr']:.2f}%** at the same working point.",'',
         f"[Final table]({BASE}support_refit_scan_v1_final_report.md) · [ROC]({BASE}support_refit_scan_v1_roc.png) · [Screenshot table]({BASE}support_refit_scan_v1_recommendations.png).",'',
-        'See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA v2 implementation baseline remains unchanged; these candidates are floating-point references, not quantized or synthesized implementations.']
+        'See [full results](docs/support_refit_scan_results.md) and the coefficient-pinned [research candidates](research_handoff/support_refit_scan_v1/selection.json). The FPGA implementation default is pinned separately in `fpga_handoff/CURRENT_MODEL.json`; these research candidates are floating-point references, not quantized or synthesized implementations.']
     u=summary.get('uncertainty',{}).get('models',{}).get('winner')
     if u:
         lo,hi=u['difference_interval95']

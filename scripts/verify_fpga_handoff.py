@@ -8,7 +8,7 @@ from pathlib import Path
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--bundle',help='Default: bundle pinned by CURRENT_MODEL.json');parser.add_argument('--compiler',default=os.environ.get('CXX','c++'))
+    parser.add_argument('--report',help='Optional new verification report path; existing frozen reports are preserved');parser.add_argument('--bundle',help='Default: bundle pinned by CURRENT_MODEL.json');parser.add_argument('--compiler',default=os.environ.get('CXX','c++'))
     args=parser.parse_args()
     repository=Path(__file__).resolve().parents[1]
     selected=json.loads((repository/'fpga_handoff/CURRENT_MODEL.json').read_text())
@@ -35,7 +35,8 @@ def main():
                     assert math.isclose(float(a[0]),float(b[0]),rel_tol=1e-10,abs_tol=1e-9),'Signal margin mismatch'
                 checks.append(dict(candidate=case['id'],input_space=space,vectors=len(actual),max_absolute_margin_error=error))
     report=dict(compiler=subprocess.check_output([compiler,'--version'],text=True).splitlines()[0],all_passed=True,checks=checks)
-    (bundle/'cpp_verification.json').write_text(json.dumps(report,indent=2)+'\n')
+    report_path=Path(args.report) if args.report else bundle/'cpp_verification.json'
+    if args.report or not report_path.exists():report_path.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
 
 

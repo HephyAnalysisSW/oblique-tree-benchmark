@@ -1,0 +1,73 @@
+{
+  "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12",
+  "seed": 42,
+  "data": {
+    "dataset_path": "data/qg_vs_wzt_standardized.npz",
+    "metadata_path": "data/qg_vs_wzt_metadata.json",
+    "input_representation": "standardized"
+  },
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "implementation_sha256": "fd649bf8c777bd648c0ce66363d713213f73c0b336ba9fce6be872e2af1802a2",
+  "full_training_policy": {
+    "scan_name": "tao_hyper_scan_v1_c12",
+    "source_scan": null,
+    "task": "qg_vs_wzt",
+    "seed": 42,
+    "split_alpha": 0.0,
+    "leaf_alpha": 0.0,
+    "leaf_mode": "linear",
+    "local_leaf_max_iter": 300,
+    "global_leaf_chunk_iter": 250,
+    "split_max_iter": 300,
+    "leaf_ftol": 1e-12,
+    "leaf_gtol": 1e-08,
+    "convergence": {
+      "loss_rtol": 1e-05,
+      "kkt_tol": 1e-06,
+      "route_tol": 0.0001,
+      "patience": 3
+    },
+    "minimum_continuation_epochs": 5,
+    "layouts": [
+      {
+        "trees": 1,
+        "depth": 4
+      }
+    ],
+    "split_search": "hard_threshold",
+    "run_suffix": "hyper_scan_v1_c12",
+    "publication_prefix": "hyper_scan_v1",
+    "initialization": "cart",
+    "label": "CART sa=0 la=0",
+    "primary_metric": "signal_efficiency_at_fixed_fpr"
+  },
+  "split_search_sha256": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+  "initialization": "cart",
+  "initialization_records": [
+    {
+      "tree": 0,
+      "bootstrap": false,
+      "cart_nodes": 31
+    }
+  ],
+  "initialization_seconds": 9.02372513525188,
+  "source_run": null,
+  "source_model_sha256": null,
+  "source_training_seconds": 0,
+  "model": {
+    "type": "hard_tao_cross_entropy",
+    "output_model_path": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12.pkl",
+    "tao": {
+      "trees": 1,
+      "depth": 4,
+      "leaf_mode": "linear",
+      "split_alpha": 0.0,
+      "leaf_alpha": 0.0
+    }
+  },
+  "evaluation": {
+    "output_prefix": "results/qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12",
+    "fixed_fpr": 0.01
+  },
+  "epoch_checkpointing": "node"
+}

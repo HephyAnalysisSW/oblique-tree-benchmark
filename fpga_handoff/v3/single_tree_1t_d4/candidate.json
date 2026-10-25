@@ -1,0 +1,176 @@
+{
+  "id": "single_tree_1t_d4",
+  "research_role": "compact_path_match_xgb",
+  "label": "One-tree reference (alternative)",
+  "checkpoint_sha256": "a06140db35833c3ebae2d0f41fb1e87bb6b76005556173e903aa6994fe0f2c05",
+  "selected_epoch": 6,
+  "training_run_converged": true,
+  "source_stage_converged": true,
+  "selected_checkpoint_converged": false,
+  "architecture": {
+    "trees": 1,
+    "depth": 4,
+    "leaf_mode": "linear"
+  },
+  "support_selection": {
+    "split_alpha": 0,
+    "leaf_alpha": 0,
+    "refit_split_alpha": 0,
+    "refit_leaf_alpha": 0,
+    "exact_zero_support": true
+  },
+  "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12",
+  "checkpoint_path": "models/support_refit_scan_v1_selected/a06140db35833c3ebae2d0f41fb1e87bb6b76005556173e903aa6994fe0f2c05.pkl",
+  "original_checkpoint_path": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa0_la0_seed42_hyper_scan_v1_c12_best_efficiency.pkl",
+  "stage": "previous_best",
+  "metrics": {
+    "accuracy": 0.8525828313253012,
+    "macro_auc": 0.9270417342844585,
+    "per_class_auc": {
+      "quark/gluon": 0.9270417339286756,
+      "W/Z/top": 0.9270417346402413
+    },
+    "macro_average_precision": 0.9161098444384267,
+    "per_class_average_precision": {
+      "quark/gluon": 0.8762670610770109,
+      "W/Z/top": 0.9559526277998425
+    },
+    "cross_entropy": 0.32934392677614494,
+    "multiclass_brier_score": 0.2089250683784485,
+    "expected_calibration_error": 0.0022055163512747058,
+    "confidence_coverage": {
+      "0.5": {
+        "coverage": 1.0,
+        "accuracy": 0.8525828313253012
+      },
+      "0.7": {
+        "coverage": 0.8096536144578313,
+        "accuracy": 0.9098510072357285
+      },
+      "0.8": {
+        "coverage": 0.660527108433735,
+        "accuracy": 0.9440593720787067
+      },
+      "0.9": {
+        "coverage": 0.5012123493975904,
+        "accuracy": 0.9743693754601043
+      },
+      "0.95": {
+        "coverage": 0.40237198795180723,
+        "accuracy": 0.9856835407504445
+      }
+    },
+    "confusion_matrix": [
+      [
+        45933,
+        6578
+      ],
+      [
+        12999,
+        67290
+      ]
+    ],
+    "fixed_fpr": 0.01,
+    "fixed_fpr_points": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "signal_efficiency_at_fixed_fpr": 0.5563028559329423,
+    "per_class_efficiency_at_fixed_fpr": {
+      "quark/gluon": 0.2636780864961627,
+      "W/Z/top": 0.5563028559329423
+    },
+    "per_class_efficiency_points": {
+      "quark/gluon": {
+        "0.001": 0.07903106015882387,
+        "0.01": 0.2636780864961627,
+        "0.1": 0.7410256898554588
+      },
+      "W/Z/top": {
+        "0.001": 0.22456376340470052,
+        "0.01": 0.5563028559329423,
+        "0.1": 0.8182690032258466
+      }
+    },
+    "signal_auc": 0.9270417346402413
+  },
+  "arithmetic": {
+    "stored_scalar_parameters": 527,
+    "selected_path_multiplications": 80,
+    "selected_path_additions": 80,
+    "selected_path_comparisons": 4,
+    "all_node_multiplications": 496,
+    "arithmetic_note": "Dense scalar counts; no zero-weight elimination, DSP mapping, clock or pipeline assumption"
+  },
+  "sparsity": {
+    "dense_parameter_slots": 527,
+    "nonzero_coefficients": 452,
+    "nonzero_split_feature_weights": 165,
+    "nonzero_leaf_feature_weights": 256,
+    "zero_coefficients": 75,
+    "structurally_reachable_internal_nodes": 15,
+    "structurally_reachable_leaves": 16,
+    "reachable_nonzero_coefficients": 452,
+    "reachable_all_node_multiplications": 421,
+    "selected_path_multiplications_upper_bound": 65,
+    "selected_path_comparisons_upper_bound": 4,
+    "note": "Exact zeros only. Unreachable branches removed only for identically constant split decisions. Counts are not FPGA latency/DSP estimates."
+  },
+  "deterministic_working_point": {
+    "signal_margin_threshold": 3.108718446755887,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5563028559329423
+  },
+  "raw_deterministic_working_point": {
+    "signal_margin_threshold": 3.10871844675588,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5563028559329423
+  },
+  "golden_vector_count": 204,
+  "training_policy": {
+    "split_alpha": 0,
+    "leaf_alpha": 0,
+    "refit_split_alpha": 0,
+    "refit_leaf_alpha": 0,
+    "exact_zero_support": true
+  },
+  "timing": {
+    "batch": 132800,
+    "calls_per_repeat": 1,
+    "repeats": 9,
+    "wall_seconds": [
+      0.05455726105719805,
+      0.05468329880386591,
+      0.053834705613553524,
+      0.05561498645693064,
+      0.05441076122224331,
+      0.05426768399775028,
+      0.05905001424252987,
+      0.062153223901987076,
+      0.06205346342176199
+    ],
+    "cpu_seconds": [
+      0.05454704600001037,
+      0.0546690099999978,
+      0.05382707800001185,
+      0.05560849500000131,
+      0.054403530000001865,
+      0.05426056700000004,
+      0.059042949000001954,
+      0.06214597100000674,
+      0.062046016000010695
+    ],
+    "median_wall_seconds": 0.05468329880386591,
+    "median_cpu_seconds": 0.0546690099999978,
+    "median_microseconds_per_event": 0.41177182834236375
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "research_selection": "research_handoff/support_refit_scan_v1/selection.json",
+  "research_selection_sha256": "d0e015dfa8627c088202d548ed4302fd017465d2db94248009182b656ea6832a",
+  "primary_candidate": "compact_refit_3t_d4",
+  "candidates": [
+    {
+      "id": "compact_refit_3t_d4",
+      "research_role": "compact_match_xgb",
+      "label": "Compact refit (DEFAULT)",
+      "checkpoint_sha256": "e89b8923fba66f5df02046e04a1828a8ea4c56f60c1d7b201a2a2f92a0ab00fa",
+      "selected_epoch": 8,
+      "training_run_converged": true,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": false,
+      "architecture": {
+        "trees": 3,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 0.003,
+        "leaf_alpha": 1e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      }
+    },
+    {
+      "id": "highest_efficiency_3t_d4",
+      "research_role": "winner",
+      "label": "Highest efficiency (alternative)",
+      "checkpoint_sha256": "80b0cd6a23d0528a31a691b27d4b006cc9acd12dca4d56022f7f4e046f744700",
+      "selected_epoch": 5,
+      "training_run_converged": false,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": true,
+      "architecture": {
+        "trees": 3,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 1e-05,
+        "leaf_alpha": 3e-05,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      }
+    },
+    {
+      "id": "single_tree_1t_d4",
+      "research_role": "compact_path_match_xgb",
+      "label": "One-tree reference (alternative)",
+      "checkpoint_sha256": "a06140db35833c3ebae2d0f41fb1e87bb6b76005556173e903aa6994fe0f2c05",
+      "selected_epoch": 6,
+      "training_run_converged": true,
+      "source_stage_converged": true,
+      "selected_checkpoint_converged": false,
+      "architecture": {
+        "trees": 1,
+        "depth": 4,
+        "leaf_mode": "linear"
+      },
+      "support_selection": {
+        "split_alpha": 0,
+        "leaf_alpha": 0,
+        "refit_split_alpha": 0,
+        "refit_leaf_alpha": 0,
+        "exact_zero_support": true
+      }
+    }
+  ]
+}

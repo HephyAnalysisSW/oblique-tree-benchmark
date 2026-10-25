@@ -1,0 +1,42 @@
+{
+  "compiler": "Apple clang version 17.0.0 (clang-1700.0.13.5)",
+  "all_passed": true,
+  "checks": [
+    {
+      "candidate": "compact_refit_3t_d4",
+      "input_space": "standardized",
+      "vectors": 270,
+      "max_absolute_margin_error": 7.105427357601002e-15
+    },
+    {
+      "candidate": "compact_refit_3t_d4",
+      "input_space": "raw",
+      "vectors": 270,
+      "max_absolute_margin_error": 2.4868995751603507e-14
+    },
+    {
+      "candidate": "highest_efficiency_3t_d4",
+      "input_space": "standardized",
+      "vectors": 323,
+      "max_absolute_margin_error": 4.440892098500626e-15
+    },
+    {
+      "candidate": "highest_efficiency_3t_d4",
+      "input_space": "raw",
+      "vectors": 323,
+      "max_absolute_margin_error": 8.881784197001252e-15
+    },
+    {
+      "candidate": "single_tree_1t_d4",
+      "input_space": "standardized",
+      "vectors": 204,
+      "max_absolute_margin_error": 2.1316282072803006e-14
+    },
+    {
+      "candidate": "single_tree_1t_d4",
+      "input_space": "raw",
+      "vectors": 204,
+      "max_absolute_margin_error": 2.1316282072803006e-14
+    }
+  ]
+}

@@ -22,6 +22,36 @@ def main():
         (root/f'fpga_handoff_{version}_roc.png',folder/'winner_roc.png'),
         (root/f'fpga_handoff_{version}_comparison.png',root/'current_winner_comparison.png')]:
         shutil.copyfile(source,target);syncer.register_file(target)
+    if manifest.get('research_selection'):
+        rows=[]
+        comparison=json.loads((manifest_path.parent/'comparison.json').read_text())
+        for entry in comparison:
+            c=next(c for c in manifest['candidates'] if c['id']==entry['id']);m=entry['metrics']
+            rows.append([entry['label'],f"{c['architecture']['trees']} x D{c['architecture']['depth']} linear",
+                f"{entry['parameters']} / {entry['nonzero_coefficients']}",f"{m['signal_efficiency_at_fixed_fpr']:.2%}",f"{m['signal_auc']:.5f}",f"{entry['timings'][-1]['median_microseconds_per_event']:.3f}"])
+        summary=json.loads((root/'support_refit_scan_v1_final_summary.json').read_text());m=manifest['xgboost']['metrics']
+        assert summary['dataset_sha256']==manifest['dataset_sha256']
+        assert abs(summary['xgboost_metrics']['signal_auc']-m['signal_auc'])<1e-12
+        rows.append(['XGBoost reference','100 x D4 constant','3099 / —',f"{m['signal_efficiency_at_fixed_fpr']:.2%}",f"{m['signal_auc']:.5f}",f"{summary['xgboost_timing']['median_microseconds_per_event']:.3f}"])
+        fig,ax=plt.subplots(figsize=(15,4.6));ax.axis('off')
+        table=ax.table(cellText=rows,colLabels=['Model / role','Architecture','Dense / nonzero','Eff. at 1% bkg','AUC','CPU us/event'],cellLoc='center',colWidths=[.31,.21,.15,.15,.08,.10],bbox=[0,.24,1,.60])
+        table.auto_set_font_size(False);table.set_fontsize(10)
+        for (r,c),cell in table.get_celld().items():
+            cell.set_edgecolor('#d9dee7')
+            if r==0:cell.set_facecolor('#23334d');cell.get_text().set_color('white')
+            else:cell.set_facecolor('#dcefdc' if r==1 else ('#f3f5f8' if r%2 else 'white'))
+        fig.suptitle('FPGA handover v3 — implement Compact refit (DEFAULT)',fontsize=17)
+        ax.text(.01,.13,'Validation only; test untouched. Dense/nonzero counts include biases and refer to standardized inputs.',transform=ax.transAxes,fontsize=10)
+        ax.text(.01,.05,'CPU: one thread, batch 132,800; NumPy versus compiled XGBoost. Not synthesized FPGA latency.',transform=ax.transAxes,fontsize=10)
+        fig.tight_layout()
+        for path in [root/f'fpga_handoff_{version}_comparison.png',root/'current_winner_comparison.png']:
+            fig.savefig(path,dpi=180);syncer.register_file(path)
+        plt.close(fig)
+        text='# Current FPGA default: Compact refit\n\nUse `'+current['candidate_id']+'` from `'+current['manifest']+'`. Higher-efficiency and one-tree models are alternatives.\n\n'+(manifest_path.parent/'comparison.md').read_text()+'\n![Comparison](current_winner_comparison.png)\n\n![ROC](current_winner_roc.png)\n'
+        (root/'current_winner_report.md').write_text(text);syncer.register_file(root/'current_winner_report.md')
+        result=dict(current_selection=current,selected_model=selected,models=json.loads((manifest_path.parent/'comparison.json').read_text()),test_evaluated=False)
+        for path in [root/'current_winner_summary.json',folder/'winner_metrics.json']:write_json(path,result);syncer.register_file(path)
+        print('Published Compact refit default from',version,flush=True);return
     comparison=json.loads((manifest_path.parent/'comparison.json').read_text())
     labels={}
     for candidate in manifest['candidates']:

@@ -10,6 +10,6 @@ class SupportDeliveryTests(unittest.TestCase):
                                xgboost_metrics=dict(signal_efficiency_at_fixed_fpr=.5548)))
         self.assertIn('1/2',text);self.assertIn('3 x D4 linear',text);self.assertIn('394 nonzero',text)
         self.assertIn('56.70%',text);self.assertIn('converged source stage',text);self.assertIn('55.48%',text)
-        self.assertIn('v2 implementation baseline remains unchanged',text)
+        self.assertIn('fpga_handoff/CURRENT_MODEL.json',text)
 
         self.assertIn('0.0003/0.0003',text);self.assertIn('immutable masks',text)

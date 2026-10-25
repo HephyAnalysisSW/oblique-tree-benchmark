@@ -1,0 +1,55 @@
+{
+  "schema": "tree-benchmark.current-model.v1",
+  "as_of": "2026-10-25",
+  "handoff_version": "v3",
+  "candidate_id": "compact_refit_3t_d4",
+  "compact_candidate_id": "compact_refit_3t_d4",
+  "alternative_candidate_ids": [
+    "highest_efficiency_3t_d4",
+    "single_tree_1t_d4"
+  ],
+  "manifest": "fpga_handoff/v3/manifest.json",
+  "manifest_sha256": "1fd47d052053e351547e28f150546f351f2032cb4defa79080d39e16985a4b21",
+  "standardized_model": "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json",
+  "raw_model": "fpga_handoff/v3/compact_refit_3t_d4/raw/model.json",
+  "standardized_model_sha256": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+  "raw_model_sha256": "f4d1f2157b17da7d360d2c43c7c59d2f7e3db92196c44959dd090ffe07bfd3f9",
+  "cpp_verification_sha256": "e1f637095f372b6b94b82a4571216427c74ecf96994320a5c1b65598a869f00f",
+  "checkpoint_sha256": "e89b8923fba66f5df02046e04a1828a8ea4c56f60c1d7b201a2a2f92a0ab00fa",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "run_name": "qg_vs_wzt_support_scan_v1_split300",
+  "selected_continuation_epoch": 8,
+  "training_run_converged": true,
+  "selected_checkpoint_converged": false,
+  "architecture": {
+    "trees": 3,
+    "depth": 4,
+    "leaf_mode": "linear",
+    "stored_scalar_parameters": 1581,
+    "nonzero_coefficients": 418
+  },
+  "training": {
+    "split_alpha": 0.003,
+    "leaf_alpha": 1e-05,
+    "refit_split_alpha": 0,
+    "refit_leaf_alpha": 0,
+    "exact_zero_support": true
+  },
+  "validation": {
+    "primary_metric": "signal_efficiency_at_fixed_fpr",
+    "fixed_fpr": 0.01,
+    "signal_efficiency": 0.5620197038199505,
+    "signal_auc": 0.9273325252733219
+  },
+  "deterministic_validation_working_point": {
+    "signal_margin_threshold": 3.1156953153105,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 525,
+    "achieved_background_efficiency": 0.009997905200815067,
+    "signal_efficiency": 0.5620197038199505
+  },
+  "test_evaluated": false,
+  "update_policy": "Compact refit is Dorian's default; preserve v1/v2/v3 and freeze a new version for any coefficient change."
+}
