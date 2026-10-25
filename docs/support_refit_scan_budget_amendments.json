@@ -1,0 +1,73 @@
+[
+  {
+    "updated_utc": "2026-10-25T21:43:08.411733+00:00",
+    "reason": "Auxiliary split 37 repeatedly exhausted 800 iterations, including rejected unchanged proposals in full passes 7-12. The latest pass had zero routing changes and leaf KKT 1.55e-7. Increase solver work without changing objective, masks or stopping tolerances.",
+    "previous_split_max_iter": 800,
+    "split_max_iter": 4000,
+    "coefficient_sha256": "64a185fe3a3fdaebffdc8c9dbae8c6d27166d034156de62cade3a125d7ddcdcd",
+    "support_sha256": "053769c722acfb9bb37e4501b34a34cbc9feeb28dcffb591e80f79f7427cb6f4",
+    "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+    "implementation_sha256": {
+      "src/tao/hard.py": "fdd4a80897d18f3d0f95ac646ec541fac78a360647864592c7fb91c32673189f",
+      "src/tao/support.py": "21fa7ead6da5a5fa5abaec9f5c306407dfd5e4098c191fca8e38b698fbb1e275",
+      "src/tao/epoch.py": "dd6a291038401f626782e22b114b72ccd9eb6ace7a5d48431c085edc02637957",
+      "src/tao/convergence.py": "7d41d2f192c45323742f4dd3174fd9bde843461289d5dbe9ad161164860a294e",
+      "src/tao/split_search.py": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+      "src/tao/sparsity.py": "1195b63aa3d6d5d38424b9b43d68ba25e5a55c94d7bb94cd20fd35c97d78de66",
+      "src/data_utils.py": "7a7b2f1d8cc3b47e6d39df5accfb358deec84ee2dbd44e36928926edf806b10f",
+      "src/evaluate.py": "4f9b31a7da322042e56e580becef71004787def9a34ef2e535599b6c6f6633dd",
+      "scripts/train_tao_support_refit.py": "e188ffcdf08ba39a77ec2eb0092acd039d9c0d439490bb55b476b218bc413d63"
+    },
+    "completed_history_rows": 17,
+    "phase": "epoch",
+    "note": "Additional auxiliary solver work only; objective, masks, coefficients, stopping tolerances and saved history unchanged.",
+    "previous_checkpoint_sha256": "cac7cbae6176aff1e9c76e3e30748e3f14d1bde5d01f80763ee3d132bf97dc5d",
+    "previous_checkpoint": "models/support_refit_policy_archive/cac7cbae6176aff1e9c76e3e30748e3f14d1bde5d01f80763ee3d132bf97dc5d.pkl",
+    "previous_plan": {
+      "run_name": "qg_vs_wzt_support_scan_v1_control",
+      "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_l1_path_v1_control.pkl",
+      "source_sha256": "5437ec63d0d657a3b8443ebc6da5803023a6efeeb9712b0fc0ee6c45cce6a1b5",
+      "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+      "stages": [
+        "leaf_only",
+        "full"
+      ],
+      "exact_zero_support": true,
+      "minimum_epochs": 5,
+      "max_epochs": 200,
+      "local_leaf_max_iter": 400,
+      "global_leaf_chunk_iter": 400,
+      "max_global_chunks": 100,
+      "split_max_iter": 800,
+      "leaf_ftol": 1e-12,
+      "leaf_gtol": 1e-08,
+      "kkt_tol": 1e-06,
+      "loss_rtol": 1e-05,
+      "route_tol": 0.0001,
+      "separation_time_limit": 600
+    },
+    "plan": {
+      "run_name": "qg_vs_wzt_support_scan_v1_control",
+      "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d4_n3_sa1e-05_la1e-05_seed42_l1_path_v1_control.pkl",
+      "source_sha256": "5437ec63d0d657a3b8443ebc6da5803023a6efeeb9712b0fc0ee6c45cce6a1b5",
+      "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+      "stages": [
+        "leaf_only",
+        "full"
+      ],
+      "exact_zero_support": true,
+      "minimum_epochs": 5,
+      "max_epochs": 200,
+      "local_leaf_max_iter": 400,
+      "global_leaf_chunk_iter": 400,
+      "max_global_chunks": 100,
+      "split_max_iter": 4000,
+      "leaf_ftol": 1e-12,
+      "leaf_gtol": 1e-08,
+      "kkt_tol": 1e-06,
+      "loss_rtol": 1e-05,
+      "route_tol": 0.0001,
+      "separation_time_limit": 600
+    }
+  }
+]
