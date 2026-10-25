@@ -995,3 +995,11 @@ in a pilot before choosing the scan.
 one-tree and three-tree terminal parents preserves logits and routes exactly
 on all 132,800 validation vectors each. Full production refits and a scan
 remain to be selected; these checks do not claim new physics performance.
+
+The [full-data pilot](docs/support_refit_pilot.md) is now running from the
+converged 520-coefficient three-tree parent, using
+`configs/tao_support_refit_pilot_v1.json`. Its first separation check passed in
+52.6 seconds with 3.40 GiB process peak RSS. Unpenalized leaf fitting is underway;
+this is not yet a completed refit result or a broader scan. The pilot Slurm
+wrapper records per-allocation resource usage and resumes only scheduler-budget
+exits; separation/numerical failures remain held for inspection.

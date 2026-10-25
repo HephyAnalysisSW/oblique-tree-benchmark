@@ -1,0 +1,23 @@
+{
+  "run_name": "qg_vs_wzt_support_refit_pilot_3t_d4_both1e4_v1",
+  "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d4_n3_sa0.0001_la0.0001_seed42_l1_path_v1_both_02.pkl",
+  "source_sha256": "2dab62f6de3c533829dcd825c695cf84e3991212366ef9afeca0a28c997e9db5",
+  "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+  "stages": [
+    "leaf_only",
+    "full"
+  ],
+  "exact_zero_support": true,
+  "minimum_epochs": 5,
+  "max_epochs": 200,
+  "local_leaf_max_iter": 400,
+  "global_leaf_chunk_iter": 400,
+  "max_global_chunks": 100,
+  "split_max_iter": 800,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "kkt_tol": 1e-06,
+  "loss_rtol": 1e-05,
+  "route_tol": 0.0001,
+  "separation_time_limit": 120
+}
