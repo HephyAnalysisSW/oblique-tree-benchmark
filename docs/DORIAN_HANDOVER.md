@@ -13,6 +13,10 @@ Repository: https://github.com/HephyAnalysisSW/oblique-tree-benchmark (branch `m
 
 All metrics use the unchanged validation split; the test partition remains untouched. Nonzero counts include biases, refer to standardized inputs, and use exact zeros. Reachability removes only input-independent constant decisions. MAC bounds are scalar arithmetic counts, not synthesized FPGA resources or latency. Raw folding can change bias zero counts.
 
+## Status rechecked on 26 October 2026
+
+Compact refit remains the pinned v3 default; its coefficients and the two v3 alternatives are unchanged. The L1 path study is complete (16/16), the support-refit scan is terminal (6 converged full refits and 4 held outcomes), and the broader architecture scan has 37/58 converged cases with three jobs running in the checked snapshot. The provisional five-tree 57.13% result is not a new handover model. See the [dated research update and checkpoint provenance](handover_status_2026-10-26.md).
+
 ## Implementation files and verification
 
 For the default, use either `fpga_handoff/v3/compact_refit_3t_d4/standardized/` **or** `raw/` consistently:

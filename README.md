@@ -16,6 +16,8 @@ split and leaf coefficients were refitted without L1 inside immutable masks.
 The selected checkpoint is full-refit pass 8; its source stage converged at
 pass 15. The selected snapshot itself is not claimed stationary.
 
+**Status rechecked 2026-10-26:** the v3 Compact refit default is unchanged. L1 paths: 16/16 converged; support refits: 6 converged full stages plus 4 held cases; architecture scan: 37/58 converged, three jobs running in the checked snapshot. The new five-tree 57.13% point is provisional. See the [dated update](docs/handover_status_2026-10-26.md) for exact saved-checkpoint metrics and hashes.
+
 Read **[Dorian's handover](docs/DORIAN_HANDOVER.md)** for exact coefficients,
 source checkpoint hashes, training scripts/configuration chain, Conda setup,
 reproduction commands and verification. The authoritative pointer is
