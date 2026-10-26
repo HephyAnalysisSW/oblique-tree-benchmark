@@ -37,21 +37,32 @@
 \begin{document}
 \maketitle
 \begin{abstract}
+% What is 'this benchmark'? You are writing for an audience who has not seen any of this (check the wholce document; we are writing for a generic audience). You can say we have "a" benchmark applcation; but typically that's said last in the abstract.
 We document the floating-point hard oblique-tree implementation used in this benchmark, its Tree Alternating Optimization
 (TAO) training procedure, and a two-stage use of sparsity: select coefficients
 with an L1 penalty, freeze their support, then refit the surviving coefficients
 without shrinkage. We call this procedure \SFR{} (SFR), a descriptive project
-name rather than a claim of a new general selection principle. On the fixed
+name rather than a claim of a new general selection principle. % Write shorter in the whole document! "select coefficients
+with an L1 penalty, freeze their support, then refit the surviving coefficients
+without shrinkage (SFR)." Why do you say in the abstract what it is **not**?
+On the fixed % "the"? It's not defined. So "a". And why don't you just write much leaner? We have similar performace when compared to CGBoost, however, at lower numbers of parameters with the best tree <..describe it briefly..>.  
 quark/gluon versus W/Z/top validation task, the implementation default is a
 three-tree depth-four forest with linear leaves, 418 nonzero coefficients in
 1,581 dense slots, and 56.20\% signal efficiency at 1\% background acceptance.
 The XGBoost reference gives 55.48\% with 3,099 scalar slots. A higher-efficiency
 837-coefficient alternative reaches 57.12\%; a one-tree reference reaches
-55.63\%. These are validation-selected floating-point results, not held-out test
+55.63\%. 
+These are validation-selected floating-point results, not held-out test % From here on it is not abstract-relevant.
 or synthesized FPGA results. Actual cut equations, complete tree printouts,
 training settings and code entry points are included for implementation and
 reproduction.
 \end{abstract}
+
+% Other general comments: Hashes should be removed or relegated to the blu-colored environment. I think this goes to far. The paper need not define precisely the handover when the repo has that info. 
+% The syntax which describes the tree is difficult to understand, can it be made more logical? Why are there unreachable parts?
+
+
+% What is the use of this? I think all information that pertains to the code should be wrapped in a blue color (mind linebreaks) and be such that it can be turned off for the actual paper. It should hold all the details for reproducibility but no information the paper needs. In the box it is unclear what a "pass" is. Just point to the result. I also think it should not be on the first page.
 \begin{contractbox}
 \textbf{Implementation target.} Dorian's pinned default is
 \path{fpga_handoff/v3/compact_refit_3t_d4/}, selected explicitly for compression,
@@ -67,6 +78,8 @@ training policies were changed to produce this note.
 
 \section{Scope, dataset and evidence}
 \label{sec:data}
+
+% Most of the paragraph says what this paper is NOT about. It is also NOT about almost everything else there exists. So ... why don't we just say positively what it is **about**??
 The intended application is a compact classification function for a future
 FPGA implementation in the CMS Phase-II Level-1 trigger context. The present
 study addresses the model and its training in floating point. It does not yet
@@ -74,6 +87,7 @@ establish a fixed-point format, device, resource count, clock, initiation
 interval or hardware latency. Neural networks are not trained or compared in
 this note.
 
+% Handover should go to a blue-colored environment since the paper doesn't need it. Split documentation / code from physics/math/ML description. The former implements the latte, the latter can not depend on the former in the text. That environment should be possible to turn off. Go through the rest of the note, I'm not going to repeat this comment, it applies in alomst every paragraph. 
 The implementation and frozen handover are maintained in the project
 repository~\cite{benchmark}. The primary example uses 16 high-level features of
 jets from the dataset catalogued as OpenML 42468,
@@ -299,7 +313,7 @@ through the left or right subtree:
  \label{eq:reduced}
 \end{equation}
 where $o_i$ is the logit offset of the other trees. Apart from an additive
-constant, changing the split minimizes a weighted binary misrouting loss,
+constant, changing the split minimizes a weighted binary misrouting loss, % \ind does not work. Please check. We need a package or another symbol.
 \begin{equation}
  \frac1W\sum_{i\in\mathcal R_j} v_i|\Delta_i|
  \ind\!\left[\ind[h_j(x_i)>0]\ne \ind[\Delta_i>0]\right]
