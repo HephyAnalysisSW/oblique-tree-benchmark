@@ -49,3 +49,8 @@ is applied. The JSON/hexadecimal headers remain the firmware authority.
 The printing utility is separate from the pinned fitting files, so writing this
 note does not change mathematical training code, current coefficients or the
 ongoing jobs' implementation identities.
+
+The note distinguishes the validation-only oblique study from the historical
+XGBoost reproduction check, which evaluated the test split. It therefore does
+not describe that partition as wholly uninspected. The conclusions state the
+measured compression result and the remaining quantization/synthesis work.

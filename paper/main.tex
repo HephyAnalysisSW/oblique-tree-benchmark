@@ -88,16 +88,19 @@ and 80,289 signal events in validation. The split and model seed are 42.
 \path{data/qg_vs_wzt_standardized.npz} and
 \path{data/qg_vs_wzt_metadata.json}. The standardization parameters are fitted
 on training only. All algorithms use these same exported train/validation
-arrays, labels and feature order. The test arrays have not been evaluated or
-used for selection. Other exported tasks are quark/gluon versus top and
+arrays, labels and feature order. The oblique-tree scans, SFR selection and comparisons in this note use
+validation only. An earlier XGBoost reproduction check did evaluate the
+166,000-event test partition; that historical check is documented in the root
+README. Thus this partition is not wholly uninspected. Its scores have not
+been used to select the oblique architectures or penalties reported here. Other exported tasks are quark/gluon versus top and
 multiclass classification; the results and binary firmware interface in this
 note concern the primary quark/gluon versus W/Z/top task only.
 
 The data file is pinned by SHA-256:
 \begin{center}\footnotesize\ttfamily\DatasetHash\end{center}
 Code checks in \file{scripts/audit_tao_splits.py} and the training workers guard
-this split contract. Reading a file's bytes to check its hash is not an
-evaluation of the held-out test partition.
+this split contract. The manuscript input generator reads validation arrays only; hashing the
+complete archive does not itself evaluate its test arrays.
 
 \paragraph{What is frozen and what is still research?}
 The v3 handover, comparison timings and SFR results were frozen on
@@ -543,9 +546,27 @@ For a penalized coordinate, the residual checks the L1 subgradient condition;
 values within $10^{-10}$ of zero are treated as zero \emph{for this numerical
 stationarity calculation}. That tolerance is distinct from the exact
 \code{!= 0} mask and parameter-count rule. Frozen coordinates have equality
-constraints and are excluded from the free-coordinate KKT check.
+constraints and are excluded from the free-coordinate KKT check. Explicitly,
+for leaf coordinate $q$ with normalized unpenalized gradient $g_q$ and
+applicable penalty $\lambda_q$ ($\lambda_\ell$ for a feature weight, zero
+for a leaf bias), the residual is
+\begin{equation}
+ r_q=\begin{cases}
+ 0,&q\text{ frozen},\\
+ |g_q+\lambda_q\operatorname{sign}(\theta_q)|,
+    &q\text{ free and }|\theta_q|>10^{-10},\\
+ \max(|g_q|-\lambda_q,0),&q\text{ free and }|\theta_q|\leq10^{-10}.
+ \end{cases}
+ \qquad r_{\mathrm{KKT}}=\max_q r_q.
+ \label{eq:kkt}
+\end{equation}
+For an unpenalized free coordinate this reduces to $|g_q|$ in either branch.
+The check certifies numerical stationarity of the convex fixed-route leaf
+problem; no corresponding differentiable KKT claim is made for discrete
+routing changes.
 
-For each epoch, the code requires a nonincreasing objective, small relative
+For each epoch, the code rejects an objective increase above the numerical
+allowance $10^{-8}$. It requires small relative
 objective gain, small fraction of events whose leaf changes in \emph{any}
 forest member, and successful inner fits. All must hold for three consecutive
 passes after the minimum-stage length. These are numerical stopping conditions
@@ -717,7 +738,7 @@ Selector & $\lambda_s/\lambda_\ell$ & Support & Parent & Leaf & Full terminal & 
 \input{generated/sfr_results.tex}\end{tabular}
 \end{table}
 
-\begin{figure}[htbp]\centering
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{figures/sfr_tradeoff.pdf}
 \caption{Each vertical segment connects an L1-selected terminal parent with
 its best eligible leaf/full refit checkpoint at the same support budget.
@@ -735,7 +756,7 @@ against XGBoost. These intervals condition on the fitted/selected models. They
 do not account for hyperparameter/checkpoint selection or training-seed
 variation. The code is \file{src/tao/uncertainty.py}; ties and resampled
 zero-weight rows are handled consistently with weighted ROC evaluation.
-\begin{table}[htbp]\centering\small
+\begin{table}[H]\centering\small
 \caption{Conditional validation difference versus XGBoost, in percentage points.
 A positive point estimate is not by itself evidence of an established
 improvement.}\label{tab:uncertainty}
@@ -802,7 +823,7 @@ training code or stopping policies. The standalone \code{paper/} folder,
 however, contains all generated text/tables and figures needed to compile this
 PDF without datasets, model pickles or a Python training environment.
 
-\begin{table}[htbp]\centering\small
+\begin{table}[H]\centering\small
 \caption{Implementation map. The function names identify the code implementing
 the mathematical objects, rather than a generic TAO library API.}
 \label{tab:code}\renewcommand{\arraystretch}{1.15}
@@ -849,10 +870,46 @@ resources and latency at a specified device and clock. Training improvements
 worth a controlled follow-up include better-conditioned auxiliary solves,
 removing frozen columns from the joint design, and generated sparse inference.
 They are not silently assumed in the present accuracy or CPU comparison.
-The independent test partition should remain reserved until the model-selection
-and implementation choices are settled.
+Further test evaluation should wait until the model-selection and
+implementation choices are settled; the historical XGBoost-only check in
+Section~\ref{sec:data} must remain disclosed.
 
 \FloatBarrier
+\section{Conclusions and implementation priorities}
+\label{sec:conclusions}
+The present result is a compact floating-point classifier at the selected
+low-background working point. The default three-tree depth-four model uses
+linear leaves and 418 exact nonzero coefficients, compared with 837 for the
+higher-efficiency oblique alternative and 3,099 scalar slots in the XGBoost
+reference. Its validation efficiency is 56.20\%, versus 55.48\% for XGBoost.
+The uncertainty interval on that difference includes zero. The justified
+claim is therefore competitive validation performance with fewer stored
+nonzero coefficients, rather than established superior generalization or a
+measured FPGA speedup.
+
+The training study separates two effects that should not be conflated:
+selecting a useful set of coefficients and shrinking their fitted values.
+For the Compact support, \SFR{} raises the terminal penalized parent's
+validation efficiency from 54.59\% to a best eligible saved value of 56.20\%
+without adding coefficients. Other supports respond differently, and some
+unpenalized stages are held for separation or an inconclusive diagnostic.
+The procedure is consequently a controlled empirical strategy, not a guarantee
+that removing regularization always improves a tree. Likewise, a numerically
+converged source run and a validation-selected earlier checkpoint are different
+objects; both are identified in the handover.
+
+The immediate implementation target remains the frozen v3 Compact refit.
+First preserve its feature order, margin sign, strict cut convention and
+constant routes in the firmware representation. Next choose explicit numeric
+formats and measure the effect of quantization on routes and on signal
+efficiency at a realizable background threshold. Finally synthesize for a
+specified FPGA and clock, reporting resources, latency and initiation interval
+alongside the classifier metric. These measurements will determine whether
+the reduction in coefficient count translates into the hardware advantage
+motivating this study. Any later compression or training improvement should
+be compared against the same frozen model and data contract, with changed
+coefficients and working points exported as a new version.
+
 \phantomsection\addcontentsline{toc}{section}{References}
 \bibliographystyle{unsrtnat}
 \bibliography{references}
