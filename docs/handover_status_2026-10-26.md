@@ -16,9 +16,9 @@ Architecture controller snapshot: `2026-10-26T14:20:29.658582+00:00`. The L1 pat
 
 ## Rechecked research checkpoints
 
-These are saved best-efficiency checkpoints, not necessarily terminal iterates. Metrics below were re-evaluated on the fixed validation arrays and matched the values saved with the coefficients. An unfinished source run is labelled provisional and is not promoted into the FPGA handover.
+These are saved best-efficiency checkpoints, not necessarily terminal iterates. Metrics below were re-evaluated on the fixed validation arrays and matched the values saved with the coefficients. An unfinished source run is labelled provisional and is not promoted into the FPGA handover. Such a run may be waiting for its next allocation; its saved phase does not mean it currently occupies one of the three active jobs.
 
-| Case | Layout | Dense / nonzero | Sparse path MAC bound | Signal efficiency at 1% background | AUC | Source run | Saved / terminal pass |
+| Case | Layout | Dense / nonzero | Sparse path MAC bound | Signal efficiency at 1% background | AUC | Source run | Saved / source passes completed |
 |---|---|---:|---:|---:|---:|---|---|
 | 50 | 5 x D4 linear | 2635 / 1258 | 221 | 57.13% | 0.92907 | Provisional — training | 5 / 5 |
 | 57 | 3 x D4 linear | 1581 / 1072 | 156 | 56.55% | 0.92936 | Converged | 9 / 22 |
