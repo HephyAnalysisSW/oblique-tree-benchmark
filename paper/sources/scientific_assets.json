@@ -1,0 +1,12 @@
+{
+  "inputs_and_outputs": {
+    "sources/results_snapshot.json": "ab996a2239caa6c633263979e80f392279a1dfd5dc901dd0d9d2c97f8a2a4a3d",
+    "sources/compact_standardized_model.json": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+    "generated/research_sfr_results.tex": "cf3888b9c2837a961617299d07a9ff545bef3f816507763348be1009725e907a",
+    "generated/research_cuts.tex": "0165bd952c1e5143fd2a7aeed780373cf7aa32157b85da7749dfc9bc821eb29c",
+    "generated/research_tiny_cut.tex": "bfa88628729a14d8af34dc70197f070f9415c1321a4c5cff784228922f593185",
+    "figures/sfr_research.pdf": "4a7dd12cbaeff677e2c14a638d2b0dbce475ce957a0f10133786d7fcb2357a96"
+  },
+  "generator_sha256": "74b3e81fbf3eaba5ba42926af1ae156e8896442656383f2d15ca02ebd6c23872",
+  "note": "Derived only from frozen checked-in snapshots; no new model evaluation."
+}

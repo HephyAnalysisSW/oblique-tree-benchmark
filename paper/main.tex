@@ -6,17 +6,17 @@
 \usepackage{amsmath,amssymb,mathtools,bm}
 \usepackage{booktabs,tabularx,array,longtable}
 \usepackage{graphicx,xcolor,float,placeins}
-\usepackage{enumitem,listings}
+\usepackage{enumitem,listings,comment}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{fancyhdr}
 \usepackage[most]{tcolorbox}
 \usepackage[colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
 \usepackage{bookmark}
-\hypersetup{pdftitle={Sparse hard oblique forests for jet classification},pdfauthor={Tree benchmark implementation note},pdfsubject={Architecture, TAO training, and Select-Freeze-Refit}}
+\hypersetup{pdftitle={Sparse hard oblique forests for jet classification},pdfsubject={Tree alternating optimization and Select-Freeze-Refit}}
 \definecolor{ink}{HTML}{20334D}
-\definecolor{softblue}{HTML}{F1F5FA}
+\definecolor{softblue}{HTML}{EEF4FC}
 \raggedbottom
-\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Hard oblique forests and TAO}\fancyhead[R]{\small Implementation note}\fancyfoot[C]{\thepage}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Sparse hard oblique forests}\fancyfoot[C]{\thepage}
 \emergencystretch=2em
 \setlength{\parskip}{4pt}\setlength{\parindent}{0pt}
 \setlist{itemsep=2pt,topsep=3pt}
@@ -24,949 +24,699 @@
 \newcommand{\file}[1]{\href{https://github.com/HephyAnalysisSW/oblique-tree-benchmark/blob/main/#1}{\nolinkurl{#1}}}
 \newcommand{\SFR}{\textsc{Select--Freeze--Refit}}
 \newcommand{\CE}{\operatorname{CE}}
-\newcommand{\ind}{\mathbb{1}}
+\newcommand{\ind}{\mathbf{1}}
 \newcommand{\normone}[1]{\left\lVert #1\right\rVert_1}
-\newtcolorbox{contractbox}{colback=softblue,colframe=ink!45,boxrule=.5pt,arc=1mm,breakable,left=8pt,right=8pt,top=5pt,bottom=5pt}
+% Set this to true to display the optional implementation boxes.
+% Alternatively compile annotated.tex, which defines \ShowImplementation.
+\newif\ifimplementationdetails
+\implementationdetailsfalse
+\ifdefined\ShowImplementation\implementationdetailstrue\fi
+\ifimplementationdetails
+  \newtcolorbox{implementation}{enhanced,breakable,colback=softblue,
+    colframe=blue!40!black,coltitle=white,title={Implementation and reproducibility},
+    fonttitle=\small\bfseries,boxrule=.45pt,arc=1mm,left=7pt,right=7pt,
+    top=5pt,bottom=5pt,before skip=10pt,after skip=10pt}
+\else
+  \excludecomment{implementation}
+\fi
 \lstdefinestyle{codeblock}{basicstyle=\ttfamily\footnotesize,columns=fullflexible,keepspaces=true,breaklines=true,breakatwhitespace=false,showstringspaces=false,frame=single,rulecolor=\color{ink!30},framerule=.3pt,xleftmargin=3pt,xrightmargin=3pt,aboveskip=7pt,belowskip=7pt,postbreak=\mbox{\textcolor{gray}{$\hookrightarrow$}\space}}
 \lstdefinestyle{treeblock}{style=codeblock,basicstyle=\ttfamily\scriptsize,breakindent=0pt,aboveskip=0pt,belowskip=2pt,frame=none,xleftmargin=0pt,xrightmargin=0pt}
 \lstset{style=codeblock}
 \input{generated/provenance.tex}
-\title{\color{ink}Sparse hard oblique forests for jet classification\\[3pt]\large Architecture, TAO training, and Select--Freeze--Refit}
-\author{Tree benchmark implementation note}
+\title{Sparse hard oblique forests for jet classification}
+\author{}
 \date{26 October 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
-% What is 'this benchmark'? You are writing for an audience who has not seen any of this (check the wholce document; we are writing for a generic audience). You can say we have "a" benchmark applcation; but typically that's said last in the abstract.
-We document the floating-point hard oblique-tree implementation used in this benchmark, its Tree Alternating Optimization
-(TAO) training procedure, and a two-stage use of sparsity: select coefficients
-with an L1 penalty, freeze their support, then refit the surviving coefficients
-without shrinkage. We call this procedure \SFR{} (SFR), a descriptive project
-name rather than a claim of a new general selection principle. % Write shorter in the whole document! "select coefficients
-with an L1 penalty, freeze their support, then refit the surviving coefficients
-without shrinkage (SFR)." Why do you say in the abstract what it is **not**?
-On the fixed % "the"? It's not defined. So "a". And why don't you just write much leaner? We have similar performace when compared to CGBoost, however, at lower numbers of parameters with the best tree <..describe it briefly..>.  
-quark/gluon versus W/Z/top validation task, the implementation default is a
-three-tree depth-four forest with linear leaves, 418 nonzero coefficients in
-1,581 dense slots, and 56.20\% signal efficiency at 1\% background acceptance.
-The XGBoost reference gives 55.48\% with 3,099 scalar slots. A higher-efficiency
-837-coefficient alternative reaches 57.12\%; a one-tree reference reaches
-55.63\%. 
-These are validation-selected floating-point results, not held-out test % From here on it is not abstract-relevant.
-or synthesized FPGA results. Actual cut equations, complete tree printouts,
-training settings and code entry points are included for implementation and
-reproduction.
+We study compact classifiers built from shallow oblique trees with linear
+leaves. Tree Alternating Optimization updates their cuts and leaf functions
+against a common forest loss. To reduce the number of coefficients, we select
+support with an L1 penalty, freeze it, and refit without shrinkage
+(\SFR{}). In a jet-classification application, three depth-four trees with
+418 nonzero coefficients achieve 56.20\% signal efficiency at 1\% background
+acceptance, compared with 55.48\% for a 100-tree XGBoost reference with 3,099
+scalar parameters. The results motivate sparse oblique forests as candidates
+for resource-constrained inference.
 \end{abstract}
 
-% Other general comments: Hashes should be removed or relegated to the blu-colored environment. I think this goes to far. The paper need not define precisely the handover when the repo has that info. 
-% The syntax which describes the tree is difficult to understand, can it be made more logical? Why are there unreachable parts?
+\section{Introduction}
+\label{sec:intro}
+Fast classification under hardware resource constraints motivates models that
+combine predictive accuracy with a small arithmetic workload. An axis-aligned
+decision tree tests one feature at each node; an oblique tree tests a linear
+combination. Oblique cuts can describe correlated decision boundaries within
+shallow trees. Linear leaf functions add first-order variation inside each
+region. Their coefficients also introduce a cost: a general affine function
+requires several multiplications and additions.
 
+We investigate this tradeoff using additive forests of hard oblique trees.
+Tree Alternating Optimization (TAO) revisits the cuts of an existing tree,
+rather than fixing each cut in a single top-down construction~\cite{tao2018}.
+Sparse oblique trees have also been used to analyze learned feature
+representations~\cite{tao2021}. Here we optimize a shared classification loss
+for all forest members and study L1 regularization followed by fixed-support
+refitting. This separates coefficient selection from shrinkage, following the
+motivation of post-selection methods such as relaxed Lasso~\cite{relaxed}.
 
-% What is the use of this? I think all information that pertains to the code should be wrapped in a blue color (mind linebreaks) and be such that it can be turned off for the actual paper. It should hold all the details for reproducibility but no information the paper needs. In the box it is unclear what a "pass" is. Just point to the result. I also think it should not be on the first page.
-\begin{contractbox}
-\textbf{Implementation target.} Dorian's pinned default is
-\path{fpga_handoff/v3/compact_refit_3t_d4/}, selected explicitly for compression,
-not for the highest efficiency. The authoritative pointer is
-\file{fpga_handoff/CURRENT_MODEL.json}. The coefficient snapshot is full-refit
-pass 8; the source full-refit stage subsequently converged at pass 15. The
-selected pass itself is \emph{not} labelled stationary. No coefficients or
-training policies were changed to produce this note.
-\end{contractbox}
-\clearpage
-\tableofcontents
-\clearpage
+Our application distinguishes quark/gluon jets from W, Z and top jets using
+16 high-level input features. The intended implementation context is FPGA
+inference for the CMS Phase-II Level-1 trigger. We compare floating-point
+classification performance, coefficient counts and arithmetic bounds, providing
+a basis for subsequent quantization and synthesis studies.
 
-\section{Scope, dataset and evidence}
-\label{sec:data}
-
-% Most of the paragraph says what this paper is NOT about. It is also NOT about almost everything else there exists. So ... why don't we just say positively what it is **about**??
-The intended application is a compact classification function for a future
-FPGA implementation in the CMS Phase-II Level-1 trigger context. The present
-study addresses the model and its training in floating point. It does not yet
-establish a fixed-point format, device, resource count, clock, initiation
-interval or hardware latency. Neural networks are not trained or compared in
-this note.
-
-% Handover should go to a blue-colored environment since the paper doesn't need it. Split documentation / code from physics/math/ML description. The former implements the latte, the latter can not depend on the former in the text. That environment should be possible to turn off. Go through the rest of the note, I'm not going to repeat this comment, it applies in alomst every paragraph. 
-The implementation and frozen handover are maintained in the project
-repository~\cite{benchmark}. The primary example uses 16 high-level features of
-jets from the dataset catalogued as OpenML 42468,
-\code{hls4ml_lhc_jets_hlf}~\cite{openml42468}. The benchmark uses archived arrays
-supplied with the project; it does not fetch a new dataset or resplit OpenML
-rows at training time. Class 0 is quark/gluon background; class 1 is W/Z/top
-signal. The unchanged partitions contain 531,200 training events, 132,800
-validation events and 166,000 held-out test events. There are 52,511 background
-and 80,289 signal events in validation. The split and model seed are 42.
-
-\file{configs/bdt_qg_vs_wzt_seed42.yaml} identifies
-\path{data/qg_vs_wzt_standardized.npz} and
-\path{data/qg_vs_wzt_metadata.json}. The standardization parameters are fitted
-on training only. All algorithms use these same exported train/validation
-arrays, labels and feature order. The oblique-tree scans, SFR selection and comparisons in this note use
-validation only. An earlier XGBoost reproduction check did evaluate the
-166,000-event test partition; that historical check is documented in the root
-README. Thus this partition is not wholly uninspected. Its scores have not
-been used to select the oblique architectures or penalties reported here. Other exported tasks are quark/gluon versus top and
-multiclass classification; the results and binary firmware interface in this
-note concern the primary quark/gluon versus W/Z/top task only.
-
-The data file is pinned by SHA-256:
-\begin{center}\footnotesize\ttfamily\DatasetHash\end{center}
-Code checks in \file{scripts/audit_tao_splits.py} and the training workers guard
-this split contract. The manuscript input generator reads validation arrays only; hashing the
-complete archive does not itself evaluate its test arrays.
-
-\paragraph{What is frozen and what is still research?}
-The v3 handover, comparison timings and SFR results were frozen on
-25 October 2026. A separate research check on 26 October re-evaluated saved
-architecture-scan checkpoints and recorded their hashes in
-\file{docs/handover_status_2026-10-26.json}. That check found 37 of 58
-architecture-scan cases converged; the 16-point L1 path study was complete.
-The ten-case SFR study had six converged full refits and four held outcomes.
-Later running-job scores are not silently substituted into the frozen v3
-comparison. Code and asset fingerprints used for this note are recorded in
-\path{sources/provenance.json} inside this standalone document folder.
-
-\section{Oblique-tree architecture as implemented}
+\section{Oblique forests}
 \label{sec:architecture}
-\subsection{Hard routing and complete binary storage}
-\file{src/tao/hard.py} defines \code{HardTree} and
-\code{HardTAOClassifier}. For feature vector $x\in\mathbb R^F$, an internal
-node $j$ of tree $t$ evaluates an affine cut
+\subsection{Cuts, paths and leaf functions}
+An event is represented by a feature vector $x\in\mathbb R^F$ and a class
+label $y\in\{0,\ldots,K-1\}$. A forest contains $T$ binary trees of depth $D$,
+where depth counts decisions on a full root-to-leaf path. We label a node by
+its path $p$ from the root: $p=\varnothing$ denotes the root, $L$ its left
+child, $R$ its right child, and $RL$ the left child of $R$. Internal paths
+have length $|p|<D$; leaf paths have length $D$. Appending $L$ or $R$ identifies
+the two children. This notation describes the tree independently of storage.
+
+At internal node $p$ of tree $t\in\{1,\ldots,T\}$, an affine function
 \begin{equation}
- h_{tj}(x)=w_{tj}^{\mathsf T}x+b_{tj},\qquad
- \text{right if }h_{tj}(x)>0,\quad \text{left if }h_{tj}(x)\leq0.
+ h_{tp}(x)=w_{tp}^{\mathsf T}x+b_{tp},\qquad
+ p\longrightarrow\begin{cases}pR,&h_{tp}(x)>0,\\pL,&h_{tp}(x)\leq0,\end{cases}
  \label{eq:cut}
 \end{equation}
-An axis-aligned cut is the special case with one nonzero feature weight.
-A genuinely oblique cut can combine several correlated features. The word
-``hard'' refers to a discrete branch choice, not a sigmoid mixture of the two
-subtrees. There is no soft routing in the models reported here.
+determines the next branch. Here $w_{tp}\in\mathbb R^F$ is the cut's feature
+weight vector and $b_{tp}\in\mathbb R$ its bias. Routing is hard: each event
+follows exactly one branch. A cut is axis-aligned when only one component of
+$w_{tp}$ is nonzero, and oblique when it combines several features.
 
-A tree of depth $D$ stores $I=2^D-1$ internal nodes and $L=2^D$ leaves. Depth
-counts decisions on a full root-to-leaf path. The root has heap index 0;
-children of internal node $j$ are $2j+1$ (left) and $2j+2$ (right). A leaf has
-array index $\ell=\text{heap index}-I$. Some complete-array branches may be
-logically unreachable because a split is input-independent. A zero weight
-vector with $b\leq0$ always chooses left; with $b>0$ it always chooses right.
-This does not depend on the empirical occupancy of a branch in a finite sample.
+A complete depth-$D$ tree has $I=2^D-1$ internal nodes and $L_D=2^D$ leaves.
+Its effective topology can be smaller. If $w_{tp}=0$, the bias determines a
+constant route, and the other child and its descendants are unreachable for
+\emph{every} input. For example, $w_{tp}=0,b_{tp}=0$ always chooses the left
+child by Eq.~\eqref{eq:cut}. Such branches can be removed without changing the
+function. A branch merely unused by a finite data sample is not necessarily
+unreachable.
 
-The stored arrays are \code{split_w} with shape $(I,F)$,
-\code{split_b} with shape $(I,)$, and \code{leaf_parameters} with shape
-$(L,B,K-1)$ for $K$ classes. Here $B=F+1$ for linear leaves and $B=1$ for
-constant leaves. \code{HardTree.routes}, \code{HardTree.leaf_indices} and
-\code{HardTree.predict_subtree} implement the traversal. The selected models
-use the \code{dense} NumPy reference traversal, not a generated sparse firmware
-kernel.
-
-\subsection{Linear leaves, reference logits and forest aggregation}
-The final class is the fixed reference class, with logit zero. A linear leaf
-stores $K-1$ affine functions,
+Let $\ell_t(x)$ be the leaf path reached in tree $t$. With class $K-1$ as a
+reference of zero logit, a linear leaf stores $K-1$ affine functions
 \begin{equation}
- f_{t\ell k}(x)=a_{t\ell k}^{\mathsf T}x+c_{t\ell k},\qquad k=0,\ldots,K-2.
+ f_{t\ell k}(x)=a_{t\ell k}^{\mathsf T}x+c_{t\ell k},
+ \qquad k=0,\ldots,K-2,
  \label{eq:leaf}
 \end{equation}
-For constant leaves, $f_{t\ell k}(x)=c_{t\ell k}$. If $\ell_t(x)$ is the selected
-leaf, the forest forms
+where $a_{t\ell k}\in\mathbb R^F$ and $c_{t\ell k}\in\mathbb R$ are the leaf
+weights and biases. A constant leaf restricts $a_{t\ell k}=0$. The forest logits
+and probabilities are
 \begin{equation}
- z_k(x)=\sum_{t=0}^{T-1}f_{t,\ell_t(x),k}(x),\quad z_{K-1}(x)=0,\qquad
- p_k(x)=\frac{e^{z_k(x)}}{\sum_{q=0}^{K-1}e^{z_q(x)}}.
+ z_k(x)=\sum_{t=1}^T f_{t,\ell_t(x),k}(x),\quad z_{K-1}(x)=0,
+ \qquad P(y=k\mid x)=\frac{\exp z_k(x)}{\sum_{q=0}^{K-1}\exp z_q(x)}.
  \label{eq:forest}
 \end{equation}
-This is the convention of \code{HardTAOClassifier.decision_function} and
-\code{HardTAOClassifier.predict_proba}. The logits are summed, not averaged;
-probabilities are not summed. Fixing a reference class removes a redundant
-class-logit degree of freedom, although different forest parameterizations
-can still yield identical summed logits. The input and logit calculations
-use binary64; the public \code{predict_proba} array is cast to float32. The
-reported ROC evaluation uses the actual API scores, including any resulting
-probability ties, while the portable margin interface remains binary64.
+Thus tree logits are added before applying softmax. Linear leaves allow
+first-order dependence within a region, but do not enforce continuity across
+its boundaries. The forest is affine on each intersection of its trees' leaf
+regions; adding trees refines this partition.
 
-For the binary task, the single stored free logit is the \emph{background}
-logit. Thus
+For the binary application, class 0 is background and class 1 is signal. The
+signal margin and probability are
 \begin{equation}
- m(x)=-z_0(x)=-\sum_t f_{t,\ell_t(x),0}(x),\qquad
- p_{\mathrm{signal}}(x)=\operatorname{sigmoid}(m(x)).
+ m(x)=-z_0(x),\qquad P(y=1\mid x)=\frac{1}{1+\exp[-m(x)]}.
  \label{eq:margin}
 \end{equation}
-Firmware can compare the increasing signal margin $m$ directly with a
-threshold. Reversing the sign would reverse the classification. The training
-code supports multiclass leaf fits, but the current
-\code{tree-benchmark.binary-hard-oblique.v1} interchange schema and C++
-reference are binary; they must be extended before a multiclass firmware export.
+A larger margin therefore corresponds to a more signal-like event.
 
-Linear leaves model first-order dependence \emph{within} each region. They do
-not impose continuity across a split: two affine leaf functions can jump at a
-boundary. A forest is affine on each intersection of its trees' leaf regions;
-adding trees refines that partition and can improve a small forest beyond
-what extra depth in one tree achieves. Conversely, the inclusion of
-axis-aligned cuts as a special case does not prove that three shallow oblique
-trees can represent every function of a hundred-tree BDT. The comparison is
-empirical, not a containment theorem between those two fixed architectures.
-
-\subsection{Parameter accounting and preprocessing}
-Counting scalar coefficients and biases, but excluding feature indices,
-topology, masks, preprocessing and metadata, gives
+\subsection{Parameter and arithmetic counts}
+Counting scalar weights and biases gives
 \begin{equation}
- P_{\mathrm{dense}}=T\left[(2^D-1)(F+1)+2^D B(K-1)\right].
+ P_{\mathrm{dense}}=T\big[(2^D-1)(F+1)+2^D B(K-1)\big],
+ \qquad B=\begin{cases}F+1,&\text{linear leaves},\\1,&\text{constant leaves}.
+ \end{cases}
  \label{eq:count}
 \end{equation}
-For $F=16$, $K=2$ and $D=4$, a linear-leaf tree has
-$15\cdot17+16\cdot17=527$ slots; three have 1,581. A constant-leaf tree has
-$15\cdot17+16=271$ slots. These allocated slots must not be confused with the
-number of coefficients that are exactly nonzero.
+This is the allocated coefficient count for a complete topology. We separately
+report $P_{\mathrm{nz}}$, the number of coefficients exactly different from
+zero, and $P_{\mathrm{reach}}$, the nonzero count after removing algebraically
+unreachable branches. These counts include biases and exclude feature indices,
+connectivity and preprocessing metadata.
 
-The Compact refit stores 418 nonzero coefficients, of which 379 remain after
-removing coefficients in algebraically unreachable branches. Dense serialized
-arrays still contain all 1,581 slots. \file{src/tao/sparsity.py}, function
-\code{sparsity_profile}, counts exact zeros and safely follows constant
-routes; it does not use validation occupancy to prune rare branches.
+For $F=16,K=2,D=4$, one linear-leaf tree has $15\cdot17+16\cdot17=527$
+coefficient slots, while three have 1,581. A single dense tree may therefore
+have a similar \emph{nonzero} count to a more strongly regularized forest
+of three trees, despite its smaller allocated count.
 
-The primary training arrays are already standardized, so the classifier's
-\code{InputTransform} is identity. The utility
-\code{InputTransform.from_variances} correctly uses square roots of variances
-for a non-identity scaler. Applying a second standardization would change the
-model. For a raw-input export, \code{export_model} in
-\file{src/tao/portable.py} folds the saved scaler into every split and linear
-leaf:
-\begin{equation}
- x_f=\frac{r_f-\mu_f}{s_f},\qquad
- w_f^{\mathrm{raw}}=\frac{w_f}{s_f},\qquad
- b^{\mathrm{raw}}=b-\sum_f\frac{w_f\mu_f}{s_f}.
- \label{eq:fold}
-\end{equation}
-``Raw'' denotes unstandardized high-level jet features, not detector inputs.
-Folding preserves feature-weight zeros for nonzero scales, but can change bias
-values and bias zero counts. The exact feature order is in Appendix~\ref{app:features}.
+A dense binary forest with linear leaves needs at most $TF(D+1)$ feature
+multiplications and $TD$ comparisons along a selected path. Bias additions
+are not multiplications. Evaluating all internal functions and leaves instead
+uses $TF(2^{D+1}-1)$ multiplications. Sparse functions reduce these counts
+according to their retained feature weights. They are arithmetic bounds;
+latency also depends on parallelism, multiplier reuse, precision and memory.
 
-\section{TAO training and numerical parameters}
+\begin{implementation}
+\textbf{Storage and inference.} \code{HardTree} and \code{HardTAOClassifier}
+in \file{src/tao/hard.py} implement Eqs.~\eqref{eq:cut}--\eqref{eq:forest}.
+Internal nodes use heap indices $j=0,\ldots,I-1$, with children $2j+1,2j+2$;
+leaf-array indices subtract $I$ from the heap index. The arrays are
+\code{split_w}, \code{split_b} and \code{leaf_parameters}. The methods
+\code{routes}, \code{leaf_indices}, \code{predict_subtree},
+\code{decision_function} and \code{predict_proba} implement traversal and logits.
+Input and logit arithmetic is binary64; public probabilities are cast to
+float32. The native ROC uses those probabilities, including any ties. Portable
+margin inference remains binary64. The current portable schema is binary,
+although the fitting code supports multiclass logits.
+
+\code{sparsity_profile} in \file{src/tao/sparsity.py} computes exact-zero and
+reachable counts. The existing NumPy \code{dense} traversal may compute a
+node function over an entire batch before selecting reaching rows; its runtime
+does not represent a generated sparse path kernel.
+\end{implementation}
+
+\section{Tree Alternating Optimization}
 \label{sec:training}
-TAO revisits the parameters of an existing tree instead of making only a
-single greedy top-down pass. The original work describes node-wise alternating
-optimization and sparse oblique splits~\cite{tao2018}; subsequent work uses
-sparse oblique trees to inspect learned feature representations~\cite{tao2021}.
-Our code is an adaptation for an additive forest with constant or affine
-multiclass logits and cross-entropy. The precise objective, acceptance tests
-and finite numerical stopping rules below describe our implementation; they
-should not be replaced by stronger claims about global hard-tree optimization.
-
-\subsection{One normalized objective for all blocks}
-For events $(x_i,y_i)$ with nonnegative weights $v_i$ and
-$W=\sum_i v_i$, the implementation minimizes
+\subsection{A common forest objective}
+For training events $(x_i,y_i)$, $i=1,\ldots,N$, let $v_i\geq0$ be event weights
+and $W=\sum_i v_i>0$. All results below use $v_i=1$. We minimize
 \begin{align}
- J(\theta)={}&\frac1W\sum_i v_i\CE(y_i,z(x_i))
- +\lambda_s\sum_{t,j}\left(\normone{w_{tj}}+|b_{tj}|\right) \nonumber\\
+ J(\theta)={}&\frac1W\sum_{i=1}^N v_i\CE(y_i,z(x_i))
+ +\lambda_s\sum_{t,p}\big(\normone{w_{tp}}+|b_{tp}|\big)\nonumber\\
  &+\lambda_\ell\sum_{t,\ell,k}\normone{a_{t\ell k}},
- \qquad
- \CE(y,z)=\log\sum_k e^{z_k}-z_y.
+ \qquad \CE(y,z)=\log\sum_{k=0}^{K-1}e^{z_k}-z_y.
  \label{eq:objective}
 \end{align}
-In this benchmark $v_i=1$. Split biases are penalized; leaf biases are not.
-A constant leaf has no feature coefficients, so its nominal leaf L1 strength
-has no effect under this convention. All node and leaf subproblems retain the
-\emph{full training-weight sum} $W$ as denominator, not the number of events
-reaching that node. Otherwise the same printed $\lambda$ would mean a different
-regularization strength at different depths or occupancies.
+Here $\theta$ denotes all cut and leaf parameters, $\lambda_s\geq0$ penalizes
+cuts and $\lambda_\ell\geq0$ penalizes leaf feature weights. Leaf biases are
+unpenalized; cut biases are penalized. For constant leaves, $\lambda_\ell$
+has no effect. Every subproblem retains the full training-weight denominator
+$W$, so a penalty has the same normalization at different depths and node
+occupancies.
 
-\code{cross_entropy_rows}, \code{ce_value_gradient},
-\code{HardTAOClassifier._penalty} and \code{HardTAOClassifier.objective}
-implement these definitions in \file{src/tao/hard.py}. There is no L2
-substitution for the requested L1 penalty. Classical Lasso uses squared-error
-linear regression; here ``Lasso-like'' refers to L1-penalized classification
-and selection, not a call to \code{sklearn.linear_model.Lasso}.
+TAO alternates optimization blocks while other parameters are fixed~\cite{tao2018}.
+An \emph{epoch} visits every tree, updates its leaves and then its internal
+nodes from the bottom up, and finally refits all forest leaves jointly. Other
+trees contribute fixed logit offsets during each individual-tree update.
+Their offsets are refreshed before updating the next tree. Earlier trees
+remain trainable; the procedure does not freeze them as later trees are added.
 
-\subsection{Leaf subproblems and the joint forest refit}
-With routes fixed, the leaf logits are linear in their coefficients. For a
-single tree update, predictions from all other trees are held as a fixed logit
-offset. Omitting that offset would fit each tree as though it were alone,
-instead of optimizing the forest loss. With all routes fixed, the complete
-forest leaf problem is convex, although its parameters need not be uniquely
-identified.
+\subsection{Leaf optimization}
+With all routes fixed, the logits in Eq.~\eqref{eq:forest} are linear in the
+leaf coefficients. The joint leaf problem is convex, although its parameters
+need not be unique. For a single tree, the sum of the other trees' logits is
+a fixed offset in the cross-entropy loss. A joint refit subsequently optimizes
+all trees' leaf functions against the same loss.
 
-\code{fit_leaf_parameters} uses SciPy's \code{minimize} with L-BFGS-B and an
-analytic softmax cross-entropy gradient. A penalized scalar is represented as
-$\theta_j=u_j-v_j$, $u_j,v_j\geq0$, with penalty
-$\lambda(u_j+v_j)$. Unpenalized coordinates are unconstrained real variables.
-At a finite solver budget, both parts can remain positive. The code therefore
-canonicalizes their difference and evaluates the \emph{actual stored}
-$\lambda|u_j-v_j|$, rather than reporting the larger packed penalty as though
-it were the objective of the exported coefficients. A candidate is retained
-only if its actual objective does not increase.
+We use analytic cross-entropy gradients and a bound-constrained quasi-Newton
+solver. A penalized scalar coefficient is represented as
+$\theta_q=u_q-v_q$ with $u_q,v_q\geq0$, contributing
+$\lambda(u_q+v_q)$; unpenalized coordinates are free real variables. After a
+finite solve, we reconstruct $\theta_q$ and evaluate the actual objective
+using $\lambda|\theta_q|$. This avoids reporting the larger auxiliary penalty
+when both $u_q$ and $v_q$ remain positive. A leaf update is retained only if
+its actual objective does not increase.
 
-\code{HardTAOClassifier._joint_design} builds a CSR design matrix whose row
-activates the selected leaf block of every tree. A linear-leaf row stores
-$T(F+1)$ entries, so the three-tree training problem has 27,091,200 stored
-design entries for 531,200 events. The implementation constructs CSR arrays
-directly. It still builds full feature blocks even for masked-out coefficients;
-model sparsity is not yet fully exploited in this training design. The method
-\code{HardTAOClassifier.global_refit} jointly reoptimizes all leaf coefficients,
-not just the last tree, using that design.
-
-\subsection{The reduced decision-node problem}
-Consider events currently reaching node $j$; ancestors, descendants and other
-trees are fixed. Evaluate the full-forest loss obtained by routing an event
-through the left or right subtree:
+\subsection{Decision-node optimization}
+Let $\mathcal R_{tp}$ be the training events reaching node $p$ in tree $t$.
+Keep its ancestors, descendants and all other trees fixed. For event $i$,
+let $g_L(x_i)$ and $g_R(x_i)$ be the logit vectors predicted by its two
+subtrees, and $o_i$ the logit sum from the other trees. The child losses are
 \begin{equation}
  C_i^L=\CE(y_i,o_i+g_L(x_i)),\quad
- C_i^R=\CE(y_i,o_i+g_R(x_i)),\quad
- \Delta_i=C_i^L-C_i^R,
+ C_i^R=\CE(y_i,o_i+g_R(x_i)),\quad \Delta_i=C_i^L-C_i^R.
  \label{eq:reduced}
 \end{equation}
-where $o_i$ is the logit offset of the other trees. Apart from an additive
-constant, changing the split minimizes a weighted binary misrouting loss, % \ind does not work. Please check. We need a package or another symbol.
+A positive $\Delta_i$ favors the right child. Up to an additive constant, the
+cut subproblem is a weighted binary misrouting loss,
 \begin{equation}
- \frac1W\sum_{i\in\mathcal R_j} v_i|\Delta_i|
- \ind\!\left[\ind[h_j(x_i)>0]\ne \ind[\Delta_i>0]\right]
- +\lambda_s\left(\normone{w_j}+|b_j|\right).
- \label{eq:reduced-hard}
+ \frac1W\sum_{i\in\mathcal R_{tp}}v_i|\Delta_i|
+ \ind\!\left\{\ind[h_{tp}(x_i)>0]\ne\ind[\Delta_i>0]\right\}
+ +\lambda_s(\normone{w_{tp}}+|b_{tp}|).
+ \label{eq:misroute}
 \end{equation}
-The reduced label is \emph{right versus left}, not the original physics class.
-This binary routing problem is compatible with a multiclass forest loss.
-Events with $v_i|\Delta_i|=0$ contain no information about this split and are
-excluded from the logistic fit; they do not create a third branch.
+The indicator $\ind[A]$ equals 1 when statement $A$ holds and 0 otherwise.
+The reduced labels denote preferred \emph{branches}, even for a multiclass
+classification loss. Events with $v_i|\Delta_i|=0$ are uninformative for this
+cut and are excluded from its auxiliary fit.
 
-The code fits a weighted logistic \emph{proposal} for these labels. In ordinary
-penalized training, \code{fit_l1_split} can use scikit-learn's
-\code{LogisticRegression} with \code{solver='liblinear'}, an L1 penalty and
-$C=1/(\lambda_s W)$, or the same positive/negative L-BFGS-B parameterization.
-The synthetic LIBLINEAR intercept is penalized consistently with
-Eq.~\eqref{eq:objective}. An unpenalized split uses the L-BFGS-B route, since
-LIBLINEAR does not supply the requested unpenalized objective. The fixed-support
-variant uses masked L-BFGS-B directly.
+We first fit a weighted L1-logistic classifier to the reduced labels with
+weights $v_i|\Delta_i|$. Its smooth loss produces a proposed cut, but is not
+Eq.~\eqref{eq:misroute}. We therefore compare the existing cut, the logistic
+proposal, directions blending 25\%, 50\% or 75\% of the proposal with the
+existing weight vector, and a constant direction. For each direction we sort
+its projected scores, move ties together, and search representable threshold
+intervals including the cut-bias penalty. We retain a strictly improving
+proposal under the actual hard-routing objective. This optimizes thresholds
+within the proposed directions, not over all possible hyperplanes.
 
-The logistic objective is not the hard routing objective. The selected
-\code{split_search='hard_threshold'} implementation therefore considers the
-current direction, the logistic direction, 25/50/75\% blends, the raw logistic
-proposal and a zero-weight constant direction. For each allowed fixed
-direction it calls \code{best_threshold} in \file{src/tao/split_search.py}.
-The function sorts projected scores, moves tied values together, enumerates
-representable threshold intervals, and includes the bias penalty. The result
-is checked again with the \emph{actual hard-routing loss}. Only a strictly
-improving hard-objective proposal replaces the current split. This is exact
-threshold optimization along the proposed directions, not exact optimization
-over all hyperplanes.
+During unpenalized fixed-support refitting, a cut that sends every
+positive-weight event to its preferred child already attains the pointwise
+lower bound of the reduced loss. We can certify it without solving an
+auxiliary logistic problem. When only one preferred branch is present, we
+skip the logistic fit and test allowed existing and constant directions.
 
-In the fixed-support variant, a current split that already sends every
-positive-weight event to its lower-loss child attains a pointwise lower bound.
-\code{FrozenSupportTAO._split_update} returns the certificate
-\code{pointwise_lower_bound} without requiring a finite optimum of an
-auxiliary logistic fit. Otherwise its certificate concerns only the configured
-proposal family. With just one pseudo-class, the logistic fit is skipped;
-current and constant directions are still tested subject to frozen bias
-constraints. This limited proposal family is another reason not to interpret
-a stopped run as globally optimal over hyperplanes.
+\subsection{Initialization and numerical stopping}
+Fresh trees are initialized by greedy axis-aligned classification trees fitted
+to bootstrap draws from the training sample. Subsequent TAO updates use the
+full training sample. Leaf class counts receive a 0.5 pseudocount before
+conversion to reference-class log odds; each tree's initial logits are divided
+by $T$. Early terminal nodes can be embedded in a complete topology using
+constant left-routing cuts, which explains some unreachable branches. The
+sparsity study below continues an existing trained forest.
 
-\subsection{An epoch, initialization and forest coupling}
-\begin{lstlisting}[float=htbp,caption={Logical structure of an implemented hard-TAO epoch. Names correspond to the Python methods; this is explanatory pseudocode.}]
-cache each tree's current logits; total = sum(cache)
-for tree in forest:
-    offset = total - cache[tree]
-    routes = tree.routes(training_inputs)
-    fit each leaf with the other-tree offset fixed
-    update internal nodes in descending heap order (bottom-up)
-    update cache[tree] and total
-HardTAOClassifier.global_refit(all_training_inputs, labels)
-check loss, leaf KKT residual, routing changes, inner fits
-\end{lstlisting}
-Bottom-up node order makes cached ancestor reaching sets valid while
-revisiting descendants. Trees are updated sequentially with refreshed offsets.
-The code does not currently train all forest members in parallel, nor does it
-simply boost a residual while keeping earlier members fixed. The serializable
-version is \code{begin_epoch}/\code{step_epoch} in \file{src/tao/epoch.py}; it
-can checkpoint between node updates without repeating a partially finished
-epoch. Cached logits avoid recomputing the whole forest for every proposal.
-
-For fresh models, \code{initialize_cart} in \file{src/tao/initialization.py}
-uses a CART seed on training data only. Forest members use bootstrap draws
-within that same training partition for initial diversity; later TAO updates
-use the full original training sample. Leaf class counts receive a 0.5
-pseudocount before conversion to reference-class log odds. Initial per-tree
-logits are divided by $T$. Early CART leaves are padded by deterministic
-left-routing zero tests in the complete storage layout.
-\code{append_zero_tree} can grow a forest without changing its current
-predictions, but this option is not used to obtain the fixed three-tree SFR
-default. That model is a continuation of a frozen v2 forest, as detailed below.
-
-\section{An actual printed tree and its affine cuts}
-\label{sec:example}
-We added the read-only \code{TreePrinter} class in
-\file{src/tao/printing.py}, with methods \code{print_tree},
-\code{format_tree}, \code{format_forest} and \code{records}. It reads the
-portable model specification. It deliberately lives outside the pinned
-numerical training files, so adding inspection does not invalidate ongoing
-training implementation hashes or alter the fitted model.
-
-\begin{lstlisting}[language=Python,caption={Print a real tree from the handed-over model, without loading a training pickle. The normal Python environment is described in Section~\ref{sec:reproduce}.}]
-import json
-from pathlib import Path
-from tao.printing import TreePrinter
-
-spec = json.loads(Path(
-    "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json"
-).read_text())
-printer = TreePrinter(spec, precision=17)
-printer.print_tree(0)  # tree indices are zero-based
-\end{lstlisting}
-The CLI \file{scripts/print_tao_tree.py} prints one tree or the whole forest
-and can write the result to a file. The output identifies each heap node,
-its left/right path, structural reachability, the full affine equation and
-both child destinations. It includes unreachable branches rather than silently
-hiding them. Only exact-zero terms are omitted. At the default precision,
-all nonzero binary64 coefficients are represented with 17 significant digits;
-a smaller precision affects display only.
-
-Here are actual standardized-input cuts from the Compact refit. Subscripts
-$(t,j)$ denote zero-based tree and internal-node indices. These equations are
-generated from the model JSON, not transcribed or invented examples. Numerical
-values in this display are rounded to eight significant digits, hence the
-$\simeq$ signs.
-\input{generated/example_cuts.tex}
-The first cut is still axis-aligned: node $(0,0)$ sends an event right when
-its standardized \code{c1_b2_mmdt} exceeds approximately $-0.4216204$. Node
-$(0,1)$ has exactly zero weights and bias, so equality always sends it left;
-its right subtree is structurally unreachable. Node $(0,2)$ combines five
-features and is genuinely oblique. Tree 2 has an oblique root combining three
-features. Thus the trained model uses a mixture of axis-aligned, oblique and
-constant decisions.
-
-The coefficients at node $(1,1)$ are tiny but nonzero. Dividing its inequality
-by a positive common scale reveals an ordinary cut on standardized
-\code{multiplicity}, with the inequality reversed when solving for that feature
-because its coefficient is negative. Replacing these numbers by zero would
-turn a real split into a constant route. This is why the support and operation
-counts do not use an arbitrary magnitude cutoff.
-
-Appendix~\ref{app:trees} records \emph{all three trees}, including every cut
-and every affine leaf, at nine significant display digits. The exact
-full-precision human-readable record is
-\path{generated/compact_forest_full_precision.txt}; the original JSON and
-hexadecimal C++ headers remain the implementation authority. Tests independently
-parse printed expressions, recover all 418 nonzero coefficients exactly at
-17 digits, reproduce the 379 reachable-coefficient count, and compare reconstructed
-forest predictions with the independent portable evaluator. They also check
-zero/equality routing, constant leaves, tiny terms and absence of mutation.
-
-\section{Training considerations and Select--Freeze--Refit}
-\label{sec:sfr}
-\subsection{Separate support selection from shrinkage}
-L1 regularization has two useful but different effects: it can make a coefficient
-exactly zero, and it shrinks the remaining values. Once a coefficient is to be
-implemented anyway, retaining shrinkage may unnecessarily compromise the
-classifier. Post-selection refitting is a familiar idea; relaxed Lasso separates
-variable selection from subsequent shrinkage in linear regression~\cite{relaxed}.
-We use that motivation, not its regression theory, for a nonconvex hard forest.
-
-We name our concrete implementation \SFR{}:
-\begin{enumerate}
-\item \textbf{Select.} Train an L1-penalized parent to the configured numerical
-stopping criterion. Trace separate split, leaf and joint penalty paths from
-warm-started \emph{terminal} parents, following the regularization-path
-principle also used in sparse TAO~\cite{tao2018}. Select the penalty/support strategy using
-validation, never test data.
-\item \textbf{Freeze.} Copy the parent and define $M_j=\ind[\theta_j\ne0]$ once,
-including split and leaf biases and all free classes. Preserve the topology and
-the exact zeros. Remove the split and leaf L1 penalties.
-\item \textbf{Refit.} First optimize surviving leaf coefficients with every
-split fixed. Optionally continue by optimizing surviving split and leaf
-coefficients, still constrained by the original masks. Select among eligible
-saved checkpoints at the declared validation working point.
-\end{enumerate}
-Each stage starts with a joint fixed-route leaf refit and repeats that refit
-after each node-update pass. A pass is not a single optimizer iteration.
-The full refit solves, approximately and by alternation,
-\begin{equation}
- \min_\theta \frac1W\sum_i v_i\CE(y_i,z(x_i;\theta))
- \quad\text{subject to}\quad \theta_j=0\ \text{whenever}\ M_j=0.
- \label{eq:frozen}
-\end{equation}
-The surviving coordinates are real unconstrained variables and can change sign.
-They are not forced to remain nonzero. If a free coefficient becomes zero, its
-original mask entry still allows it to move later; the mask is not reselected.
-Simply reducing L1 on the original unrestricted model would instead permit
-removed coordinates to regrow, defeating the controlled fixed-support study.
-
-\code{freeze_support} and \code{continue_full_refit} in
-\file{src/tao/support.py} implement this distinction. \code{FrozenSupportTAO}
-checks mask hashes, shapes, topology, finite values, zero regrowth and the zero
-L1 settings. Leaf-only splits are bit-identical to the parent. Splits that
-were already input-independent retain their decision and bias. A frozen-zero
-split bias is not revived by an unrestricted threshold search. No epsilon
-pruning, L2 fallback or implicit renormalization is introduced.
-
-\subsection{The exact Compact refit training chain}
-\label{sec:chain}
-The default is \emph{not} a fresh fit at its final L1 values. Its chain is:
-\begin{center}
-\begin{tabular}{@{}ll@{}}\toprule
-Stage & Configuration / setting\\\midrule
-Frozen start & v2 \code{winner_3t_d4} portable coefficients\\
-Same-penalty control & \code{configs/l1_path_v1/control.json}\\
-Split L1 path & $3\!\times\!10^{-5},10^{-4},3\!\times\!10^{-4},10^{-3},3\!\times\!10^{-3}$\\
-Leaf L1 during path & $10^{-5}$ throughout\\
-Refit parent & Converged terminal \code{split_05} checkpoint, 418 nonzeros\\
-SFR leaf-only then full & \code{configs/support_refit_scan_v1/split300.json}\\\bottomrule
-\end{tabular}
-\end{center}
-The path manifest is \file{configs/tao_l1_path_v1.json}; the individual split
-configs are \code{split_01.json} through \code{split_05.json} under
-\code{configs/l1_path_v1/}. The parent worker is
-\file{scripts/train_tao_fully.py}. The path configurations start with 300
-local leaf iterations, 250 iterations per joint-leaf chunk, and 300 auxiliary
-split iterations. The worker logs repeated refit chunks and any adaptive
-inner-budget increases instead of treating an iteration limit as convergence.
-The refit driver is
-\file{scripts/train_tao_support_refit.py}, with evaluated-snapshot archiving
-installed by \file{scripts/run_support_refit_scan_case.py} and
-\file{scripts/support_refit_artifacts.py}.
-
-For this fixed support, validation efficiency changes from 54.59\% for the
-L1-selected terminal parent to 54.81\% after leaf-only refitting. The full stage
-converges at pass 15 with 55.98\%. Its best saved validation checkpoint is pass
-8, at 56.20\%, with the same 418 nonzero coefficients. A converged source run
-therefore does not imply that its selected earlier snapshot is stationary.
-The immutable snapshot is pinned by SHA-256:
-\begin{center}\footnotesize\ttfamily\CompactCheckpointHash\end{center}
-
-\subsection{Solver budgets and the numerical meaning of convergence}
-The Compact refit uses the settings in Table~\ref{tab:settings}. A solver
-iteration cap is a compute budget, not a success criterion. The worker repeats
-joint-leaf solver chunks until the constrained leaf KKT residual meets its
-threshold, or labels the case unsuccessful if a guard is reached.
-\begin{table}[htbp]\centering
-\caption{Default Compact refit settings. Penalties are zero during refitting;
-the parent was selected using split/leaf L1 $0.003/10^{-5}$.}
-\label{tab:settings}
-\begin{tabular}{@{}ll@{}}\toprule
-Setting & Value\\\midrule
-Training / split seed & 42 / 42\\
-Local leaf iterations per call & 400\\
-Joint-leaf iterations per chunk & 400 (at most 100 chunks per phase)\\
-Auxiliary split iterations & 800\\
-L-BFGS-B \code{ftol} / \code{gtol} & $10^{-12}$ / $10^{-8}$\\
-Leaf KKT infinity-norm tolerance & $10^{-6}$\\
-Relative training-objective gain tolerance & $10^{-5}$\\
-Routing-change fraction tolerance & $10^{-4}$\\
-Stable passes required / minimum passes & 3 / 5 per stage\\
-Maximum passes per stage & 200 (guard, not convergence)\\
-Separation diagnostic time limit & 600\,s\\
-Checkpoint allocation budget & 2,700\,s; clean return code 75\\\bottomrule
-\end{tabular}
-\end{table}
-
-\code{leaf_kkt_residual} and \code{convergence_check} in
-\file{src/tao/convergence.py} implement the checks. For a free unpenalized leaf
-coordinate, stationarity requires its normalized CE gradient to be small.
-For a penalized coordinate, the residual checks the L1 subgradient condition;
-values within $10^{-10}$ of zero are treated as zero \emph{for this numerical
-stationarity calculation}. That tolerance is distinct from the exact
-\code{!= 0} mask and parameter-count rule. Frozen coordinates have equality
-constraints and are excluded from the free-coordinate KKT check. Explicitly,
-for leaf coordinate $q$ with normalized unpenalized gradient $g_q$ and
-applicable penalty $\lambda_q$ ($\lambda_\ell$ for a feature weight, zero
-for a leaf bias), the residual is
+We distinguish an optimizer iteration, an epoch of alternating tree updates,
+and convergence of the full run. Reaching an iteration cap alone is not
+convergence. For fixed routes, let $g_q$ be the gradient of normalized
+unpenalized cross-entropy with respect to leaf coordinate $\theta_q$, and let
+$\lambda_q$ equal $\lambda_\ell$ for a penalized feature weight and zero for
+a bias. The leaf stationarity residual is
 \begin{equation}
  r_q=\begin{cases}
  0,&q\text{ frozen},\\
- |g_q+\lambda_q\operatorname{sign}(\theta_q)|,
-    &q\text{ free and }|\theta_q|>10^{-10},\\
- \max(|g_q|-\lambda_q,0),&q\text{ free and }|\theta_q|\leq10^{-10}.
+ |g_q+\lambda_q\operatorname{sign}(\theta_q)|,&q\text{ free},\ |\theta_q|>\delta,\\
+ \max(|g_q|-\lambda_q,0),&q\text{ free},\ |\theta_q|\leq\delta,
  \end{cases}
- \qquad r_{\mathrm{KKT}}=\max_q r_q.
+ \quad r_{\mathrm{KKT}}=\max_q r_q,
  \label{eq:kkt}
 \end{equation}
-For an unpenalized free coordinate this reduces to $|g_q|$ in either branch.
-The check certifies numerical stationarity of the convex fixed-route leaf
-problem; no corresponding differentiable KKT claim is made for discrete
-routing changes.
+with numerical zero tolerance $\delta=10^{-10}$. Here KKT denotes the
+Karush--Kuhn--Tucker stationarity conditions. Frozen coordinates are subject
+to equality constraints and do not require zero gradients. The tolerance
+$\delta$ is used only for this residual; support selection uses exact zeros.
 
-For each epoch, the code rejects an objective increase above the numerical
-allowance $10^{-8}$. It requires small relative
-objective gain, small fraction of events whose leaf changes in \emph{any}
-forest member, and successful inner fits. All must hold for three consecutive
-passes after the minimum-stage length. These are numerical stopping conditions
-for the fixed routes/available proposals, not a proof of a global optimum over
-all trees or hyperplanes.
+We require $r_{\mathrm{KKT}}\leq10^{-6}$, successful inner solves, relative
+objective gain at most $10^{-5}$ and a routing-change fraction at most $10^{-4}$
+for three consecutive epochs, after at least five epochs. An event counts as
+rerouted if its leaf changes in any forest member. The relative gain is
+$\max(0,(J_{\mathrm{before}}-J_{\mathrm{after}})/
+\max(|J_{\mathrm{before}}|,10^{-12}))$; increases above $10^{-8}$ are rejected.
+These conditions concern numerical stationarity of leaf fits and the available
+cut proposals. They do not establish global optimality of the forest.
 
-One mild-control case exposed a practical failure mode: an auxiliary router
-repeatedly hit 800 iterations even when its hard proposal was rejected and
-routing had stopped changing. A tested, recorded checkpoint-policy migration
-raised that case's auxiliary budget to 4,000 without changing its coefficients,
-masks, objective or stopping tolerances. The next complete pass solved that
-router in 2,028 iterations; the control eventually converged after 16 full
-passes. This is documented in
-\file{docs/support_refit_scan_budget_amendments.json} and implemented by
-\file{scripts/amend_support_solver_budget.py}. It was not a relaxation of the
-convergence rule or a change to the Compact refit's 800-iteration setting.
+\begin{implementation}
+\textbf{Objective and leaf solvers.} \file{src/tao/hard.py} contains
+\code{cross_entropy_rows}, \code{ce_value_gradient}, \code{fit_leaf_parameters},
+\code{HardTAOClassifier._penalty}, \code{objective}, \code{_joint_design} and
+\code{global_refit}. The joint CSR design activates a leaf block in each tree:
+a linear-leaf row has $T(F+1)$ stored entries. For 531,200 events and three
+trees this is 27,091,200 entries. Frozen feature columns are still stored.
+The solver is SciPy L-BFGS-B. \code{fit_l1_split} also supports scikit-learn
+LIBLINEAR for ordinary penalized proposals, with $C=1/(\lambda_s W)$ and a
+penalized synthetic intercept. Zero-penalty and masked proposals use L-BFGS-B.
 
-\subsection{Separation and held fits}
-Removing L1 can expose complete or quasi separation: the unpenalized logistic
-loss may approach its infimum only as some coefficients diverge. An iteration
-cap or tiny loss change must not be mistaken for a finite well-behaved fit.
-With routes fixed, \code{separation_check} in \file{src/tao/support.py} searches
-for a free-coefficient direction that makes every training true-class versus
-other-class logit margin nondecreasing and at least one strictly increasing.
-The reference class remains zero. Box bounds on this homogeneous diagnostic
-fix its scale; they do not cap the fitted model coefficients.
+\textbf{Cuts and epochs.} \code{best_threshold} in
+\file{src/tao/split_search.py} implements the threshold search;
+\code{FrozenSupportTAO._split_update} in \file{src/tao/support.py} handles
+fixed support and pointwise certificates. \code{begin_epoch}/\code{step_epoch}
+in \file{src/tao/epoch.py} serialize a bottom-up epoch and cache other-tree
+logits. \code{initialize_cart} in \file{src/tao/initialization.py} initializes
+fresh trees. \code{append_zero_tree} can extend a forest while preserving
+predictions; the selected compact forest was not obtained with that option.
+\code{leaf_kkt_residual} and \code{convergence_check} in
+\file{src/tao/convergence.py} implement Eq.~\eqref{eq:kkt} and the stopping tests.
+\end{implementation}
 
-The sparse LP uses all positive-weight training events and allowed coordinates.
-A feasible positive improvement indicates separation; a solver failure,
-ambiguous numerical result or timeout is inconclusive. Its practical score
-thresholds distinguish an improvement above $10^{-7}$ from a near-zero score
-at or below $10^{-10}$, with intermediate values held; feasibility is checked
-numerically. It is a diagnostic, not a proof of uniqueness of the forest
-parameters. Certificates are cached only while leaf routes remain unchanged.
+\section{Selecting support and refitting}
+\label{sec:sfr}
+\subsection{Select--Freeze--Refit}
+L1 regularization both removes coefficients and shrinks surviving values.
+Once a coefficient will be retained, shrinkage can unnecessarily reduce
+accuracy. Motivated by post-selection refitting~\cite{relaxed}, we use the
+following procedure, termed \SFR{} (SFR):
+\begin{enumerate}
+\item \textbf{Select.} Follow split-only, leaf-only or joint L1 paths using
+converged terminal fits as warm starts. Choose a support strategy on validation.
+\item \textbf{Freeze.} Copy the selected parent, fix its topology, and record
+$M_q=\ind[\theta_q\ne0]$ for every coefficient, including biases.
+\item \textbf{Refit.} Remove both L1 penalties. First optimize the surviving
+leaf coefficients with cuts fixed; then optionally alternate cut and leaf
+updates while preserving the original masks.
+\end{enumerate}
+Let $\mathcal C$ denote coordinates of input-independent cuts and
+$\theta_{\mathcal C}^{\mathrm{parent}}$ their parent values. The full refit minimizes
+\begin{equation}
+ \frac1W\sum_i v_i\CE(y_i,z(x_i;\theta))
+ \quad\text{subject to }\theta_q=0\text{ if }M_q=0,\quad
+ \theta_{\mathcal C}=\theta_{\mathcal C}^{\mathrm{parent}}.
+ \label{eq:frozen}
+\end{equation}
+Free coefficients may change sign or pass through zero; their masks are not
+reselected. Frozen-zero coefficients cannot regrow. Cuts that were already
+input-independent retain their parameters and constant decision. A frozen-zero cut bias
+also remains zero during threshold search. This differs from simply lowering
+L1 on an unrestricted forest, which could restore removed parameters.
 
-Of ten SFR cases, two full stages were held for separation and two for
-inconclusive 600-second LP timeouts. They remain visible in the results. A
-completed leaf-only stage can still be used: this is how the 57.12\%
-higher-efficiency alternative is certified. Its later 57.24\% full-refit
-snapshot is diagnostic-only and is \emph{not} the handed-over alternative.
+Each stage begins with a joint fixed-route leaf fit; the full stage repeats
+it after each epoch of cut updates. Model selection uses the declared
+validation working point among eligible saved fits. A run that eventually
+converges can have its best validation score at an earlier epoch; the selected
+snapshot need not itself be stationary.
 
-\subsection{Penalty strength, cut-scale ambiguity and precision}
-An L1 setting is not an invariant count of model parameters. In exact
-arithmetic, for any $c>0$,
+\subsection{Separation and cut-scale ambiguity}
+Unpenalized logistic fits can exhibit complete or quasi separation, with the
+loss approaching an infimum as coefficients diverge. With routes fixed, logits
+are linear in free leaf coordinates. We search for a free direction $d$ such
+that every true-class margin against another class has a nonnegative change
+and at least one has a positive change:
+\begin{equation}
+ \frac{d}{d\alpha}\big[z_{y_i}(x_i;\theta+\alpha d)
+              -z_k(x_i;\theta+\alpha d)\big]\geq0
+ \quad(v_i>0,\ k\ne y_i).
+ \label{eq:separation}
+\end{equation}
+These are linear inequalities in $d$. A box-constrained linear program fixes
+the scale of the direction and searches for a positive summed improvement.
+A positive feasible result indicates a separating direction; an ambiguous
+result or timeout is held as inconclusive. Such stages are excluded from
+selection, while a separately completed leaf-only stage can remain eligible.
+This diagnostic does not establish uniqueness of the fitted coefficients.
+
+Cut scale presents a separate issue. For any $c>0$, in exact arithmetic,
 \begin{equation}
  \ind[w^{\mathsf T}x+b>0]=\ind[cw^{\mathsf T}x+cb>0],\qquad
  \normone{cw}+|cb|=c(\normone{w}+|b|).
  \label{eq:scale}
 \end{equation}
-Thus the outer hard-routing loss is unchanged by a positive rescaling, while
-its raw-coefficient L1 penalty can be reduced without removing a feature.
-The logistic proposal gives a margin-scale-dependent subproblem, but the
-outer hard objective is still not a globally scale-identified model-size
-criterion. The penalty is therefore an empirical knob in our alternating
-procedure, not an exact L0 penalty or a theorem that a particular $\lambda$
-selects a unique topology. This observation follows directly from our routing
-and objective definitions; it is not an additional normalization implemented
-in the archived models.
+The hard-routing loss is unchanged by positive rescaling, while raw-coefficient
+L1 decreases as $c$ decreases. The logistic proposal fixes a scale within its
+smooth subproblem, but the outer hard objective remains scale-ambiguous.
+Thus L1 is an empirical sparsity control in this alternating procedure, not
+an invariant measure of tree size. Small nonzero cut coefficients cannot
+simply be discarded: their ratios may still define an important boundary.
+Explicit rescaling before quantization requires verification near boundaries.
+An input-independent cut can instead be replaced by its Boolean branch choice.
 
-The tiny real split in Section~\ref{sec:example} illustrates the issue. All
-reported masks use exact zeros. Renormalizing a hyperplane by a positive scale
-could be useful before quantization, but must be an explicit separately verified
-transformation: floating reduction order and finite-precision rounding can
-matter near boundaries. No such renormalization or magnitude threshold was
-silently applied to v3. The printout even contains a strictly positive
-constant bias equal to the smallest positive binary64 value: for example,
-node $(1,6)$ has $h_{1,6}=2^{-1074}>0$ and always chooses right. Rounding it
-to zero would reverse that decision. A compiler can instead fold such a
-constant node to a Boolean branch choice; it need not numerically represent
-that bias in a fixed-point dot product. This is different from arbitrarily
-pruning a nonconstant tiny-weight split.
+\begin{implementation}
+\textbf{Masks and separation.} \code{freeze_support}, \code{continue_full_refit},
+\code{FrozenSupportTAO} and \code{separation_check} are in
+\file{src/tao/support.py}. They check topology, shapes, finite values, mask
+hashes and absence of zero regrowth. Leaf-only cuts remain bit-identical.
+The separation LP uses all positive-weight training events, checks feasibility,
+and treats scores above $10^{-7}$ as positive and at or below $10^{-10}$ as
+near-zero; intermediate values and 600-second timeouts are held. Certificates
+are cached only while routes remain unchanged.
 
-Aggressive L1 can remove needed directions or leaf features; SFR cannot bring
-them back. Moderate penalties can retain useful support while imposing excessive
-shrinkage, in which case refitting helps. The empirical scan tests both effects;
-it does not assume that stronger sparsity is always preferable. The training
-objective is cross-entropy, whereas model selection uses low-background
-acceptance. A lower training loss can therefore yield a worse selected-working-
-point efficiency, motivating exact saved-checkpoint selection and an honest
-separation of terminal and best validation iterates.
+A concrete precision trap occurs in the compact model: scientific node
+$(t,p)=(2,RR)$ (storage tree 1, node 6) has zero weights and bias $2^{-1074}>0$.
+It always chooses right. Rounding the bias to zero changes the decision; folding
+the constant branch preserves it without representing a subnormal constant
+in fixed-point arithmetic.
+\end{implementation}
 
-\section{Comparison with XGBoost and current results}
+\section{Jet-classification study}
+\label{sec:data}
+\subsection{Data and comparison protocol}
+We use 16 high-level jet features from the dataset catalogued as OpenML
+42468~\cite{openml42468}. Class 0 combines quark and gluon jets; class 1 combines
+W, Z and top jets. The fixed partitions contain 531,200 training, 132,800
+validation and 166,000 test events, using split seed 42. Validation contains
+52,511 background and 80,289 signal events. Each feature is standardized by
+its training mean $\mu_f$ and standard deviation $s_f>0$:
+\begin{equation}
+ x_f=(r_f-\mu_f)/s_f,\qquad f=1,\ldots,F,
+ \label{eq:standardization}
+\end{equation}
+where $r_f$ denotes the unstandardized feature. All models use the same
+partitions, labels and feature order.
+
+The primary metric is signal efficiency $\epsilon_s$ at background efficiency
+$\epsilon_b=0.01$, interpolated on the empirical receiver operating
+characteristic (ROC). AUC denotes its area. Both use the predicted signal
+probability. For a threshold $\tau$, the operating efficiencies are the
+fractions of signal and background events accepted by a score above $\tau$.
+Interpolation can give a point not exactly realized by a strict threshold.
+With the validation sample here, a realizable threshold accepting at most
+1\% background permits at most $\lfloor0.01\cdot52{,}511\rfloor=525$
+background events.
+
+All oblique scans, SFR choices and results below use validation, with AUC
+secondary to the low-background working point. The test partition was used
+in an earlier XGBoost reproduction check, but not to select the oblique models
+or penalties. Reported uncertainties consequently concern validation and
+condition on the selected fitted models.
+
+The XGBoost reference is an additive ensemble of axis-aligned trees with
+constant leaves, trained using gradient/Hessian information for greedy splits
+and regularized leaf updates~\cite{xgboost}. It has 100 trees, maximum depth 4,
+learning rate 0.1, row and feature subsampling 0.8, histogram-based splits,
+binary logistic objective and random seed 42. Its realized structure contains
+1,499 thresholds, 1,599 leaf values and one base bias: 3,099 scalar parameters.
+Feature indices and topology are excluded, consistently with the oblique count.
+
+\begin{implementation}
+The project repository~\cite{benchmark} contains the archived data contract and
+training configuration \file{configs/bdt_qg_vs_wzt_seed42.yaml};
+\file{src/train_bdt.py} trains the reference. The input files are
+\code{data/qg_vs_wzt_standardized.npz} and \code{data/qg_vs_wzt_metadata.json}.
+\file{scripts/audit_tao_splits.py} checks split identities. The data hash is
+\begin{center}\scriptsize\ttfamily\DatasetHash\end{center}
+No new split is drawn from OpenML. The root README documents the historical
+XGBoost test reproduction. \file{src/evaluate.py} supplies the common ROC
+interpolation. XGBoost version 3.2.0 is used with one thread; remaining settings
+are those of that version. The handed-over native JSON fixes the actual model.
+The paper input generator evaluates validation only.
+\end{implementation}
+
+\subsection{Selected models and fixed-support study}
 \label{sec:results}
-\subsection{Reference configuration and metric}
-XGBoost fits an additive ensemble of axis-aligned trees with scalar constant
-leaves, using gradient/Hessian information for greedy tree construction and
-regularized leaf updates~\cite{xgboost}. Our reference uses
-\code{xgboost==3.2.0}, 100 estimators, maximum depth 4, learning rate 0.1,
-row and feature subsampling 0.8 each, \code{tree_method='hist'},
-\code{objective='binary:logistic'}, \code{n_jobs=1} and random state 42.
-The configuration is \file{configs/bdt_qg_vs_wzt_seed42.yaml}; the trainer is
-\file{src/train_bdt.py}. There is no new XGBoost tuning or refit in this note.
-Settings not explicitly overridden are those of the pinned XGBoost version;
-the native JSON in the handover fixes the actual trained reference.
-Its actual structure has 1,499 internal thresholds, 1,599 leaf values and one
-base bias, giving 3,099 scalar slots. Feature indices and topology are omitted
-from this count, just as metadata are omitted from the oblique coefficient
-count.
+Table~\ref{tab:main} compares three oblique configurations and XGBoost. All
+oblique entries use depth-four trees and linear leaves. We call the
+418-coefficient three-tree model \emph{Compact refit}; the
+837-coefficient model is the \emph{higher-efficiency} alternative. A one-tree
+reference illustrates the distinction between allocated and retained
+parameters. Figure~\ref{fig:roc} shows the corresponding ROCs.
 
-The primary metric is signal efficiency at background efficiency 0.01,
-interpolated on the empirical ROC by the common evaluation implementation in
-\file{src/evaluate.py}. AUC is secondary. Separately, each exported JSON records
-a realizable strict margin threshold with at most
-$\lfloor0.01\cdot52{,}511\rfloor=525$ accepted validation background events.
-This deterministic operating point and an interpolated ROC value are distinct
-concepts. Raw and standardized exports each carry a separately calibrated
-threshold; firmware must use the threshold for its chosen input space.
-
-\subsection{Pinned v3 models}
 \begin{table}[htbp]\centering\small
-\caption{Frozen implementation comparison on the same validation partition.
-All oblique models have linear leaves; the XGBoost leaves are constant. Dense
-slots and exact nonzeros include biases. CPU is frozen bulk time per event in
-microseconds, not FPGA or single-event latency. Compact refit is the explicit
-default, irrespective of which row has the highest efficiency.}
-\label{tab:main}
-\setlength{\tabcolsep}{4pt}
+\caption{Validation comparison. Layout gives tree count and maximum depth
+(D4 means depth four). Dense and nonzero counts include biases. CPU is median
+bulk time per event in microseconds, measured as described in the text.}
+\label{tab:main}\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lrrrrrr@{}}\toprule
-Model & Layout & Dense & Nonzero & $\epsilon_s$ [\%] & AUC & CPU [$\mu$s]\\\midrule
+Model & Layout & $P_{\rm dense}$ & $P_{\rm nz}$ & $\epsilon_s$ [\%] & AUC & CPU [$\mu$s]\\\midrule
 \input{generated/main_results.tex}\end{tabular}
 \end{table}
-The Compact refit uses about half the nonzeros of the higher-efficiency
-alternative (418 versus 837) and 49\% fewer dense slots than XGBoost (1,581
-versus 3,099). These are different comparisons: 418 nonzeros are not an array
-of only 418 allocated slots, and a threshold in XGBoost does not have the same
-hardware cost as an oblique multiply-add. The one-tree model is slightly larger
-in nonzero count than Compact refit, but has fewer paths/trees and a smaller
-sparse arithmetic bound.
+The Compact refit uses 49\% fewer allocated scalars than XGBoost and about half
+the nonzero coefficients of the higher-efficiency oblique model. These are
+different comparisons: a coefficient slot is not necessarily nonzero, and an
+oblique feature weight does not have the same hardware cost as an axis-aligned
+threshold. The one-tree reference has fewer allocated slots but more nonzero
+coefficients than Compact refit.
 
 \begin{figure}[htbp]\centering
 \includegraphics[width=\textwidth]{figures/roc.pdf}
-\caption{ROCs regenerated from the exact frozen saved models on validation.
-The right panel resolves the low-background region. Dots mark the interpolated
-1\% background working point. These curves do not include the held 57.24\%
-full-stage diagnostic or a newly selected running model.}
+\caption{Validation ROCs of the four selected models. The right panel resolves
+low background acceptance; dots mark the interpolated 1\% background point.}
 \label{fig:roc}
 \end{figure}
 
+For Compact refit, a converged three-tree parent was continued along a
+split-penalty path
+$\lambda_s=3\cdot10^{-5},10^{-4},3\cdot10^{-4},10^{-3},3\cdot10^{-3}$,
+with $\lambda_\ell=10^{-5}$. The terminal fit at the final penalty supplied
+418 coefficients. Leaf-only refitting raised validation efficiency from
+54.59\% to 54.81\%. Full alternating refitting converged after 15 epochs at
+55.98\%; its best saved validation snapshot was epoch 8 at 56.20\%. The
+selected model is this earlier snapshot, with the same 418 coefficients.
+The one-tree reference was trained without L1 and without SFR.
+
+Table~\ref{tab:sfr} and Fig.~\ref{fig:tradeoff} summarize ten parent supports.
+Six full refits completed, two were held for separation and two for an
+inconclusive linear-program timeout. The higher-efficiency model is a completed
+leaf-only refit at 57.12\%, improving its own parent by about 0.21 percentage
+points. Its full stage was held and is excluded from selection. Stronger
+penalization does not consistently improve the accuracy--size tradeoff;
+refitting cannot restore a direction removed by support selection.
+
 \begin{table}[htbp]\centering\small
-\caption{Analytical sparse selected-path bounds for the binary standardized
-models, from \code{sparsity_profile}. Reachable coefficients omit only
-algebraically unreachable branches. All-node counts sum feature terms over
-all reachable split and leaf functions; path counts bound a selected route.
-Bias additions are not multiplications. A dense three-tree linear forest has
-240 selected-path or 1,488 all-node multiplications and 12 path decisions.}
-\label{tab:arithmetic}
-\begin{tabular}{@{}lrrrr@{}}\toprule
-Model & Reachable & Path mult. & All-node mult. & Path decisions\\\midrule
-\input{generated/arithmetic.tex}\end{tabular}
-\end{table}
-
-\subsection{The fixed-support penalty study}
-Table~\ref{tab:sfr} keeps each parent and its refits on the same selected support.
-The scan includes mild and strong split-only or joint penalties and a smaller
-one-tree architecture. The Compact refit row recovers about 1.61 percentage
-points from its terminal L1 parent with no added coefficients. The
-higher-efficiency leaf-only refit improves its own parent by about 0.21 points;
-that small gain must not be overstated.
-
-\begin{table}[htbp]\centering\footnotesize
-\caption{Ten-parent SFR study. Efficiencies are percentages at 1\% background.
-All rows are three D4 linear trees except $*$ (one D4 tree). Full terminal and
-best saved full are deliberately separate. $\dagger$ marks a held full-stage
-diagnostic, excluded from implementation selection; a completed leaf stage
-remains eligible. \code{LP timeout} is inconclusive, not a proof of separation.}
-\label{tab:sfr}\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llrrrrrl@{}}\toprule
-Selector & $\lambda_s/\lambda_\ell$ & Support & Parent & Leaf & Full terminal & Best full & Full state\\\midrule
-\input{generated/sfr_results.tex}\end{tabular}
+\caption{Fixed-support refitting study. Efficiencies are percentages at 1\%
+background. All models have three depth-four trees except the starred
+one-tree case. Parent and leaf columns are terminal stage results; best is the
+best eligible saved leaf/full refit. Held full stages contribute no candidates.
+The support budget is the parent's exact nonzero count.}
+\label{tab:sfr}\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrl@{}}\toprule
+$\lambda_s/\lambda_\ell$ & Support & Parent & Leaf & Best & Full stage\\\midrule
+\input{generated/research_sfr_results.tex}\end{tabular}
 \end{table}
 
 \begin{figure}[H]\centering
-\includegraphics[width=\textwidth]{figures/sfr_tradeoff.pdf}
-\caption{Each vertical segment connects an L1-selected terminal parent with
-its best eligible leaf/full refit checkpoint at the same support budget.
-Held full stages are excluded, but their converged leaf-only results can
-contribute. This figure illustrates the separation of support selection from
-coefficient shrinkage; no support regrowth is used.}
+\includegraphics[width=\textwidth]{figures/sfr_research.pdf}
+\caption{L1-selected terminal parents and their best eligible fixed-support
+refits. Each vertical segment keeps the support budget fixed. Only refits
+from eligible stages contribute; the penalty settings are given in
+Table~\ref{tab:sfr}.}
 \label{fig:tradeoff}
 \end{figure}
 
-\subsection{Uncertainty, running studies and timing limits}
-The frozen comparison includes a paired class-stratified bootstrap with 1,000
-replicates, seed 20261025, using the same interpolated working point in each
-replicate. Table~\ref{tab:uncertainty} gives percentile intervals for differences
-against XGBoost. These intervals condition on the fitted/selected models. They
-do not account for hyperparameter/checkpoint selection or training-seed
-variation. The code is \file{src/tao/uncertainty.py}; ties and resampled
-zero-weight rows are handled consistently with weighted ROC evaluation.
+\subsection{Uncertainty and inference cost}
+A paired class-stratified bootstrap with 1,000 replicates, seed 20261025,
+recomputes the interpolated working point in each replicate.
+Table~\ref{tab:uncertainty} gives percentile intervals for the difference from
+XGBoost. The Compact interval includes zero. These intervals condition on the
+selected models and account for neither hyperparameter/checkpoint selection
+nor training-seed variation; they are not independent test claims.
 \begin{table}[H]\centering\small
-\caption{Conditional validation difference versus XGBoost, in percentage points.
-A positive point estimate is not by itself evidence of an established
-improvement.}\label{tab:uncertainty}
+\caption{Conditional validation efficiency difference from XGBoost, in
+percentage points (pp), with paired 95\% percentile intervals.}
+\label{tab:uncertainty}
 \begin{tabular}{@{}lrr@{}}\toprule
-Model & Difference [pp] & Paired 95\% interval [pp]\\\midrule
+Model & Difference [pp] & Interval [pp]\\\midrule
 \input{generated/uncertainty.tex}\end{tabular}
 \end{table}
-In particular, Compact refit's interval includes zero. It is an attractive
-compression point with a slightly higher validation point estimate, not a
-confirmed held-out superiority claim. The higher-efficiency alternative has
-an interval above zero in this conditional comparison, but still needs an
-independent final evaluation if a generalization claim is to be made.
 
-The dated research snapshot on 26 October also contains an unfinished five-tree
-D4 linear forest at 57.13\%, AUC 0.92907, with 2,635 dense slots and 1,258
-nonzero coefficients. Its score is only about 0.014 percentage points above
-the frozen 837-coefficient alternative; it is not converged and is not promoted.
-The exact inspected checkpoint, configuration and status are in
-\file{docs/handover_status_2026-10-26.json}. This research observation is kept
-separate from Table~\ref{tab:main}, rather than replacing a frozen row with a
-transient training value.
-
-The CPU values in Table~\ref{tab:main} use a full batch of 132,800 validation
-events, one thread, nine timing repeats and the median wall time per event.
-They compare the current NumPy TAO API with compiled XGBoost. The NumPy
-\code{dense} traversal can evaluate a node's dot product over a full input
-batch before selecting reaching rows; it is not executing only the sparse
-path arithmetic of Table~\ref{tab:arithmetic}. There is no hidden claim of an
-equally optimized CPU implementation, batch-size-one trigger latency, or an
-FPGA speedup. FPGA cost additionally depends on feature distribution/fanout,
-coefficient formats, adder trees, multiplier reuse, memory layout, pipelining
-and overflow policy.
-
-\FloatBarrier
-\section{Reproduction, code map and the firmware handover}
-\label{sec:reproduce}
-\subsection{Pinned environment and entry points}
-Training and input regeneration use Python 3.10 with the pinned
-\file{requirements.txt}: NumPy 1.26.4, SciPy 1.15.2, scikit-learn 1.7.2,
-XGBoost 3.2.0, PyYAML 6.0.3 and matplotlib 3.10.7. The reference CLIP checkout
-is \path{/users/robert.schoefbeck/CMS/tree_benchmark}; its Conda environment is
-\code{tree-benchmark}. On CLIP use the conda-forge CPU XGBoost build, since the
-PyPI Linux wheel requires newer glibc than the reference login environment.
-No GPU is needed.
-\begin{minipage}{\textwidth}
-\begin{lstlisting}[language=bash]
-source /software/f2022/software/mamba/24.3.0-0/etc/profile.d/conda.sh
-conda activate tree-benchmark
-cd /users/robert.schoefbeck/CMS/tree_benchmark
-export PYTHONPATH="$PWD/src:$PWD" PYTHONDONTWRITEBYTECODE=1
-export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
-python scripts/print_tao_tree.py \
-  --model fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json \
-  --precision 17 --output /tmp/compact_forest.txt
-\end{lstlisting}
-\end{minipage}
-For a new training account or checkout, the complete environment-creation and
-controlled refit recipe is in \file{docs/DORIAN_HANDOVER.md}. The datasets and
-pickle archives are deliberately not in Git. Exact reproduction of the refit
-starts from the hash-pinned terminal parent; rebuilding its entire L1 path can
-produce differently serialized checkpoint bytes and requires a new explicit
-source hash/run name. Existing named runs must not be resumed under changed
-training code or stopping policies. The standalone \code{paper/} folder,
-however, contains all generated text/tables and figures needed to compile this
-PDF without datasets, model pickles or a Python training environment.
-
+Table~\ref{tab:arithmetic} gives sparse arithmetic bounds. For comparison, a
+dense three-tree depth-four linear forest has 240 selected-path or 1,488
+all-node feature multiplications and 12 path decisions. The CPU timings in
+Table~\ref{tab:main} use 132,800-event validation batches, one thread, nine
+repeats and the median wall time per event. They compare a NumPy oblique
+traversal with compiled XGBoost and are bulk-throughput measurements.
+Parameter and operation counts motivate implementation studies; FPGA cost
+requires a numeric format, device, clock and synthesis strategy.
 \begin{table}[H]\centering\small
-\caption{Implementation map. The function names identify the code implementing
-the mathematical objects, rather than a generic TAO library API.}
-\label{tab:code}\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{.36\textwidth}X@{}}\toprule
-Object / operation & Entry point\\\midrule
-Routing, logits, objective & \code{HardTree}; \code{HardTAOClassifier} in \file{src/tao/hard.py}\\
-Weighted leaf optimization & \code{fit_leaf_parameters}; \code{ce_value_gradient}\\
-Joint leaf design/refit & \code{_joint_design}; \code{global_refit}\\
-Reduced split proposals & \code{_hard_split_update}; \code{FrozenSupportTAO._split_update}\\
-Sorted hard threshold search & \code{best_threshold} in \file{src/tao/split_search.py}\\
-Node-resumable epoch & \code{begin_epoch}; \code{step_epoch} in \file{src/tao/epoch.py}\\
-Masks and separation & \code{freeze_support}; \code{continue_full_refit}; \code{separation_check}\\
-Stopping and exact-zero work counts & \code{leaf_kkt_residual}; \code{convergence_check}; \code{sparsity_profile}\\
-Read-only equations & \code{TreePrinter.print_tree} in \file{src/tao/printing.py}\\
-Portable inference / firmware export & \code{export_model}; \code{predict_margin}; \code{cpp_header} in \file{src/tao/portable.py}\\\bottomrule
-\end{tabularx}
+\caption{Sparse arithmetic bounds after removing input-independent unreachable
+branches. Path counts bound one selected route; all-node counts evaluate every
+reachable affine function. Bias additions are excluded from multiplications.}
+\label{tab:arithmetic}
+\begin{tabular}{@{}lrrrr@{}}\toprule
+Model & $P_{\rm reach}$ & Path mult. & All-node mult. & Path decisions\\\midrule
+\input{generated/arithmetic.tex}\end{tabular}
 \end{table}
 
-\subsection{Frozen coefficients and reference verification}
-\file{fpga_handoff/v3/manifest.json} hashes the candidate JSONs, hexadecimal C++
-headers, feature contract, conservative training-box ranges and golden vectors.
-Each candidate has both standardized and raw-input variants; choose one and
-use its matching vectors and working-point threshold. The default JSON hash is
-\begin{center}\footnotesize\ttfamily\CompactModelHash\end{center}
-The corresponding immutable pickle is named by the checkpoint hash given in
-Section~\ref{sec:chain}, under \path{models/support_refit_scan_v1_selected/} on CLIP. The binary portable
-JSON and headers suffice for firmware; Python pickles are not needed there.
+\begin{implementation}
+\textbf{Selected results.} The frozen comparison uses the v3 model bundle.
+\file{fpga_handoff/CURRENT_MODEL.json} selects
+\code{fpga_handoff/v3/compact_refit_3t_d4/}. The 837-coefficient alternative is
+\code{highest_efficiency_3t_d4}; the one-tree reference is
+\code{single_tree_1t_d4}. All exact source snapshots and masks are recorded
+in the handover manifest. A later 57.24\% full-refit diagnostic for the
+higher-efficiency support is held and not an eligible model.
 
-The C++17 reference in \file{fpga_handoff/reference.cpp} passed all six v3
-variants: 1,594 vector evaluations with exact leaf assignments and maximum
-margin difference below $2.5\times10^{-14}$. The verifier
-\file{scripts/verify_fpga_handoff.py} needs only Python's standard library and
-a C++17 compiler. It checks bundle hashes before compiling/running the golden
-vectors and preserves an existing frozen verification report. Fixed-point
-verification remains a separate next step. v1 and v2 are retained historical
-bundles; \file{fpga_handoff/CURRENT_MODEL.json} selects v3 Compact refit for new
-implementation work.
+\textbf{Compact training chain.} Start from the v2 \code{winner_3t_d4}
+coefficients, run \file{configs/l1_path_v1/control.json}, then the split path
+\code{split_01.json} through \code{split_05.json} in \code{configs/l1_path_v1/}.
+The manifest is \file{configs/tao_l1_path_v1.json}. The final terminal parent
+feeds \file{configs/support_refit_scan_v1/split300.json}. Parent training uses
+\file{scripts/train_tao_fully.py}; SFR uses
+\file{scripts/train_tao_support_refit.py},
+\file{scripts/run_support_refit_scan_case.py} and
+\file{scripts/support_refit_artifacts.py}. Exact refit reproduction begins with
+the archived hash-pinned terminal parent, rather than a fresh fit at the final
+penalties. The selected checkpoint hash is
+\begin{center}\scriptsize\ttfamily\CompactCheckpointHash\end{center}
 
-\paragraph{Practical next measurements.}
-The next implementation study should establish explicit feature/coefficient/
-accumulator formats, evaluate quantization and near-boundary routing changes,
-recalibrate a realizable validation working point, and measure synthesis
-resources and latency at a specified device and clock. Training improvements
-worth a controlled follow-up include better-conditioned auxiliary solves,
-removing frozen columns from the joint design, and generated sparse inference.
-They are not silently assumed in the present accuracy or CPU comparison.
-Further test evaluation should wait until the model-selection and
-implementation choices are settled; the historical XGBoost-only check in
-Section~\ref{sec:data} must remain disclosed.
+\textbf{Budgets.} The penalty path starts with local/joint/split iteration
+budgets 300/250/300 and logs repeated chunks or adaptive increases. Compact
+refit uses 400/400/800, L-BFGS-B tolerances \code{ftol=1e-12},
+\code{gtol=1e-8}, at most 100 joint-fit chunks and 200 epochs per stage.
+A 2,700-second allocation checkpoints with return code 75. A mild-control
+router required a documented 800-to-4,000 iteration-budget amendment and
+converged after 2,028 auxiliary iterations; this changed no objective or
+stopping tolerances. See \file{scripts/amend_support_solver_budget.py} and
+\file{docs/support_refit_scan_budget_amendments.json}.
+
+\textbf{Research status.} These results were frozen on 25 October 2026.
+The separate dated record \file{docs/handover_status_2026-10-26.json} found
+37/58 architecture cases converged and the 16-point L1 path complete. A running
+five-tree depth-four checkpoint reached 57.13\% with 1,258 nonzeros but was
+unconverged and was not promoted. \file{src/tao/uncertainty.py} implements the
+bootstrap; \file{scripts/build_paper_inputs.py} regenerates frozen tables and
+curves. \code{sources/provenance.json} in this document folder records hashes
+of inputs, numerical source files, tables and figures.
+\end{implementation}
+
+\section{An example learned tree}
+\label{sec:example}
+Actual cuts illustrate the mixture of axis-aligned, oblique and constant
+nodes. In Compact refit, using the standardized feature indices of
+Table~\ref{tab:features}, the first tree contains
+\input{generated/research_cuts.tex}
+Coefficients marked $\simeq$ are rounded to eight significant digits. At the
+root an event goes right if $x_4>-0.4216204$. Otherwise it reaches $L$, whose
+constant cut sends it left again. Hence the entire $LR$ subtree is
+unreachable. The root's right child combines five input features.
+
+For the second tree, another learned cut is
+\input{generated/research_tiny_cut.tex}
+Its small scale does not make it uninformative: it routes right approximately
+when $x_{16}<-1.3334$. Setting both coefficients to zero would turn it into a
+constant left route. This example motivates distinguishing exact sparsity
+from coefficient magnitude before quantization.
+
+\begin{implementation}
+\textbf{Print the actual functions.} \code{TreePrinter} in
+\file{src/tao/printing.py} provides \code{print_tree}, \code{format_tree},
+\code{format_forest} and \code{records}. The CLI
+\file{scripts/print_tao_tree.py} prints every cut and affine leaf, including
+unreachable branches. It is read-only and separate from pinned fitting code.
+For example, after setting the environment described below:
+\begin{lstlisting}[language=Python]
+import json
+from pathlib import Path
+from tao.printing import TreePrinter
+spec = json.loads(Path(
+    "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json"
+).read_text())
+TreePrinter(spec, precision=17).print_tree(0)
+\end{lstlisting}
+The complete 17-digit record is
+\code{generated/compact_forest_full_precision.txt}; the annotated supplement
+prints all three trees at nine display digits. Only exact-zero terms are
+omitted. Independent tests parse the printed expressions, recover all 418
+nonzero coefficients, count 379 reachable coefficients, and compare predictions
+with the portable evaluator. They also check equality routing, constant leaves,
+tiny terms and non-mutation. The full suite passed 81 tests.
+\end{implementation}
 
 \FloatBarrier
-\section{Conclusions and implementation priorities}
-\label{sec:conclusions}
-The present result is a compact floating-point classifier at the selected
-low-background working point. The default three-tree depth-four model uses
-linear leaves and 418 exact nonzero coefficients, compared with 837 for the
-higher-efficiency oblique alternative and 3,099 scalar slots in the XGBoost
-reference. Its validation efficiency is 56.20\%, versus 55.48\% for XGBoost.
-The uncertainty interval on that difference includes zero. The justified
-claim is therefore competitive validation performance with fewer stored
-nonzero coefficients, rather than established superior generalization or a
-measured FPGA speedup.
+\section{Discussion}
+Shallow oblique forests with linear leaves provide competitive validation
+performance with fewer coefficients than the axis-aligned reference in this
+application. Compact refit reaches 56.20\% signal efficiency at 1\% background
+acceptance, with 418 nonzeros in 1,581 allocated slots. The higher-efficiency
+alternative reaches 57.12\% with 837 nonzeros. The conditional uncertainty on
+the Compact--XGBoost difference includes zero, so the principal result is a
+compression point at comparable validation performance.
 
-The training study separates two effects that should not be conflated:
-selecting a useful set of coefficients and shrinking their fitted values.
-For the Compact support, \SFR{} raises the terminal penalized parent's
-validation efficiency from 54.59\% to a best eligible saved value of 56.20\%
-without adding coefficients. Other supports respond differently, and some
-unpenalized stages are held for separation or an inconclusive diagnostic.
-The procedure is consequently a controlled empirical strategy, not a guarantee
-that removing regularization always improves a tree. Likewise, a numerically
-converged source run and a validation-selected earlier checkpoint are different
-objects; both are identified in the handover.
+Fixed-support refitting recovers accuracy lost to shrinkage without restoring
+removed coefficients. Its benefit depends on the selected support: aggressive
+L1 can remove useful directions that refitting cannot recover. Separation,
+cut-scale ambiguity and the distinction between a converged terminal model
+and a validation-selected earlier snapshot remain relevant to interpreting
+training results. Axis-aligned cuts are contained in the oblique family, but
+this does not imply that three shallow trees can represent every function of
+a hundred-tree ensemble.
 
-The immediate implementation target remains the frozen v3 Compact refit.
-First preserve its feature order, margin sign, strict cut convention and
-constant routes in the firmware representation. Next choose explicit numeric
-formats and measure the effect of quantization on routes and on signal
-efficiency at a realizable background threshold. Finally synthesize for a
-specified FPGA and clock, reporting resources, latency and initiation interval
-alongside the classifier metric. These measurements will determine whether
-the reduction in coefficient count translates into the hardware advantage
-motivating this study. Any later compression or training improvement should
-be compared against the same frozen model and data contract, with changed
-coefficients and working points exported as a new version.
+The next step is to quantify how the reduced arithmetic workload translates
+into hardware. This requires explicit feature, coefficient and accumulator
+formats, verification of routing changes near cut boundaries, calibration of
+a realizable working-point threshold, and synthesis measurements at a specified
+device and clock. Further model choices should be completed before additional
+test evaluation, retaining disclosure of the earlier XGBoost-only test check.
 
-\phantomsection\addcontentsline{toc}{section}{References}
+\begin{implementation}
+\input{implementation_reproduction.tex}
+\end{implementation}
+
+\FloatBarrier
 \bibliographystyle{unsrtnat}
 \bibliography{references}
-
-\clearpage\appendix
-\section{Input feature order and model identity}
+\appendix
+\section{Input feature order}
 \label{app:features}
-All equations use the following exact standardized feature names. Their raw
-counterparts have the same order; the shared scaler is in
-\path{fpga_handoff/v3/input_contract.json}.
-\begin{center}\small
-\begin{longtable}{@{}rl@{}}\toprule
-Index & Feature\\\midrule\endhead
-\input{generated/features.tex}\end{longtable}
-\end{center}
-The repository base examined for this note is
-\begin{center}\footnotesize\ttfamily\SourceCommit\end{center}
-The added read-only printer and input generator are fingerprinted separately
-in \path{sources/provenance.json}, together with the unchanged numerical
-training files, selected model, data, generated tables and figures. Model
-selection is defined by the frozen source hashes, not by whatever checkpoint
-happens to be latest when this PDF is opened.
-
-\section{Complete Compact refit forest printout}
-\label{app:trees}
-This record is generated by \code{TreePrinter.format_tree} from the exact v3
-standardized model. It lists every internal decision and every leaf output in
-preorder, with heap indices and root-to-node paths. A node labelled unreachable
-is excluded only by an input-independent constant ancestor, not by absent
-training or validation examples. Numeric values are displayed with nine
-significant digits. The full 17-digit record is checked in as
-\path{generated/compact_forest_full_precision.txt}. These listings are for
-inspection; implementation should consume the frozen JSON or hexadecimal
-header. In all trees, a leaf output contributes to the background logit; the
-signal margin is the \emph{negative sum} of the three selected outputs.
-
+Table~\ref{tab:features} defines the coordinates $r_f$ of the archived feature
+vector, using the source dataset's feature names. All displayed cuts use their
+standardized counterparts $x_f$ from Eq.~\eqref{eq:standardization}.
+\begin{table}[H]\centering\small
+\caption{Feature-coordinate convention. Names identify columns in the
+high-level jet dataset~\cite{openml42468}.}\label{tab:features}
+\begin{tabular}{@{}rlrl@{}}\toprule
+$f$ & Dataset feature & $f$ & Dataset feature\\\midrule
+1 & \texttt{zlogz} & 9 & \texttt{d2\_a1\_b1\_mmdt}\\
+2 & \texttt{c1\_b0\_mmdt} & 10 & \texttt{d2\_a1\_b2\_mmdt}\\
+3 & \texttt{c1\_b1\_mmdt} & 11 & \texttt{m2\_b1\_mmdt}\\
+4 & \texttt{c1\_b2\_mmdt} & 12 & \texttt{m2\_b2\_mmdt}\\
+5 & \texttt{c2\_b1\_mmdt} & 13 & \texttt{n2\_b1\_mmdt}\\
+6 & \texttt{c2\_b2\_mmdt} & 14 & \texttt{n2\_b2\_mmdt}\\
+7 & \texttt{d2\_b1\_mmdt} & 15 & \texttt{mass\_mmdt}\\
+8 & \texttt{d2\_b2\_mmdt} & 16 & \texttt{multiplicity}\\\bottomrule
+\end{tabular}
+\end{table}
+\ifimplementationdetails
 \clearpage
-\subsection{Tree 0}
-\input{generated/compact_tree_0_listing.tex}
-\clearpage
-\subsection{Tree 1}
-\input{generated/compact_tree_1_listing.tex}
-\clearpage
-\subsection{Tree 2}
-\input{generated/compact_tree_2_listing.tex}
+\input{implementation_trees.tex}
+\fi
 \end{document}

@@ -1,0 +1,68 @@
+
+\textbf{Environment and entry points.}
+Training and input regeneration use Python 3.10 with the pinned
+\file{requirements.txt}: NumPy 1.26.4, SciPy 1.15.2, scikit-learn 1.7.2,
+XGBoost 3.2.0, PyYAML 6.0.3 and matplotlib 3.10.7. The reference CLIP checkout
+is \path{/users/robert.schoefbeck/CMS/tree_benchmark}; its Conda environment is
+\code{tree-benchmark}. On CLIP use the conda-forge CPU XGBoost build, since the
+PyPI Linux wheel requires newer glibc than the reference login environment.
+No GPU is needed.
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=bash]
+source /software/f2022/software/mamba/24.3.0-0/etc/profile.d/conda.sh
+conda activate tree-benchmark
+cd /users/robert.schoefbeck/CMS/tree_benchmark
+export PYTHONPATH="$PWD/src:$PWD" PYTHONDONTWRITEBYTECODE=1
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+python scripts/print_tao_tree.py \
+  --model fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json \
+  --precision 17 --output /tmp/compact_forest.txt
+\end{lstlisting}
+\end{minipage}
+For a new training account or checkout, the complete environment-creation and
+controlled refit recipe is in \file{docs/DORIAN_HANDOVER.md}. The datasets and
+pickle archives are deliberately not in Git. Exact reproduction of the refit
+starts from the hash-pinned terminal parent; rebuilding its entire L1 path can
+produce differently serialized checkpoint bytes and requires a new explicit
+source hash/run name. Existing named runs must not be resumed under changed
+training code or stopping policies. The standalone \code{paper/} folder,
+however, contains all generated text/tables and figures needed to compile this
+PDF without datasets, model pickles or a Python training environment.
+
+\par\begingroup\small
+\textbf{Implementation map.}\par\smallskip
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{@{}p{.36\linewidth}X@{}}\toprule
+Object / operation & Entry point\\\midrule
+Routing, logits, objective & \code{HardTree}; \code{HardTAOClassifier} in \file{src/tao/hard.py}\\
+Weighted leaf optimization & \code{fit_leaf_parameters}; \code{ce_value_gradient}\\
+Joint leaf design/refit & \code{_joint_design}; \code{global_refit}\\
+Reduced split proposals & \code{_hard_split_update}; \code{FrozenSupportTAO._split_update}\\
+Sorted hard threshold search & \code{best_threshold} in \file{src/tao/split_search.py}\\
+Node-resumable epoch & \code{begin_epoch}; \code{step_epoch} in \file{src/tao/epoch.py}\\
+Masks and separation & \code{freeze_support}; \code{continue_full_refit}; \code{separation_check}\\
+Stopping and exact-zero work counts & \code{leaf_kkt_residual}; \code{convergence_check}; \code{sparsity_profile}\\
+Read-only equations & \code{TreePrinter.print_tree} in \file{src/tao/printing.py}\\
+Portable inference / firmware export & \code{export_model}; \code{predict_margin}; \code{cpp_header} in \file{src/tao/portable.py}\\\bottomrule
+\end{tabularx}
+\par\endgroup
+
+\textbf{Frozen coefficients and reference verification.}
+\file{fpga_handoff/v3/manifest.json} hashes the candidate JSONs, hexadecimal C++
+headers, feature contract, conservative training-box ranges and golden vectors.
+Each candidate has both standardized and raw-input variants; choose one and
+use its matching vectors and working-point threshold. The default JSON hash is
+\begin{center}\footnotesize\ttfamily\CompactModelHash\end{center}
+The corresponding immutable pickle is named by the checkpoint hash given in
+the Compact training chain below, under \path{models/support_refit_scan_v1_selected/} on CLIP. The binary portable
+JSON and headers suffice for firmware; Python pickles are not needed there.
+
+The C++17 reference in \file{fpga_handoff/reference.cpp} passed all six v3
+variants: 1,594 vector evaluations with exact leaf assignments and maximum
+margin difference below $2.5\times10^{-14}$. The verifier
+\file{scripts/verify_fpga_handoff.py} needs only Python's standard library and
+a C++17 compiler. It checks bundle hashes before compiling/running the golden
+vectors and preserves an existing frozen verification report. Fixed-point
+verification remains a separate next step. v1 and v2 are retained historical
+bundles; \file{fpga_handoff/CURRENT_MODEL.json} selects v3 Compact refit for new
+implementation work.

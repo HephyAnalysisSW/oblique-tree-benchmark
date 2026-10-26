@@ -53,10 +53,12 @@ unchanged.**
 
 ## Technical writeup
 
-The standalone [LaTeX note](paper/main.tex) and [compiled PDF](paper/main.pdf)
-describe the implemented architecture, TAO updates, Select–Freeze–Refit (SFR),
-training checks, current comparisons and cited bibliography. The appendix prints
-all actual cuts and linear leaves of the Compact refit. See [build instructions](paper/README.md).
+The [research paper](paper/main.pdf) describes the architecture, TAO updates,
+Select–Freeze–Refit (SFR), training checks and validation comparisons. Its
+[annotated edition](paper/annotated.pdf) adds optional blue implementation boxes,
+reproduction instructions and every actual cut and affine leaf of Compact refit.
+Both PDFs share one [LaTeX source](paper/main.tex); see the [build and visibility
+instructions](paper/README.md).
 The read-only API is `tao.printing.TreePrinter.print_tree`; its CLI is
 `scripts/print_tao_tree.py`. Adding inspection does not change the pinned fitting code.
 

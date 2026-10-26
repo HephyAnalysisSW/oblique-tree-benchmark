@@ -1,38 +1,60 @@
-# Standalone LaTeX implementation note
+# Research paper and optional implementation notes
 
-`main.tex` and the checked-in `main.pdf` describe the implemented oblique forests,
-TAO training, **Select–Freeze–Refit (SFR)**, the fixed benchmark and exact printed
-tree functions. The cited bibliography is `references.bib`.
+- **`main.pdf`** is the scientific paper, with implementation boxes hidden.
+- **`annotated.pdf`** contains the identical scientific text plus blue, page-breakable
+  implementation boxes, reproducibility instructions, and complete tree printouts.
+- **`main.tex`** is the common source. `annotated.tex` enables the boxes and includes it.
+- **`references.bib`** contains the cited references; each edition builds its own bibliography.
 
-Compile from this directory with a normal TeX Live installation:
+Compile with TeX Live and `latexmk` from this directory:
 
 ```bash
+make
+# Or build either edition:
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
-# or: make
+latexmk -pdf -interaction=nonstopmode -halt-on-error annotated.tex
 ```
 
-All included figures, tables, examples and tree listings are in this folder;
-compilation needs no datasets, trained pickles, network connection or Python.
-`main.pdf` is intentionally committed; only intermediate TeX files are ignored.
+To show the blue notes directly in `main.tex`, change
+`\implementationdetailsfalse` to `\implementationdetailstrue`. The environment
+is named `implementation`. With it disabled, its content is excluded before
+LaTeX processes it. Scientific definitions, algorithms, numerical settings,
+results and qualifications remain in the paper. All file paths, code/API names,
+hashes, shell commands and storage conventions belong in the blue notes.
 
-To regenerate data-derived inputs, use the repository's pinned Python environment
-from the repository root (see `../docs/DORIAN_HANDOVER.md`):
+All inputs are included here. Both PDFs build without datasets, model pickles,
+a Python training environment or a network connection. PDFs are intentionally
+committed; intermediate TeX files are ignored.
+
+## Data-derived inputs
+
+The frozen v3 results and actual model are recorded in `sources/`; the original
+implementation-note generator and its provenance remain available. From the
+repository root, using the pinned training environment:
 
 ```bash
 export PYTHONPATH="$PWD/src:$PWD"
 python scripts/build_paper_inputs.py
-# Also regenerate ROC/tradeoff figures, requiring CLIP's archived NPZ/pickles:
+# Regenerate the native-model ROCs as well (requires CLIP archives):
 python scripts/build_paper_inputs.py --with-roc
 ```
 
-The generator reads only training provenance and validation arrays, not test
-arrays. A results snapshot and actual compact model JSON are included under
-`sources/`; source hashes and generated-asset hashes are in `sources/provenance.json`.
-The manuscript's frozen comparison is v3, not a moving best score from an
-unfinished architecture scan. The dated provisional comparison is identified
-separately in the text.
+The scientific table, path-labelled example equations and sparsity figure are
+derived solely from the checked-in frozen snapshots:
 
-The read-only print API is `tao.printing.TreePrinter.print_tree`. For example:
+```bash
+python3 paper/build_scientific_assets.py
+# Regenerate the sparsity figure too; requires matplotlib, but no datasets:
+python3 paper/build_scientific_assets.py --plot
+```
+
+`research_sfr_results.tex` compares eligible leaf/full refits, excluding held
+full-stage diagnostics. `sources/scientific_assets.json` records input/output
+and generator hashes. The scientific figure uses model names instead of run IDs.
+`research_cuts.tex` and `research_tiny_cut.tex` use feature coordinates and
+root-to-node paths, with coefficients rounded to eight significant digits.
+
+The read-only printer is `tao.printing.TreePrinter`. For a full-precision record:
 
 ```bash
 python scripts/print_tao_tree.py \
@@ -40,17 +62,11 @@ python scripts/print_tao_tree.py \
   --precision 17 --output /tmp/compact_forest.txt
 ```
 
-`generated/compact_forest_full_precision.txt` records every affine cut and leaf
-with 17 significant digits. The PDF appendix uses nine display digits; the
-main-text worked equations use eight and are explicitly marked as rounded.
-Only exact-zero terms are omitted. No magnitude pruning or cut normalization
-is applied. The JSON/hexadecimal headers remain the firmware authority.
+`generated/compact_forest_full_precision.txt` contains all affine cuts and leaf
+functions at 17 significant digits. The annotated supplement uses nine display
+digits. Exact-zero terms are omitted; small nonzero terms are retained. The
+portable JSON and hexadecimal headers are the inference authority.
 
-The printing utility is separate from the pinned fitting files, so writing this
-note does not change mathematical training code, current coefficients or the
-ongoing jobs' implementation identities.
-
-The note distinguishes the validation-only oblique study from the historical
-XGBoost reproduction check, which evaluated the test split. It therefore does
-not describe that partition as wholly uninspected. The conclusions state the
-measured compression result and the remaining quantization/synthesis work.
+The paper distinguishes the validation-only oblique study from the historical
+XGBoost reproduction check, which evaluated the test split. The frozen model
+selection, coefficients and numerical training code are unchanged by this revision.

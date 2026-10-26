@@ -11,7 +11,7 @@ Repository: https://github.com/HephyAnalysisSW/oblique-tree-benchmark (branch `m
 | One-tree alternative | `single_tree_1t_d4` | 1 hard oblique tree, depth 4, linear leaves | 527 / 452 | 452 | 65 | 55.63% | 0.92704 |
 | XGBoost reference | `xgboost_reference` | 100 axis-aligned trees, depth 4, constant leaves | 3099 / not counted | — | — | 55.48% | 0.92056 |
 
-All metrics use the unchanged validation split; the test partition remains untouched. Nonzero counts include biases, refer to standardized inputs, and use exact zeros. Reachability removes only input-independent constant decisions. MAC bounds are scalar arithmetic counts, not synthesized FPGA resources or latency. Raw folding can change bias zero counts.
+All metrics in this handover use the unchanged validation split. The oblique study did not evaluate or select models on test data; the earlier XGBoost reproduction check did evaluate the test partition. Nonzero counts include biases, refer to standardized inputs, and use exact zeros. Reachability removes only input-independent constant decisions. MAC bounds are scalar arithmetic counts, not synthesized FPGA resources or latency. Raw folding can change bias zero counts.
 
 ## Status rechecked on 26 October 2026
 
@@ -134,4 +134,4 @@ Existing bundle directories are never overwritten. Promotion rejects changed fil
 
 ## Mathematical writeup and actual tree equations
 
-See the [standalone technical note](../paper/main.pdf), its [LaTeX source](../paper/main.tex) and [build instructions](../paper/README.md). It describes the exact TAO/SFR implementation and prints every cut and affine leaf of the Compact refit. `TreePrinter.print_tree` in `src/tao/printing.py` and `scripts/print_tao_tree.py` provide the same read-only inspection; default 17-digit output retains every nonzero coefficient, including tiny nonzeros. The PDF's rounded display listings do not replace the authoritative model JSON or hexadecimal headers.
+See the [research paper](../paper/main.pdf) and its [annotated edition](../paper/annotated.pdf), with shared [LaTeX source](../paper/main.tex) and [build instructions](../paper/README.md). The annotated edition adds optional blue implementation and reproduction notes and prints every cut and affine leaf of Compact refit. `TreePrinter.print_tree` in `src/tao/printing.py` and `scripts/print_tao_tree.py` provide the same read-only inspection; default 17-digit output retains every nonzero coefficient, including tiny nonzeros. The PDF's rounded display listings do not replace the authoritative model JSON or hexadecimal headers.
