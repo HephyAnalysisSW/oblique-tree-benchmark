@@ -215,59 +215,283 @@ Their offsets are refreshed before updating the next tree. Earlier trees
 remain trainable; the procedure does not freeze them as later trees are added.
 
 \subsection{Leaf optimization}
-With all routes fixed, the logits in Eq.~\eqref{eq:forest} are linear in the
-leaf coefficients. The joint leaf problem is convex, although its parameters
-need not be unique. For a single tree, the sum of the other trees' logits is
-a fixed offset in the cross-entropy loss. A joint refit subsequently optimizes
-all trees' leaf functions against the same loss.
+Fix every cut, so the leaf reached by each training event is fixed. For leaf
+$\ell$ of tree $t$, define its event set
+$\mathcal I_{t\ell}=\{i:\ell_t(x_i)=\ell\}$. Introduce the leaf basis
+$\phi(x)=(x_1,\ldots,x_F,1)^{\mathsf T}\in\mathbb R^B$ for linear leaves
+and $\phi(x)=1$ for constant leaves. Let $\beta_{t\ell k}$ collect the
+coefficients of that basis: it is $(a_{t\ell k},c_{t\ell k})$ for a linear
+leaf and just $c_{t\ell k}$ for a constant leaf. For $i\in\mathcal I_{t\ell}$,
+\begin{equation}
+ z_{ik}=o_{ik}+\phi(x_i)^{\mathsf T}\beta_{t\ell k},\qquad
+ o_{ik}=\sum_{s\ne t}f_{s,\ell_s(x_i),k}(x_i),\qquad k<K-1,
+ \label{eq:leaf-offset}
+\end{equation}
+with $z_{i,K-1}=o_{i,K-1}=0$. Thus the other trees enter as a fixed offset,
+not as an additional target to be fitted.
 
-We use analytic cross-entropy gradients and a bound-constrained quasi-Newton
-solver. A penalized scalar coefficient is represented as
-$\theta_q=u_q-v_q$ with $u_q,v_q\geq0$, contributing
-$\lambda(u_q+v_q)$; unpenalized coordinates are free real variables. After a
-finite solve, we reconstruct $\theta_q$ and evaluate the actual objective
-using $\lambda|\theta_q|$. This avoids reporting the larger auxiliary penalty
-when both $u_q$ and $v_q$ remain positive. A leaf update is retained only if
-its actual objective does not increase.
+Terms in Eq.~\eqref{eq:objective} from other leaves and all cuts are constant
+in this update. Removing them leaves the subproblem
+\begin{equation}
+ J_{t\ell}(\beta)=\frac1W\sum_{i\in\mathcal I_{t\ell}}
+ v_i\CE(y_i,z_i(\beta))
+ +\lambda_\ell\sum_{b=1}^{B}\sum_{k=0}^{K-2}\rho_b|\beta_{t\ell k,b}|,
+ \label{eq:leaf-subproblem}
+\end{equation}
+where $\rho=(1,\ldots,1,0)$ for a linear leaf and $\rho=0$ for a constant
+leaf. In particular, the bias is unpenalized and the denominator remains
+$W$, not the weight sum in $\mathcal I_{t\ell}$.
+
+Write $\pi_{ik}=\exp(z_{ik})/\sum_{j=0}^{K-1}\exp(z_{ij})$ for the current
+class probabilities, and let $\ind[A]$ equal 1 when statement $A$ holds and
+0 otherwise. Differentiating the cross-entropy gives
+\begin{equation}
+ \frac{\partial\CE(y_i,z_i)}{\partial z_{ik}}
+ =\pi_{ik}-\ind[y_i=k],\qquad
+ \frac{\partial L_{t\ell}}{\partial\beta_{t\ell k,b}}
+ =\frac1W\sum_{i\in\mathcal I_{t\ell}}
+ v_i\phi_b(x_i)\big(\pi_{ik}-\ind[y_i=k]\big),
+ \label{eq:leaf-gradient}
+\end{equation}
+where $L_{t\ell}$ denotes the unpenalized term in
+Eq.~\eqref{eq:leaf-subproblem}. Different leaves of this tree involve disjoint
+event sets, so they can be fitted separately while its other-tree offset is
+held fixed.
+
+The joint forest leaf refit has the same form, but includes every tree in
+one design matrix. Index its columns by $(t,\ell,b)$ and define
+\begin{equation}
+ A_{i,(t,\ell,b)}=\ind[\ell_t(x_i)=\ell]\,\phi_b(x_i),\qquad
+ \Theta_{(t,\ell,b),k}=\beta_{t\ell k,b}.
+ \label{eq:joint-leaf-design}
+\end{equation}
+Here $A\in\mathbb R^{N\times(TL_DB)}$ and
+$\Theta\in\mathbb R^{(TL_DB)\times(K-1)}$. Thus
+$z_{ik}=(A\Theta)_{ik}$ for $k<K-1$, with the reference logit zero.
+If $q=(t,\ell,b)$ indexes a design column and $\rho_q=\rho_b$, its objective
+and smooth gradient are
+\begin{align}
+ J_{\mathrm{leaf}}(\Theta)
+ &=\underbrace{\frac1W\sum_i v_i\CE(y_i,z_i(\Theta))}_{L(\Theta)}
+   +\lambda_\ell\sum_{q,k}\rho_q|\Theta_{qk}|,
+ \label{eq:joint-leaf-objective}\\
+ \nabla_\Theta L&=\frac1W A^{\mathsf T}R,\qquad
+ R_{ik}=v_i\big(\pi_{ik}-\ind[y_i=k]\big),\quad k<K-1.
+ \label{eq:joint-leaf-gradient}
+\end{align}
+Cross-entropy is convex in its logits, the logits are affine in the leaf
+coefficients, and the L1 term is convex. Both the individual-leaf and joint
+problems are therefore convex. The joint parameters need not be unique:
+different trees can contribute compensating logits.
+
+To handle L1 with a smooth bound-constrained solver, flatten the coefficients
+being fitted into scalars $\vartheta_r$, and let $\lambda_r$ be their penalty
+strength ($\lambda_\ell\rho_b$ for a leaf coordinate). For each penalized
+coordinate, write $\vartheta_r=u_r^+-u_r^-$ with $u_r^+,u_r^-\geq0$.
+This is an exact reformulation because
+\begin{equation}
+ \min_{u^+,u^-\geq0:\ u^+-u^-=\vartheta}
+ \lambda_r(u^++u^-)=\lambda_r|\vartheta|.
+ \label{eq:l1-parts}
+\end{equation}
+Coordinates with $\lambda_r=0$ are optimized directly as unconstrained real
+variables. For either smooth leaf loss $L$, the auxiliary objective and its
+penalized-coordinate derivatives are
+\begin{equation}
+ \widetilde J=L(\vartheta(u))+
+   \sum_{r:\lambda_r>0}\lambda_r(u_r^++u_r^-),\qquad
+ \frac{\partial\widetilde J}{\partial u_r^+}=g_r+\lambda_r,\quad
+ \frac{\partial\widetilde J}{\partial u_r^-}=-g_r+\lambda_r,
+ \label{eq:l1-parts-gradient}
+\end{equation}
+where $g_r=\partial L/\partial\vartheta_r$ is obtained from
+Eq.~\eqref{eq:leaf-gradient} or \eqref{eq:joint-leaf-gradient}. The free-coordinate
+derivative remains $g_r$. We minimize this differentiable objective using a
+bound-constrained quasi-Newton solver and reconstruct the stored coefficients
+as $\vartheta_r=u_r^+-u_r^-$.
+
+At a finite iteration budget, both parts can remain positive. Define the
+actual coefficient objective as
+$J_{\mathrm{actual}}=L(\vartheta)+\sum_r\lambda_r|\vartheta_r|$.
+The auxiliary objective exceeds it by the explicit gap
+\begin{equation}
+ \widetilde J-J_{\mathrm{actual}}
+ =\sum_{r:\lambda_r>0}\lambda_r
+  \big(u_r^++u_r^- - |u_r^+-u_r^-|\big)
+ =2\sum_{r:\lambda_r>0}\lambda_r\min(u_r^+,u_r^-)\geq0.
+ \label{eq:l1-gap}
+\end{equation}
+Canonical parts $\max(\vartheta_r,0)$ and $\max(-\vartheta_r,0)$ remove this
+gap without changing any logit. We evaluate the candidate with the actual
+L1 norm and accept it only if its leaf objective does not increase. Since
+the omitted terms are fixed, this also ensures nonincrease of the full
+objective in Eq.~\eqref{eq:objective}.
 
 \subsection{Decision-node optimization}
 Let $\mathcal R_{tp}$ be the training events reaching node $p$ in tree $t$.
-Keep its ancestors, descendants and all other trees fixed. For event $i$,
-let $g_L(x_i)$ and $g_R(x_i)$ be the logit vectors predicted by its two
-subtrees, and $o_i$ the logit sum from the other trees. The child losses are
+Nodes with no reaching events are left unchanged; the following update assumes
+$\mathcal R_{tp}\ne\varnothing$. Keep its ancestors, descendants, leaf
+functions and all other trees fixed.
+Ancestors determine $\mathcal R_{tp}$, so changing this cut cannot affect
+any event outside that set. For $i\in\mathcal R_{tp}$, let $g_L(x_i)$ and
+$g_R(x_i)$ be the fixed logit vectors predicted by its two subtrees, and
+$o_i$ the logit sum from the other trees. The two possible losses are
 \begin{equation}
- C_i^L=\CE(y_i,o_i+g_L(x_i)),\quad
- C_i^R=\CE(y_i,o_i+g_R(x_i)),\quad \Delta_i=C_i^L-C_i^R.
+ C_i^L=\CE(y_i,o_i+g_L(x_i)),\qquad
+ C_i^R=\CE(y_i,o_i+g_R(x_i)),\qquad \Delta_i=C_i^L-C_i^R.
  \label{eq:reduced}
 \end{equation}
-A positive $\Delta_i$ favors the right child. Up to an additive constant, the
-cut subproblem is a weighted binary misrouting loss,
+Write $r_i(w,b)=\ind[w^{\mathsf T}x_i+b>0]$ for the proposed right-branch
+decision. All other penalties and all outside-event losses are constant, so
+Eq.~\eqref{eq:objective} reduces to
 \begin{equation}
- \frac1W\sum_{i\in\mathcal R_{tp}}v_i|\Delta_i|
- \ind\!\left\{\ind[h_{tp}(x_i)>0]\ne\ind[\Delta_i>0]\right\}
- +\lambda_s(\normone{w_{tp}}+|b_{tp}|).
+ Q(w,b)=\frac1W\sum_{i\in\mathcal R_{tp}}v_i
+   \big[(1-r_i(w,b))C_i^L+r_i(w,b)C_i^R\big]
+   +\lambda_s(\normone{w}+|b|).
+ \label{eq:cut-subproblem}
+\end{equation}
+Define a preferred-branch label $q_i=\ind[\Delta_i>0]$ and an effective
+weight $\gamma_i=v_i|\Delta_i|$. For either decision $r\in\{0,1\}$,
+\begin{equation}
+ (1-r)C_i^L+rC_i^R
+ =\min(C_i^L,C_i^R)+|\Delta_i|\,\ind[r\ne q_i].
+ \label{eq:child-loss-identity}
+\end{equation}
+Subtracting the first, cut-independent term gives the equivalent weighted
+misrouting objective
+\begin{equation}
+ Q(w,b)-\frac1W\sum_{i\in\mathcal R_{tp}}v_i\min(C_i^L,C_i^R)
+ =\frac1W\sum_{i\in\mathcal R_{tp}}\gamma_i\ind[r_i(w,b)\ne q_i]
+  +\lambda_s(\normone{w}+|b|).
  \label{eq:misroute}
 \end{equation}
-The indicator $\ind[A]$ equals 1 when statement $A$ holds and 0 otherwise.
-The reduced labels denote preferred \emph{branches}, even for a multiclass
-classification loss. Events with $v_i|\Delta_i|=0$ are uninformative for this
-cut and are excluded from its auxiliary fit.
+Thus the reduced labels describe preferred branches, even when the original
+forest classifies more than two classes. A large $|\Delta_i|$ makes a wrong
+branch expensive. Events with $\gamma_i=0$ are indifferent or have zero
+training weight and give no information for this cut.
 
-We first fit a weighted L1-logistic classifier to the reduced labels with
-weights $v_i|\Delta_i|$. Its smooth loss produces a proposed cut, but is not
-Eq.~\eqref{eq:misroute}. We therefore compare the existing cut, the logistic
-proposal, directions blending 25\%, 50\% or 75\% of the proposal with the
-existing weight vector, and a constant direction. For each direction we sort
-its projected scores, move ties together, and search representable threshold
-intervals including the cut-bias penalty. We retain a strictly improving
-proposal under the actual hard-routing objective. This optimizes thresholds
-within the proposed directions, not over all possible hyperplanes.
+\paragraph{Logistic proposal.}
+The discrete misrouting term has no useful ordinary gradient in $(w,b)$.
+When both branch labels occur among active events, we form a smooth proposal
+by assigning the right branch probability
+$\sigma(h_i)$, where $h_i=w^{\mathsf T}x_i+b$ and
+$\sigma(h)=1/(1+e^{-h})$. The Bernoulli negative log-likelihood for branch
+label $q_i$ is
+\begin{equation}
+ -q_i\log\sigma(h_i)-(1-q_i)\log[1-\sigma(h_i)]
+ =\log(1+e^{h_i})-q_i h_i.
+ \label{eq:branch-logistic-loss}
+\end{equation}
+This gives the weighted proposal objective
+\begin{equation}
+ S(w,b)=\underbrace{\frac1W\sum_{i\in\mathcal R_{tp}:\gamma_i>0}
+ \gamma_i\big[\log(1+e^{h_i})-q_i h_i\big]}_{L_{\mathrm{log}}(w,b)}
+ +\lambda_s(\normone{w}+|b|),
+ \label{eq:split-surrogate}
+\end{equation}
+with smooth derivatives
+\begin{equation}
+ \nabla_w L_{\mathrm{log}}=\frac1W\sum_i\gamma_i[\sigma(h_i)-q_i]x_i,
+ \qquad
+ \frac{\partial L_{\mathrm{log}}}{\partial b}
+ =\frac1W\sum_i\gamma_i[\sigma(h_i)-q_i],
+ \label{eq:split-surrogate-gradient}
+\end{equation}
+where these sums run over the same active events as
+Eq.~\eqref{eq:split-surrogate}. The L1 penalty includes the bias and can be
+handled by the positive/negative parameterization above. Let
+$(\widehat w,\widehat b)$ denote the resulting approximate minimizer. A decrease
+in $S$ does not imply a decrease in the hard loss $Q$, so the proposal must be
+checked against Eq.~\eqref{eq:cut-subproblem}.
 
-During unpenalized fixed-support refitting, a cut that sends every
-positive-weight event to its preferred child already attains the pointwise
-lower bound of the reduced loss. We can certify it without solving an
-auxiliary logistic problem. When only one preferred branch is present, we
-skip the logistic fit and test allowed existing and constant directions.
+\paragraph{Threshold search and acceptance.}
+Let $(w^{(0)},b^{(0)})$ be the current cut. We consider directions
+\begin{equation}
+ \mathcal D=\{w^{(0)},\widehat w,0\}
+ \;\cup\;
+ \{(1-\eta)w^{(0)}+\eta\widehat w:
+                 \eta\in\{0.25,0.5,0.75\}\}.
+ \label{eq:cut-directions}
+\end{equation}
+For a fixed direction $d\in\mathcal D$, set $s_i=d^{\mathsf T}x_i$ and
+$\tau=-b$, so right routing means $s_i>\tau$. Let
+$a_1<\cdots<a_M$ be the distinct projected scores of events in
+$\mathcal R_{tp}$. The intervals
+\begin{equation}
+ I_0=(-\infty,a_1),\qquad I_m=[a_m,a_{m+1})\ (1\leq m<M),\qquad
+ I_M=[a_M,\infty)
+ \label{eq:threshold-intervals}
+\end{equation}
+exhaust the possible routings along $d$. The half-open convention follows
+from sending equality left. Equal scores move together; the endpoints
+include all-right and all-left routing.
+
+To evaluate every interval, start with all events on the right and define
+\begin{equation}
+ U=\sum_{i\in\mathcal R_{tp}}v_i C_i^R,\qquad
+ B_m=\sum_{i\in\mathcal R_{tp}:s_i\leq a_m}v_i(C_i^L-C_i^R),
+ \qquad B_0=0.
+ \label{eq:threshold-prefix}
+\end{equation}
+The values $B_m$ are obtained by sorting the scores once and accumulating
+whole tied groups. For $\tau\in I_m$, the objective is
+\begin{equation}
+ Q(d,-\tau)=\frac{U+B_m}{W}+\lambda_s\normone{d}+\lambda_s|\tau|.
+ \label{eq:threshold-objective}
+\end{equation}
+Only the bias penalty varies within an interval. We therefore choose its
+representable finite threshold nearest zero,
+\begin{equation}
+ \tau_m^*\in\underset{\tau\in I_m\cap\mathbb F}{\arg\min}|\tau|,
+ \label{eq:threshold-representative}
+\end{equation}
+where $\mathbb F$ is the set of finite numbers in the working floating-point
+format; empty intersections are discarded. This is zero if zero belongs
+to the interval, the included lower endpoint for an entirely positive
+interval, and the representable predecessor of the open upper endpoint for
+an entirely negative interval. The two outer intervals use the same rule.
+When $\lambda_s=0$, every threshold in an interval has the same loss; we
+keep this representative convention.
+
+For each direction $d$, let $m(d)$ minimize
+Eq.~\eqref{eq:threshold-objective} over its nonempty intervals. We compare the
+resulting pairs $(d,-\tau_{m(d)}^*)$, the raw logistic pair
+$(\widehat w,\widehat b)$, and the unchanged cut. Each of these proposed cuts
+is reevaluated using actual hard routing, including both weight and bias
+penalties. We update
+only when the best candidate satisfies
+\begin{equation}
+ Q(w^{\mathrm{new}},b^{\mathrm{new}})<Q(w^{(0)},b^{(0)}).
+ \label{eq:cut-acceptance}
+\end{equation}
+Because all omitted terms are fixed, this strictly decreases the full forest
+objective. The threshold search is exhaustive for each proposed direction;
+the finite direction set does not exhaust all hyperplanes. In fixed-support
+refitting, directions must preserve frozen-zero weights, and a frozen-zero
+bias permits only $\tau=0$ rather than unrestricted threshold search.
+
+\paragraph{A lower-bound certificate and one-sided labels.}
+During unpenalized fixed-support refitting, $\lambda_s=0$ and
+Eq.~\eqref{eq:misroute} gives the bound
+\begin{equation}
+ Q(w,b)\geq Q_{\mathrm{lb}}
+ :=\frac1W\sum_{i\in\mathcal R_{tp}}v_i\min(C_i^L,C_i^R),\qquad
+ Q(w,b)-Q_{\mathrm{lb}}
+ =\frac1W\sum_i\gamma_i\ind[r_i(w,b)\ne q_i].
+ \label{eq:cut-lower-bound}
+\end{equation}
+The last sum is over $\mathcal R_{tp}$. If the current cut chooses the
+preferred child for every event with $\gamma_i>0$, the gap is zero. It already
+minimizes this node's hard subproblem, even over all feasible cuts, so an
+auxiliary logistic fit is unnecessary. This is a local certificate with
+subtrees and other trees fixed, not a statement about the full forest optimum.
+
+When active events contain only one branch label, we skip the logistic fit
+and retain only the current and zero directions in the threshold search.
+The zero direction gives a constant route whenever the allowed bias permits
+it. If all $\gamma_i=0$, any route has the same data loss; the current cut
+already attains the unpenalized lower bound. These cases introduce no third
+branch and do not require a finite optimum of a one-class logistic problem.
 
 \subsection{Initialization and numerical stopping}
 Fresh trees are initialized by greedy axis-aligned classification trees fitted
@@ -694,6 +918,7 @@ test evaluation, retaining disclosure of the earlier XGBoost-only test check.
 \FloatBarrier
 \bibliographystyle{unsrtnat}
 \bibliography{references}
+\ifimplementationdetails\else\clearpage\fi
 \appendix
 \section{Input feature order}
 \label{app:features}
