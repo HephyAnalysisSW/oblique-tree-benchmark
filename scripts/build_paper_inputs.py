@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
-import argparse,hashlib,json,subprocess
+import argparse,hashlib,json,subprocess,re
 from datetime import datetime,timezone
 from tao.printing import TreePrinter
 
@@ -59,7 +59,15 @@ def main():
     spec=read(source);write(PAPER/'sources/compact_standardized_model.json',json.dumps(spec,indent=2)+'\n')
     printer=TreePrinter(spec,17);write(PAPER/'generated/compact_forest_full_precision.txt',printer.format_forest())
     display=TreePrinter(spec,9)
-    for t in range(3):write(PAPER/f'generated/compact_tree_{t}.txt',display.format_tree(t))
+    for t in range(3):
+        text=display.format_tree(t);write(PAPER/f'generated/compact_tree_{t}.txt',text)
+        lines=text.splitlines();starts=[i+1 for i,line in enumerate(lines) if re.match(r'^\s*[NL]\d+ \[',line)]
+        blocks=[r'\begingroup\setlength{\parskip}{0pt}']
+        spans=[(1,starts[0]-1)]+[(a,b-1) for a,b in zip(starts,starts[1:]+[len(lines)+1])]
+        for a,b in spans:
+            blocks += [r'\noindent\begin{minipage}{\linewidth}',
+                r'\lstinputlisting[style=treeblock,firstline='+str(a)+',lastline='+str(b)+r']{generated/compact_tree_'+str(t)+'.txt}',r'\end{minipage}\par']
+        blocks.append(r'\endgroup');write(PAPER/f'generated/compact_tree_{t}_listing.tex','\n'.join(blocks)+'\n')
     snippets=[]
     for t,n in [(0,0),(0,1),(0,2),(1,1),(2,0)]:
         r=next(r for r in printer.records(t) if r['kind']=='split' and r['index']==n)
@@ -81,7 +89,7 @@ def main():
     rows=[]
     for label,tag in roles:
         r=s['selections'][tag]['record'];n=r['sparsity']
-        rows.append(f"{label} & {n['reachable_nonzero_coefficients']} & {n['selected_path_multiplications_upper_bound']} & {n['selected_path_comparisons_upper_bound']} \\\\")
+        rows.append(f"{label} & {n['reachable_nonzero_coefficients']} & {n['selected_path_multiplications_upper_bound']} & {n['reachable_all_node_multiplications']} & {n['selected_path_comparisons_upper_bound']} \\\\")
     write(PAPER/'generated/arithmetic.tex','\n'.join(rows)+'\n'+r'\bottomrule'+'\n')
     rows=[]
     for row in s['models']:
