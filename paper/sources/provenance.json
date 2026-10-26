@@ -1,0 +1,42 @@
+{
+  "created_utc": "2026-10-26T15:25:43.929222+00:00",
+  "repository_base_commit": "9e08df2b7e2e99d34203544c344f3fdfc775f5a8",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "model_json_sha256": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+  "selected_checkpoint_sha256": "e89b8923fba66f5df02046e04a1828a8ea4c56f60c1d7b201a2a2f92a0ab00fa",
+  "fpga_manifest_sha256": "1fd47d052053e351547e28f150546f351f2032cb4defa79080d39e16985a4b21",
+  "source_hashes": {
+    "src/tao/hard.py": "fdd4a80897d18f3d0f95ac646ec541fac78a360647864592c7fb91c32673189f",
+    "src/tao/support.py": "21fa7ead6da5a5fa5abaec9f5c306407dfd5e4098c191fca8e38b698fbb1e275",
+    "src/tao/split_search.py": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+    "src/tao/epoch.py": "dd6a291038401f626782e22b114b72ccd9eb6ace7a5d48431c085edc02637957",
+    "src/tao/convergence.py": "7d41d2f192c45323742f4dd3174fd9bde843461289d5dbe9ad161164860a294e",
+    "src/tao/initialization.py": "9ff360a6bfbaf27b6744cc288431f64b2973e050e15ea3c4d03b5d1fb5698d60",
+    "src/tao/printing.py": "2beb117f0f28f15917e9962682ec172be108ba0f9262b82fdbd136ff4afaa725",
+    "scripts/train_tao_support_refit.py": "e188ffcdf08ba39a77ec2eb0092acd039d9c0d439490bb55b476b218bc413d63",
+    "scripts/build_paper_inputs.py": "86ce02ccb2106efa2eacbfeefad01221a57144e6f2dd247d539f7483dd9f2d37",
+    "configs/support_refit_scan_v1/split300.json": "5ccb22537b50968dadc18aab79e9120cb25caa28de3e61a9f660a59a95e2739b",
+    "configs/bdt_qg_vs_wzt_seed42.yaml": "d1d430b8c786df4561739a68acd0a9ef79ffc03f5ee8f11890e9dfd8b34dc229",
+    "requirements.txt": "ae7994e9cf2503cac11de91db8bb5a3272491314e422b40b5e1ffe959d15dc07"
+  },
+  "generated_assets": {
+    "generated/arithmetic.tex": "f5c63cdccdb3dffce1e7424648b80dd09c5bc624431823b20caba1e84865bce5",
+    "generated/compact_forest_full_precision.txt": "d7e357ab798c0576bda3409496cccb28cce37828cf5f037e8b260dd742ef451c",
+    "generated/compact_tree_0.txt": "5314e19be902e8c4c5ecca5289491bc48cb9492ddffedf6b5a831651ecd28fcc",
+    "generated/compact_tree_0_listing.tex": "83dbfee11962b241f85d18d265814fa655596a6dc95b5b9c9d4a6c7e828bbeac",
+    "generated/compact_tree_1.txt": "c683529eb40679fe3dca8ba4ab73db6e380ef8e001a4a941ee08c78f1b474df5",
+    "generated/compact_tree_1_listing.tex": "33c962f3adaa39ee48f1c27059fe3fb5a962b2f0c50b9ea23d9c17984140add4",
+    "generated/compact_tree_2.txt": "4c7bd628958fc3a8781b6e63c6a51488ca58f0f5d5e4f9343feb37d1e2dbce4d",
+    "generated/compact_tree_2_listing.tex": "c349eb599a2f17d92e351befe2c8bdba6934f62562d6a3b716ce28b65cc71742",
+    "generated/example_cuts.tex": "cfcea0423607c4b6119a1c513e284f650c2b2f42f783e7762d681c55400f5c1a",
+    "generated/features.tex": "810cefc909ed1b87125a9b68a477d9332c37bd638896bab0c9802709c70b6570",
+    "generated/main_results.tex": "d04b40c55f13068d986b38e4fc0962d3ecf2388b9fc971dcf9ac2fe5628b1eca",
+    "generated/sfr_results.tex": "395ce85fd8f07fd950a252a86247f4b475cb64279dbf6dc3e9e598155a443291",
+    "generated/uncertainty.tex": "fb00c2092e27fb448c42920f866ba43481e4bc9c9b1d3fdb8717e6aabb01cb39"
+  },
+  "figure_assets": {
+    "figures/roc.pdf": "1ef729777e1631c1402455841394712ce84daffb9138a0d4d1bbe7a2f87c3e45",
+    "figures/sfr_tradeoff.pdf": "74099066a79ddc86ab53288320427d174d694929e9d9a73bf410a52da5db3c8f"
+  },
+  "test_evaluated": false
+}

@@ -39,7 +39,7 @@ untouched. All six standardized/raw C++ variants passed **1,594 golden vector
 evaluations** with exact routes and margin error below 2.5e-14. Hardware precision,
 resource usage and latency still require implementation and synthesis. v1 and
 v2 remain unchanged historical bundles; do not use their older defaults for new
-work. The current Python suite passes **77 tests**.
+work. The current Python suite passes **81 tests**.
 
 [ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_roc.png)
 · [screenshot table with timings](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_comparison.png)
@@ -50,6 +50,15 @@ The methodological rule is:
 **BDT and oblique-tree models may differ only in the model/training algorithm.
 Dataset, event split, labels, preprocessing, and evaluation must remain
 unchanged.**
+
+## Technical writeup
+
+The standalone [LaTeX note](paper/main.tex) and [compiled PDF](paper/main.pdf)
+describe the implemented architecture, TAO updates, Select–Freeze–Refit (SFR),
+training checks, current comparisons and cited bibliography. The appendix prints
+all actual cuts and linear leaves of the Compact refit. See [build instructions](paper/README.md).
+The read-only API is `tao.printing.TreePrinter.print_tree`; its CLI is
+`scripts/print_tao_tree.py`. Adding inspection does not change the pinned fitting code.
 
 ## Dataset
 

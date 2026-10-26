@@ -131,3 +131,7 @@ python3 scripts/verify_fpga_handoff.py --bundle fpga_handoff/v4 --compiler c++
 Existing bundle directories are never overwritten. Promotion rejects changed files or incomplete C++ checks. `src/tao/portable.py` is the independent Python evaluator/export contract; `fpga_handoff/reference.cpp` is the standalone C++ reference. No fixed-point formats, target device, clock or synthesis results have been chosen yet.
 
 [ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_roc.png) · [timing/parameter table](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_comparison.png) · [full scan results](support_refit_scan_results.md) · [training validation and protocol](support_refit_scan.md).
+
+## Mathematical writeup and actual tree equations
+
+See the [standalone technical note](../paper/main.pdf), its [LaTeX source](../paper/main.tex) and [build instructions](../paper/README.md). It describes the exact TAO/SFR implementation and prints every cut and affine leaf of the Compact refit. `TreePrinter.print_tree` in `src/tao/printing.py` and `scripts/print_tao_tree.py` provide the same read-only inspection; default 17-digit output retains every nonzero coefficient, including tiny nonzeros. The PDF's rounded display listings do not replace the authoritative model JSON or hexadecimal headers.

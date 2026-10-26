@@ -1,0 +1,81 @@
+TREE 1: depth=4, leaves=linear, input=standardized
+Coefficient display: 9 significant digits; exact zeros omitted.
+At every cut: h > 0 goes RIGHT; h <= 0 goes LEFT (including equality).
+N0 [path=root; heap=0; reachable]
+  h_1_0(x) = 1 * c1_b2_mmdt + 0.421515048
+  <= 0 -> N1; > 0 -> N2
+  N1 [path=L; heap=1; reachable]
+    h_1_1(x) = -2.3776136e-11 * multiplicity - 3.17032814e-11
+    <= 0 -> N3; > 0 -> N4
+    N3 [path=LL; heap=3; reachable]
+      h_1_3(x) = -0.0032891119 * zlogz + 0.0142175742 * d2_b1_mmdt + 0.00121827303 * d2_a1_b1_mmdt - 0.000244599886 * m2_b2_mmdt - 0.00553888952 * n2_b2_mmdt + 0.295132576 * mass_mmdt + 0.0218087714
+      <= 0 -> N7; > 0 -> N8
+      N7 [path=LLL; heap=7; reachable]
+        h_1_7(x) = 0.0213173363 * zlogz + 0.612901764 * c1_b0_mmdt - 0.0606512036
+        <= 0 -> L0; > 0 -> L1
+        L0 [path=LLLL; heap=15; reachable]
+          f_1_0(x) = 1.02493155 * zlogz + 0.475780074 * c1_b0_mmdt - 3.46865641 * c1_b1_mmdt + 1.39660226 * c1_b2_mmdt + 0.0808524935 * d2_b1_mmdt + 0.0625866107 * d2_b2_mmdt + 0.0808524935 * d2_a1_b1_mmdt + 0.265262813 * d2_a1_b2_mmdt + 0.0469595498 * m2_b1_mmdt - 0.00734786374 * m2_b2_mmdt + 3.49945192 * mass_mmdt - 0.346146245
+        L1 [path=LLLR; heap=16; reachable]
+          f_1_1(x) = 2.42880675 * zlogz + 3.52193453 * c1_b0_mmdt - 2.27198818 * c1_b1_mmdt - 0.640806627 * c1_b2_mmdt + 0.0986683506 * d2_b1_mmdt + 0.101873458 * d2_b2_mmdt + 0.0986683506 * d2_a1_b1_mmdt + 0.331194728 * m2_b1_mmdt + 0.0539714566 * n2_b1_mmdt + 3.24454093 * mass_mmdt + 0.503474228 * multiplicity - 1.50898053
+      N8 [path=LLR; heap=8; reachable]
+        h_1_8(x) = 7.32169007e-19 * zlogz - 2.06778204e-19 * d2_b1_mmdt - 1.91895639e-18 * d2_a1_b1_mmdt + 4.16333634e-17 * mass_mmdt + 5.02329003e-19
+        <= 0 -> L2; > 0 -> L3
+        L2 [path=LLRL; heap=17; reachable]
+          f_1_2(x) = 0.398116558 * d2_b1_mmdt + 0.398116558 * d2_a1_b1_mmdt - 0.660830844 * d2_a1_b2_mmdt - 0.114827421 * m2_b2_mmdt - 0.310979867 * n2_b2_mmdt + 0.846928396 * multiplicity - 0.9437156
+        L3 [path=LLRR; heap=18; reachable]
+          f_1_3(x) = 0.244294729 * zlogz + 0.880510729 * d2_b2_mmdt - 1.42081066 * m2_b1_mmdt + 1.71265082 * multiplicity - 2.14718376
+    N4 [path=LR; heap=4; reachable]
+      h_1_4(x) = 0
+      <= 0 -> N9; > 0 -> N10; CONSTANT: always LEFT
+      N9 [path=LRL; heap=9; reachable]
+        h_1_9(x) = 0.128095519 * m2_b1_mmdt + 0.00063403479 * multiplicity - 0.0832689733
+        <= 0 -> L4; > 0 -> L5
+        L4 [path=LRLL; heap=19; reachable]
+          f_1_4(x) = 0.232595756 * zlogz + 0.336338146 * c1_b0_mmdt + 0.186230458 * d2_b1_mmdt + 0.186230458 * d2_a1_b1_mmdt - 0.0975771333 * m2_b1_mmdt + 0.100432843 * m2_b2_mmdt - 0.712895383 * multiplicity - 1.51109101
+        L5 [path=LRLR; heap=20; reachable]
+          f_1_5(x) = 0.26497515 * d2_b2_mmdt + 0.322656527 * n2_b2_mmdt - 0.656358636
+      N10 [path=LRR; heap=10; UNREACHABLE (constant ancestor)]
+        h_1_10(x) = 3.11856008e-17 * zlogz + 1.03393415e-17 * d2_b1_mmdt + 3.62950285e-17 * d2_a1_b1_mmdt - 3.214346e-17 * m2_b1_mmdt - 5.71317478e-17 * m2_b2_mmdt + 5.83355278e-17 * mass_mmdt + 1.70316265e-11 * multiplicity - 1.89719708e-11
+        <= 0 -> L6; > 0 -> L7
+        L6 [path=LRRL; heap=21; UNREACHABLE (constant ancestor)]
+          f_1_6(x) = 0
+        L7 [path=LRRR; heap=22; UNREACHABLE (constant ancestor)]
+          f_1_7(x) = 0
+  N2 [path=R; heap=2; reachable]
+    h_1_2(x) = 1.08273826 * c1_b2_mmdt + 0.24935691 * c2_b2_mmdt - 0.0971598576 * d2_b1_mmdt + 0.256354852 * d2_b2_mmdt - 0.0929252735 * d2_a1_b1_mmdt - 0.228292085 * m2_b1_mmdt + 0.0567631958 * mass_mmdt + 0.28027011 * multiplicity - 0.13138567
+    <= 0 -> N5; > 0 -> N6
+    N5 [path=RL; heap=5; reachable]
+      h_1_5(x) = 0
+      <= 0 -> N11; > 0 -> N12; CONSTANT: always LEFT
+      N11 [path=RLL; heap=11; reachable]
+        h_1_11(x) = -0.259890766 * d2_a1_b2_mmdt + 0.208572797 * m2_b1_mmdt + 3.31046124 * mass_mmdt - 0.0387863599
+        <= 0 -> L8; > 0 -> L9
+        L8 [path=RLLL; heap=23; reachable]
+          f_1_8(x) = 1.49591861 * zlogz + 0.441575961 * c1_b0_mmdt + 1.71623752 * c1_b2_mmdt + 0.707286758 * d2_a1_b2_mmdt + 0.136799401 * n2_b1_mmdt - 0.0922364294 * n2_b2_mmdt - 4.1902612 * mass_mmdt + 0.994771372 * multiplicity + 0.902352018
+        L9 [path=RLLR; heap=24; reachable]
+          f_1_9(x) = 1.06616852 * zlogz + 0.26139261 * c1_b0_mmdt - 1.59073627 * c1_b1_mmdt - 3.31259981 * c2_b1_mmdt + 2.90835606 * c2_b2_mmdt + 0.0402529973 * d2_b1_mmdt + 0.0402529973 * d2_a1_b1_mmdt + 3.30625 * d2_a1_b2_mmdt - 2.78491928 * m2_b1_mmdt + 0.342727361 * m2_b2_mmdt - 0.69660259 * n2_b2_mmdt + 1.00497391 * mass_mmdt + 2.54220983 * multiplicity + 0.0829818883
+      N12 [path=RLR; heap=12; UNREACHABLE (constant ancestor)]
+        h_1_12(x) = 3.32650029e-05 * c1_b2_mmdt + 1.11948505e-05 * c2_b2_mmdt + 2.49204468e-05 * d2_a1_b2_mmdt + 1.99509567e-06 * m2_b2_mmdt + 0.000137262248 * n2_b1_mmdt + 9.50083532e-05
+        <= 0 -> L10; > 0 -> L11
+        L10 [path=RLRL; heap=25; UNREACHABLE (constant ancestor)]
+          f_1_10(x) = 0
+        L11 [path=RLRR; heap=26; UNREACHABLE (constant ancestor)]
+          f_1_11(x) = 0
+    N6 [path=RR; heap=6; reachable]
+      h_1_6(x) = 4.94065646e-324
+      <= 0 -> N13; > 0 -> N14; CONSTANT: always RIGHT
+      N13 [path=RRL; heap=13; UNREACHABLE (constant ancestor)]
+        h_1_13(x) = -2.68948213e-10 * zlogz - 5.82051432e-11 * c2_b1_mmdt - 2.85373406e-10 * d2_b1_mmdt + 2.05721037e-10 * d2_b2_mmdt - 1.06470833e-10 * d2_a1_b1_mmdt + 9.05405039e-12 * d2_a1_b2_mmdt + 3.42554664e-10 * m2_b2_mmdt + 2.13357549e-10 * n2_b2_mmdt - 8.89638165e-10 * mass_mmdt + 1.4924407e-09 * multiplicity - 1.72964941e-09
+        <= 0 -> L12; > 0 -> L13
+        L12 [path=RRLL; heap=27; UNREACHABLE (constant ancestor)]
+          f_1_12(x) = 0
+        L13 [path=RRLR; heap=28; UNREACHABLE (constant ancestor)]
+          f_1_13(x) = 0
+      N14 [path=RRR; heap=14; reachable]
+        h_1_14(x) = -0.0357752902 * c1_b2_mmdt + 1.00738533 * mass_mmdt - 1.85526559
+        <= 0 -> L14; > 0 -> L15
+        L14 [path=RRRL; heap=29; reachable]
+          f_1_14(x) = 0.992368325 * zlogz - 4.80052499 * c1_b1_mmdt + 2.90036981 * c1_b2_mmdt - 0.714839331 * c2_b1_mmdt - 0.349819173 * d2_b1_mmdt - 0.0440891415 * d2_b2_mmdt - 0.349819173 * d2_a1_b1_mmdt + 0.777214702 * d2_a1_b2_mmdt + 0.176693713 * m2_b1_mmdt + 2.01859804 * n2_b1_mmdt - 1.16458901 * n2_b2_mmdt - 1.53336443 * mass_mmdt + 0.283339646 * multiplicity + 2.63807278
+        L15 [path=RRRR; heap=30; reachable]
+          f_1_15(x) = -0.485616316 * c1_b0_mmdt - 0.625011056 * c2_b2_mmdt + 0.51939675 * d2_b1_mmdt + 0.199901858 * d2_b2_mmdt + 0.51939675 * d2_a1_b1_mmdt - 0.491209214 * m2_b2_mmdt + 2.38441955 * mass_mmdt - 0.280424752 * multiplicity - 5.0660948
+Selected leaf f is a class-0 logit contribution; forest signal margin = -sum(f).

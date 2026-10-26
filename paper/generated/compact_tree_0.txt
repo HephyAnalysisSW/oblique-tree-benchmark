@@ -1,0 +1,81 @@
+TREE 0: depth=4, leaves=linear, input=standardized
+Coefficient display: 9 significant digits; exact zeros omitted.
+At every cut: h > 0 goes RIGHT; h <= 0 goes LEFT (including equality).
+N0 [path=root; heap=0; reachable]
+  h_0_0(x) = 1 * c1_b2_mmdt + 0.421620399
+  <= 0 -> N1; > 0 -> N2
+  N1 [path=L; heap=1; reachable]
+    h_0_1(x) = 0
+    <= 0 -> N3; > 0 -> N4; CONSTANT: always LEFT
+    N3 [path=LL; heap=3; reachable]
+      h_0_3(x) = 0
+      <= 0 -> N7; > 0 -> N8; CONSTANT: always LEFT
+      N7 [path=LLL; heap=7; reachable]
+        h_0_7(x) = 0.318308228 * c1_b0_mmdt + 0.330704464
+        <= 0 -> L0; > 0 -> L1
+        L0 [path=LLLL; heap=15; reachable]
+          f_0_0(x) = 0.723115375 * zlogz - 0.424343964 * c1_b0_mmdt - 0.446947898 * c1_b1_mmdt - 0.415001941 * c2_b1_mmdt - 0.139216682 * d2_b1_mmdt - 0.139216682 * d2_a1_b1_mmdt + 0.54944101 * m2_b1_mmdt - 0.495073946 * m2_b2_mmdt + 0.059415836 * n2_b1_mmdt + 0.858013396 * multiplicity - 1.35727329
+        L1 [path=LLLR; heap=16; reachable]
+          f_0_1(x) = 1.51929697 * zlogz + 0.669978191 * c1_b0_mmdt - 3.56315299 * c1_b2_mmdt + 0.613457803 * c2_b1_mmdt - 0.396278128 * d2_b1_mmdt + 0.152304141 * d2_b2_mmdt - 0.396278128 * d2_a1_b1_mmdt - 0.199974866 * m2_b2_mmdt + 0.980332415 * n2_b1_mmdt - 0.420497004 * n2_b2_mmdt + 0.396719294 * mass_mmdt + 1.34144785 * multiplicity - 1.72085229
+      N8 [path=LLR; heap=8; UNREACHABLE (constant ancestor)]
+        h_0_8(x) = 0
+        <= 0 -> L2; > 0 -> L3; CONSTANT: always LEFT
+        L2 [path=LLRL; heap=17; UNREACHABLE (constant ancestor)]
+          f_0_2(x) = 0
+        L3 [path=LLRR; heap=18; UNREACHABLE (constant ancestor)]
+          f_0_3(x) = 0
+    N4 [path=LR; heap=4; UNREACHABLE (constant ancestor)]
+      h_0_4(x) = 0
+      <= 0 -> N9; > 0 -> N10; CONSTANT: always LEFT
+      N9 [path=LRL; heap=9; UNREACHABLE (constant ancestor)]
+        h_0_9(x) = -0.0491155824 * c1_b0_mmdt + 0.000379329885
+        <= 0 -> L4; > 0 -> L5
+        L4 [path=LRLL; heap=19; UNREACHABLE (constant ancestor)]
+          f_0_4(x) = 0
+        L5 [path=LRLR; heap=20; UNREACHABLE (constant ancestor)]
+          f_0_5(x) = 0
+      N10 [path=LRR; heap=10; UNREACHABLE (constant ancestor)]
+        h_0_10(x) = 1.75931373e-09 * c1_b0_mmdt - 3.92622475e-09 * m2_b2_mmdt + 1.22858604e-07 * multiplicity - 1.097723e-07
+        <= 0 -> L6; > 0 -> L7
+        L6 [path=LRRL; heap=21; UNREACHABLE (constant ancestor)]
+          f_0_6(x) = 0
+        L7 [path=LRRR; heap=22; UNREACHABLE (constant ancestor)]
+          f_0_7(x) = 0
+  N2 [path=R; heap=2; reachable]
+    h_0_2(x) = 0.0881065951 * c1_b2_mmdt + 0.0025365055 * c2_b2_mmdt + 0.17735909 * m2_b1_mmdt + 0.0312233619 * mass_mmdt + 0.100640807 * multiplicity + 0.0190586642
+    <= 0 -> N5; > 0 -> N6
+    N5 [path=RL; heap=5; reachable]
+      h_0_5(x) = 0
+      <= 0 -> N11; > 0 -> N12; CONSTANT: always LEFT
+      N11 [path=RLL; heap=11; reachable]
+        h_0_11(x) = -9.45167785e-16 * d2_b1_mmdt - 5.84426162e-16
+        <= 0 -> L8; > 0 -> L9
+        L8 [path=RLLL; heap=23; reachable]
+          f_0_8(x) = 0.472450802 * zlogz + 0.0989313467 * c1_b0_mmdt - 0.831430736 * c1_b2_mmdt - 0.431555721 * c2_b2_mmdt + 0.0150358961 * d2_b1_mmdt + 0.648844514 * d2_b2_mmdt + 0.0150358961 * d2_a1_b1_mmdt - 3.09641516 * d2_a1_b2_mmdt + 1.49849996 * m2_b1_mmdt + 1.81153643 * n2_b1_mmdt - 0.893777123 * n2_b2_mmdt + 0.182450792 * multiplicity - 2.83938374
+        L9 [path=RLLR; heap=24; reachable]
+          f_0_9(x) = 0.232327574 * zlogz - 0.23205911 * c1_b0_mmdt - 0.516471161 * c1_b1_mmdt - 0.848527306 * c2_b1_mmdt - 1.97477014 * c2_b2_mmdt + 1.42114491 * d2_b2_mmdt + 0.536602443 * m2_b1_mmdt + 0.651756707 * mass_mmdt - 1.64666395
+      N12 [path=RLR; heap=12; UNREACHABLE (constant ancestor)]
+        h_0_12(x) = 9.89173599e-11 * c1_b2_mmdt + 1.79437153e-09 * c2_b1_mmdt + 1.81919634e-09 * c2_b2_mmdt + 1.04854961e-09
+        <= 0 -> L10; > 0 -> L11
+        L10 [path=RLRL; heap=25; UNREACHABLE (constant ancestor)]
+          f_0_10(x) = 0
+        L11 [path=RLRR; heap=26; UNREACHABLE (constant ancestor)]
+          f_0_11(x) = 0
+    N6 [path=RR; heap=6; reachable]
+      h_0_6(x) = 0.164748862 * c1_b2_mmdt + 0.185195199 * c2_b2_mmdt + 0.271888733 * d2_a1_b2_mmdt + 1.06018366 * mass_mmdt - 0.265110937 * multiplicity - 1.32289565
+      <= 0 -> N13; > 0 -> N14
+      N13 [path=RRL; heap=13; reachable]
+        h_0_13(x) = 0.635416434 * c1_b2_mmdt - 0.475835509 * multiplicity + 0.00561843162
+        <= 0 -> L12; > 0 -> L13
+        L12 [path=RRLL; heap=27; reachable]
+          f_0_12(x) = 0.000756449729 * zlogz + 0.576353531 * c1_b0_mmdt + 1.62064775 * c1_b1_mmdt - 2.48681119 * c1_b2_mmdt - 2.10518311 * c2_b1_mmdt + 1.37970957 * c2_b2_mmdt - 0.0135562553 * d2_b1_mmdt + 0.338362995 * d2_b2_mmdt - 0.0135562553 * d2_a1_b1_mmdt - 1.72149735 * d2_a1_b2_mmdt - 0.38025814 * m2_b1_mmdt - 0.351321056 * m2_b2_mmdt + 2.69042188 * n2_b1_mmdt - 0.919390109 * n2_b2_mmdt + 0.32251432 * mass_mmdt + 0.582538651 * multiplicity - 3.45473882
+        L13 [path=RRLR; heap=28; reachable]
+          f_0_13(x) = -0.140117186 * c1_b2_mmdt + 0.652505422 * c2_b1_mmdt + 0.253434919 * d2_b1_mmdt - 0.602112106 * d2_b2_mmdt + 0.253434919 * d2_a1_b1_mmdt - 0.527210682 * d2_a1_b2_mmdt - 0.00193453091 * n2_b2_mmdt - 1.64156297 * mass_mmdt + 0.0192123329 * multiplicity - 2.68453555
+      N14 [path=RRR; heap=14; reachable]
+        h_0_14(x) = 0
+        <= 0 -> L14; > 0 -> L15; CONSTANT: always LEFT
+        L14 [path=RRRL; heap=29; reachable]
+          f_0_14(x) = -0.727395772 * zlogz - 1.0021119 * c1_b0_mmdt - 1.77913852 * c1_b1_mmdt + 1.29863387 * c1_b2_mmdt - 5.22419531 * c2_b1_mmdt + 1.67449112 * c2_b2_mmdt + 0.609159654 * d2_b1_mmdt - 1.14240277 * d2_b2_mmdt + 0.609159654 * d2_a1_b1_mmdt + 0.462711749 * d2_a1_b2_mmdt - 0.379623445 * m2_b1_mmdt - 1.49230987 * m2_b2_mmdt + 1.44153754 * n2_b1_mmdt - 4.67940637 * mass_mmdt + 1.29820647 * multiplicity + 5.68806483
+        L15 [path=RRRR; heap=30; UNREACHABLE (constant ancestor)]
+          f_0_15(x) = 0
+Selected leaf f is a class-0 logit contribution; forest signal margin = -sum(f).
