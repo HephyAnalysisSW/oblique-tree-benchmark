@@ -51,6 +51,15 @@ The methodological rule is:
 Dataset, event split, labels, preprocessing, and evaluation must remain
 unchanged.**
 
+## XGBoost FPGA emulation
+
+The frozen XGBoost model has a tested conifer → CMSSW/HLS C++ emulation chain.
+See the [precision results](docs/conifer_xgboost_v1/results.md), [ROC](docs/conifer_xgboost_v1/roc.pdf)
+and [setup/reproduction guide](docs/conifer_xgboost_v1/README.md). Both generated
+CMSSW workspaces and Python environments live in ignored `workspaces/` directories.
+The validated chain uses conifer 1.11 for conversion/HLS and the actual CMSSW 1.7
+external for this axis-aligned reference. It does not yet report FPGA synthesis resources.
+
 ## Technical writeup
 
 The [research paper](paper/main.pdf) describes the architecture, TAO updates,

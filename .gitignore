@@ -11,3 +11,8 @@ results/file_sync_storage.txt.lock
 /artifacts/
 .venv/
 .DS_Store
+
+# Reproducible generated CMSSW/Python workspaces and conifer projects.
+/workspaces/
+/build/
+/tmp/

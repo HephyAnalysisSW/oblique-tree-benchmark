@@ -1,0 +1,12 @@
+# CPU-only conversion/evaluation environment; run inside cmssw-el9.
+# Kept separate from the pinned training environment.
+conifer==1.11
+xgboost-cpu==3.2.0
+numpy==1.26.4
+scipy==1.15.2
+pandas==2.3.3
+scikit-learn==1.7.2
+matplotlib==3.10.7
+PyYAML==6.0.3
+pybind11==2.13.6
+packaging==25.0

@@ -135,3 +135,13 @@ Existing bundle directories are never overwritten. Promotion rejects changed fil
 ## Mathematical writeup and actual tree equations
 
 See the [research paper](../paper/main.pdf) and its [annotated edition](../paper/annotated.pdf), with shared [LaTeX source](../paper/main.tex) and [build instructions](../paper/README.md). The annotated edition adds optional blue implementation and reproduction notes and prints every cut and affine leaf of Compact refit. `TreePrinter.print_tree` in `src/tao/printing.py` and `scripts/print_tao_tree.py` provide the same read-only inspection; default 17-digit output retains every nonzero coefficient, including tiny nonzeros. The PDF's rounded display listings do not replace the authoritative model JSON or hexadecimal headers.
+
+## XGBoost conifer emulation reference
+
+The [XGBoost emulator study](conifer_xgboost_v1/results.md) now tests the native
+model against conifer conversion, the actual CMSSW external and generated HLS
+C++ emulation, including fixed-point precision scans. [Setup and version
+constraints](conifer_xgboost_v1/README.md) are explicit; the CMSSW 1.7 bridge is
+restricted to axis-aligned cuts and constant leaves. The compact converted
+reference is under `fpga/conifer/reference/xgboost_v1/`. No FPGA resource or
+latency measurements are implied, and the pinned Compact refit default is unchanged.

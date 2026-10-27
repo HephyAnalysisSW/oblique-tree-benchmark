@@ -1,0 +1,6 @@
+<use name="conifer"/>
+<use name="hls"/>
+<use name="json"/>
+<bin file="validateXGBoost.cc" name="validateXGBoostConifer">
+  <flags CXXFLAGS="-fno-fast-math -ffp-contract=off"/>
+</bin>

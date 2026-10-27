@@ -1,0 +1,18 @@
+{
+  "model": "fpga_handoff/v3/xgboost_reference/model.json",
+  "manifest": "fpga_handoff/v3/manifest.json",
+  "dataset": "data/qg_vs_wzt_standardized.npz",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "validation_events": 132800,
+  "features": 16,
+  "trees": 100,
+  "max_depth": 4,
+  "fractional_bits": [18, 12, 10, 8, 6, 4],
+  "integer_bits": "derived from training input/threshold and conservative tree-score bounds",
+  "rounding": "AP_RND_CONV",
+  "overflow": "AP_SAT",
+  "hls_emulation_events": 512,
+  "native_margin_absolute_tolerance": 0.00001,
+  "floating_backend_absolute_tolerance": 0.00001,
+  "note": "Validation only. The test arrays are never loaded. No synthesis device or clock is selected by this emulator study."
+}

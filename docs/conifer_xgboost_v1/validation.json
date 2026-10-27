@@ -1,0 +1,776 @@
+{
+  "complete": true,
+  "test_evaluated": false,
+  "configuration": {
+    "model": "fpga_handoff/v3/xgboost_reference/model.json",
+    "manifest": "fpga_handoff/v3/manifest.json",
+    "dataset": "data/qg_vs_wzt_standardized.npz",
+    "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+    "validation_events": 132800,
+    "features": 16,
+    "trees": 100,
+    "max_depth": 4,
+    "fractional_bits": [
+      18,
+      12,
+      10,
+      8,
+      6,
+      4
+    ],
+    "integer_bits": "derived from training input/threshold and conservative tree-score bounds",
+    "rounding": "AP_RND_CONV",
+    "overflow": "AP_SAT",
+    "hls_emulation_events": 512,
+    "native_margin_absolute_tolerance": 1e-05,
+    "floating_backend_absolute_tolerance": 1e-05,
+    "note": "Validation only. The test arrays are never loaded. No synthesis device or clock is selected by this emulator study."
+  },
+  "versions": {
+    "conifer": "1.11",
+    "xgboost-cpu": "3.2.0",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.7.2",
+    "pandas": "2.3.3",
+    "pybind11": "2.13.6"
+  },
+  "python": "3.10.22 | packaged by conda-forge | (main, Oct  6 2026, 23:02:24) [GCC 14.4.0]",
+  "cmssw": "CMSSW_15_1_2",
+  "scram_arch": "el9_amd64_gcc12",
+  "compiler": "g++ (GCC) 12.3.1 20230527",
+  "model_sha256": "8d9315c22b260c52f4f22d631a84a37fcc31bab10af116c93d48d9cf877e030a",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "score_semantics": "increasing signal raw margin; no sigmoid in emulator",
+  "scope": "full_validation",
+  "profiles": [
+    {
+      "name": "double",
+      "input": "double",
+      "score": "double",
+      "weight": "double",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5548207101844587,
+        "auc": 0.920558806144742,
+        "strict_threshold": 2.819604839677922,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5548207101844587
+      },
+      "native_margin_error": {
+        "max_abs": 2.884829299887315e-06,
+        "mean_abs": 4.3858867281642283e-07,
+        "exact_mismatches": 132800
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 2.5986513350062523e-06,
+        "mean_abs": 3.4663554161512217e-07,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 3.4795867931097746,
+        "stderr": "events=132800 wall_seconds=3.41575 (includes binary I/O and optional independent trace)"
+      },
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_double",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/double",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "double",
+          "ThresholdPrecision": "double",
+          "WeightPrecision": "double",
+          "ScorePrecision": "double"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "5c943e2a7183afd4ea526a115a00673fc2eaeb527eb6fcad7e0156a1c02bcbb8"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "float",
+      "input": "float",
+      "score": "float",
+      "weight": "float",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5548207101844587,
+        "auc": 0.9205588049587996,
+        "strict_threshold": 2.8196048736572266,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5548207101844587
+      },
+      "native_margin_error": {
+        "max_abs": 2.86102294921875e-06,
+        "mean_abs": 4.1980008381322106e-07,
+        "exact_mismatches": 115825
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 2.384185791015625e-06,
+        "mean_abs": 3.5198304158502334e-07,
+        "exact_mismatches": 4175
+      },
+      "execution": {
+        "wall_seconds_including_io": 2.9419615641236305,
+        "stderr": "events=132800 wall_seconds=2.90369 (includes binary I/O and optional independent trace)"
+      },
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_float",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/float",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "float",
+          "ThresholdPrecision": "float",
+          "WeightPrecision": "float",
+          "ScorePrecision": "float"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "c9823768ec686268a77f34cc3bce7fe1db3ff43a318aeb6cf6ec2af223d7464e"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f18",
+      "fractional_bits": 18,
+      "input": "ap_fixed<23,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5548207101844587,
+        "auc": 0.9205592270357681,
+        "strict_threshold": 2.8196144104003906,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5548207101844587
+      },
+      "native_margin_error": {
+        "max_abs": 0.29046154022216797,
+        "mean_abs": 2.1139865539335444e-05,
+        "exact_mismatches": 131525
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.087139070034027,
+        "mean_abs": 0.035443834375027544,
+        "exact_mismatches": 4786
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.441975275054574,
+        "stderr": "events=132800 wall_seconds=4.40284 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 23,
+      "score_bits": 24,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f18",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f18",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<23,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<23,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "87f79224ca400734d56de6528062c760d05095955d7c8d25b634fbb1dcc02a84"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f12",
+      "fractional_bits": 12,
+      "input": "ap_fixed<17,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5549106353298708,
+        "auc": 0.9205559162398339,
+        "strict_threshold": 2.819091796875,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.554907895228487
+      },
+      "native_margin_error": {
+        "max_abs": 0.7413950450718403,
+        "mean_abs": 0.0011196520078198982,
+        "exact_mismatches": 132774
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.086955964565277,
+        "mean_abs": 0.03723564218149034,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.353917614091188,
+        "stderr": "events=132800 wall_seconds=4.31475 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 17,
+      "score_bits": 18,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f12",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f12",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<17,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<17,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "03bf6bfc0104da4df2ca4e324ca7f37532a8f1bc3bd7e0035e61adae0419c4e1"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f10",
+      "fractional_bits": 10,
+      "input": "ap_fixed<15,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<16,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5545713609585373,
+        "auc": 0.9205568922705871,
+        "strict_threshold": 2.8232421875,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5545467000460835
+      },
+      "native_margin_error": {
+        "max_abs": 0.8151223659515381,
+        "mean_abs": 0.006293049100366546,
+        "exact_mismatches": 132800
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.088420808315277,
+        "mean_abs": 0.03953209888467052,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.300780709134415,
+        "stderr": "events=132800 wall_seconds=4.26289 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 15,
+      "score_bits": 16,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f10",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f10",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<15,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<15,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<16,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "9bd7f46d66a3b8a317af7fb020d6c93e38957744f12f267804432bf66243f2cd"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f8",
+      "fractional_bits": 8,
+      "input": "ap_fixed<13,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5555783482170659,
+        "auc": 0.9204776424870361,
+        "strict_threshold": 2.80859375,
+        "accepted_background": 524,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009978861571861133,
+        "strict_signal_efficiency": 0.55530645542976
+      },
+      "native_margin_error": {
+        "max_abs": 1.0461007952690125,
+        "mean_abs": 0.026683189980544357,
+        "exact_mismatches": 132800
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.076702058315277,
+        "mean_abs": 0.06413911524327467,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.4423900209367275,
+        "stderr": "events=132800 wall_seconds=4.39443 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 13,
+      "score_bits": 14,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f8",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f8",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<13,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<13,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "b0b525267af527df3f009bea0ad425c9398d909f563fbcc417b8f8e72d9c765c"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f6",
+      "fractional_bits": 6,
+      "input": "ap_fixed<11,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<12,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5547245575359016,
+        "auc": 0.9204009141360299,
+        "strict_threshold": 2.828125,
+        "accepted_background": 522,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009940774313953267,
+        "strict_signal_efficiency": 0.5528652741969635
+      },
+      "native_margin_error": {
+        "max_abs": 1.3487701416015625,
+        "mean_abs": 0.0619632201944537,
+        "exact_mismatches": 132800
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.143108308315277,
+        "mean_abs": 0.08915368798014037,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.534950219793245,
+        "stderr": "events=132800 wall_seconds=4.4968 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 11,
+      "score_bits": 12,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f6",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f6",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<11,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<11,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<12,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "948dfef855daa1b6dd9de583174c8248bd9d8b082c72eeda620294e29f73ccbf"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    },
+    {
+      "name": "fixed_f4",
+      "fractional_bits": 4,
+      "input": "ap_fixed<9,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<10,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5204838439504637,
+        "auc": 0.9175962218121361,
+        "strict_threshold": 2.75,
+        "accepted_background": 477,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.00908381101102626,
+        "strict_signal_efficiency": 0.5084507217676145
+      },
+      "native_margin_error": {
+        "max_abs": 2.745144844055176,
+        "mean_abs": 0.3159498951427687,
+        "exact_mismatches": 132800
+      },
+      "boundary_native_margin_error": {
+        "max_abs": 1.8824426531791687,
+        "mean_abs": 0.28237057444462743,
+        "exact_mismatches": 4821
+      },
+      "execution": {
+        "wall_seconds_including_io": 4.421497927047312,
+        "stderr": "events=132800 wall_seconds=4.38342 (includes binary I/O and optional independent trace)"
+      },
+      "validation_input_values_outside_representable_range": 0,
+      "input_bits": 9,
+      "score_bits": 10,
+      "hls_cpp_emulation": {
+        "events": 512,
+        "error_against_cmssw": {
+          "max_abs": 0.0,
+          "mean_abs": 0.0,
+          "exact_mismatches": 0
+        },
+        "configuration": {
+          "Backend": "xilinxhls",
+          "ProjectName": "xgb_fixed_f4",
+          "OutputDir": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/hls/fixed_f4",
+          "XilinxPart": "xcvu9p-flgb2104-2L-e",
+          "ClockPeriod": "5",
+          "Unroll": true,
+          "AcceleratorConfig": null,
+          "Precision": "ap_fixed<18,8>",
+          "InputPrecision": "ap_fixed<9,5,AP_RND_CONV,AP_SAT>",
+          "ThresholdPrecision": "ap_fixed<9,5,AP_RND_CONV,AP_SAT>",
+          "WeightPrecision": "ap_fixed<2,2,AP_TRN,AP_WRAP>",
+          "ScorePrecision": "ap_fixed<10,6,AP_RND_CONV,AP_SAT>"
+        },
+        "synthesis_run": false,
+        "reused_compiled_bridge": {
+          "from_report": "/users/robert.schoefbeck/CMS/tree_benchmark/artifacts/conifer/xgboost_smoke/report.json",
+          "library_sha256": "abd825487cd35881f3ecae2e9ee4208f63308fbef7df411ff58e80c2b528cdc2"
+        },
+        "target_note": "Conifer default part/clock are export placeholders, not a chosen resource benchmark"
+      }
+    }
+  ],
+  "validation_events": 132800,
+  "native_margin_metrics": {
+    "signal_efficiency_at_1pct_background": 0.5548207101844587,
+    "auc": 0.9205588061447421,
+    "strict_threshold": 2.8196048736572266,
+    "accepted_background": 525,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009997905200815067,
+    "strict_signal_efficiency": 0.5548207101844587
+  },
+  "native_probability_metrics": {
+    "signal_efficiency_at_1pct_background": 0.5548207101844587,
+    "auc": 0.9205588063819305,
+    "strict_threshold": 0.943726122379303,
+    "accepted_background": 525,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009997905200815067,
+    "strict_signal_efficiency": 0.5548207101844587
+  },
+  "shared_evaluation_probability_metrics": {
+    "accuracy": 0.8474774096385542,
+    "macro_auc": 0.9205588064412277,
+    "per_class_auc": {
+      "quark/gluon": 0.9205588065005248,
+      "W/Z/top": 0.9205588063819305
+    },
+    "macro_average_precision": 0.9073761127828869,
+    "per_class_average_precision": {
+      "quark/gluon": 0.8618154592772123,
+      "W/Z/top": 0.9529367662885615
+    },
+    "cross_entropy": 0.34125697334622723,
+    "multiclass_brier_score": 0.21719273924827576,
+    "expected_calibration_error": 0.012385367149689111,
+    "confidence_coverage": {
+      "0.5": {
+        "coverage": 1.0,
+        "accuracy": 0.8474774096385542
+      },
+      "0.7": {
+        "coverage": 0.8133509036144578,
+        "accuracy": 0.9022895392221306
+      },
+      "0.8": {
+        "coverage": 0.6069352409638554,
+        "accuracy": 0.9494547214054416
+      },
+      "0.9": {
+        "coverage": 0.45354668674698795,
+        "accuracy": 0.9776693065032956
+      },
+      "0.95": {
+        "coverage": 0.34332831325301205,
+        "accuracy": 0.9889678466464886
+      }
+    },
+    "confusion_matrix": [
+      [
+        46098,
+        6413
+      ],
+      [
+        13842,
+        66447
+      ]
+    ],
+    "fixed_fpr": 0.01,
+    "fixed_fpr_points": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "signal_efficiency_at_fixed_fpr": 0.5548207101844587,
+    "per_class_efficiency_at_fixed_fpr": {
+      "quark/gluon": 0.2255908285882958,
+      "W/Z/top": 0.5548207101844587
+    },
+    "per_class_efficiency_points": {
+      "quark/gluon": {
+        "0.001": 0.05979699491535107,
+        "0.01": 0.2255908285882958,
+        "0.1": 0.708956218697035
+      },
+      "W/Z/top": {
+        "0.001": 0.22255241689397054,
+        "0.01": 0.5548207101844587,
+        "0.1": 0.812128685124986
+      }
+    },
+    "signal_auc": 0.9205588063819305
+  },
+  "conversion_reconciliation": {
+    "thresholds": 1499,
+    "leaf_values": 1599,
+    "base_score_before": [
+      0.42462566787278777
+    ],
+    "max_depth_before": 6,
+    "base_score_after": [
+      0.4246255904430287
+    ],
+    "max_depth_after": 4,
+    "source_trees": 100,
+    "input_contract": "finite inputs rounded to binary32, matching XGBoost DMatrix"
+  },
+  "upstream_python_margin_error_sample": {
+    "max_abs": 0.2668495588777695,
+    "mean_abs": 0.026764573519034145,
+    "exact_mismatches": 256
+  },
+  "reconciled_python_margin_error_sample": {
+    "max_abs": 2.4235626909785424e-06,
+    "mean_abs": 4.163929310518899e-07,
+    "exact_mismatches": 256
+  },
+  "ranges": {
+    "training_max_abs_input": 8.960660934448242,
+    "max_abs_threshold": 4.726310729980469,
+    "conservative_float_score_bound": 15.092841032891883,
+    "input_integer_bits": 5,
+    "score_integer_bits": 6,
+    "selection": "training inputs, model thresholds, conservative leaf-sum bound; no validation tuning"
+  },
+  "precision_profiles": [
+    {
+      "name": "double",
+      "input": "double",
+      "score": "double",
+      "weight": "double"
+    },
+    {
+      "name": "float",
+      "input": "float",
+      "score": "float",
+      "weight": "float"
+    },
+    {
+      "name": "fixed_f18",
+      "fractional_bits": 18,
+      "input": "ap_fixed<23,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f12",
+      "fractional_bits": 12,
+      "input": "ap_fixed<17,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f10",
+      "fractional_bits": 10,
+      "input": "ap_fixed<15,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<16,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f8",
+      "fractional_bits": 8,
+      "input": "ap_fixed<13,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f6",
+      "fractional_bits": 6,
+      "input": "ap_fixed<11,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<12,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f4",
+      "fractional_bits": 4,
+      "input": "ap_fixed<9,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<10,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    }
+  ],
+  "emulator_sha256": "4a34861e80fba4d6a43f071cb63816fda41709cd8c2c28038e0bf5a5cb303c89",
+  "tools": {
+    "conifer": "Tool info as configured in location /users/robert.schoefbeck/CMS/tree_benchmark/workspaces/cmssw/CMSSW_15_1_2\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nName : conifer\nVersion : 1.7-534f25fc4bc9f0613c4a06112877d465\nRevision : 2\n++++++++++++++++++++\n\nCONIFER_BASE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/conifer/1.7-534f25fc4bc9f0613c4a06112877d465\nINCLUDE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/conifer/1.7-534f25fc4bc9f0613c4a06112877d465/include\nUSE=json\n\n",
+    "hls": "Tool info as configured in location /users/robert.schoefbeck/CMS/tree_benchmark/workspaces/cmssw/CMSSW_15_1_2\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nName : hls\nVersion : 2025.05-4da036171b10090d7d21e15c49bb27a1\nRevision : 2\n++++++++++++++++++++\n\nHLS_BASE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/hls/2025.05-4da036171b10090d7d21e15c49bb27a1\nINCLUDE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/hls/2025.05-4da036171b10090d7d21e15c49bb27a1/include\nROOT_INCLUDE_PATH=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/hls/2025.05-4da036171b10090d7d21e15c49bb27a1/include\nSYSTEM_INCLUDE+=1\nUSE=root_cxxdefaults\n\n",
+    "json": "Tool info as configured in location /users/robert.schoefbeck/CMS/tree_benchmark/workspaces/cmssw/CMSSW_15_1_2\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nName : json\nVersion : 3.11.3-fe8b14080d05d6ff46ded7c91e3977bc\nRevision : 2\n++++++++++++++++++++\n\nINCLUDE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/json/3.11.3-fe8b14080d05d6ff46ded7c91e3977bc/include\nJSON_BASE=/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/json/3.11.3-fe8b14080d05d6ff46ded7c91e3977bc\n\n"
+  },
+  "upstream_python_boundary_margin_error": {
+    "max_abs": 0.9567015992690227,
+    "mean_abs": 0.029394330154830835,
+    "exact_mismatches": 4821
+  },
+  "boundary_tests": {
+    "handover_vectors": 324,
+    "node_edge_vectors": 4497,
+    "covered_internal_nodes": 1499,
+    "total": 4821
+  },
+  "native_leaf_conversion_checks": {
+    "validation_comparisons": 13280000,
+    "boundary_comparisons": 482100,
+    "all_exact": true,
+    "method": "independent converted-tree walker, compared with native XGBoost pred_leaf"
+  },
+  "synthesis": {
+    "run": false,
+    "tools_on_path": {
+      "vitis_hls": null,
+      "vivado_hls": null,
+      "vitis-run": null,
+      "vivado": null
+    },
+    "note": "C++ emulation is validated; no FPGA resources or hardware latency are inferred."
+  },
+  "environment_freeze": [
+    "cloudpickle==3.1.2",
+    "conifer==1.11",
+    "contourpy==1.3.2",
+    "cycler==0.12.1",
+    "fonttools==4.65.0",
+    "joblib==1.6.0",
+    "kiwisolver==1.5.1",
+    "matplotlib==3.10.7",
+    "numpy==1.26.4",
+    "packaging==25.0",
+    "pandas==2.3.3",
+    "pillow==12.3.0",
+    "pybind11==2.13.6",
+    "pyparsing==3.3.3",
+    "python-dateutil==3.0.0",
+    "pytz==2026.5",
+    "PyYAML==6.0.3",
+    "scikit-learn==1.7.2",
+    "scipy==1.15.2",
+    "six==1.17.0",
+    "threadpoolctl==3.7.0",
+    "tzdata==2026.5",
+    "xgboost-cpu==3.2.0"
+  ],
+  "source_hashes": {
+    "scripts/validate_xgboost_conifer.py": "46b6c74a2b4a4e432f05cb2268387cb577fb310ac7e506b20db388bae9cdece1",
+    "fpga/conifer/compat.py": "8b10cfe106f51970e9ed3e9d1606e37a0fde66da465a6588aaf790d52c922c46",
+    "cmssw/TreeBenchmark/ConiferValidation/bin/validateXGBoost.cc": "1f857e2bc570f33b87169cc857b4054cba8fd2872e3a8a289817c522585e9dd0",
+    "configs/conifer_xgboost_emulation.json": "6c0b2ff38d84837e8b46e362762973354c38a60bd5ab119aaceb194ad4b8497b"
+  },
+  "header_hashes": {
+    "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/conifer/1.7-534f25fc4bc9f0613c4a06112877d465/include/conifer.h": "ebc7a421aa3b9ff2e63d700dfaf99c95fb023bcb258ce71ebd4b956d6ab052f7",
+    "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/hls/2025.05-4da036171b10090d7d21e15c49bb27a1/include/ap_fixed.h": "de5778ab2178ef99c3b68e7b00772c2ddf8f7e827b765a650e864f2d7228e9de",
+    "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/json/3.11.3-fe8b14080d05d6ff46ded7c91e3977bc/include/nlohmann/json.hpp": "9bea4c8066ef4a1c206b2be5a36302f8926f7fdc6087af5d20b417d0cf103ea6"
+  },
+  "hls_stream_header_available": false
+}

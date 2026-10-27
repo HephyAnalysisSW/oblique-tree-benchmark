@@ -1,0 +1,82 @@
+{
+  "native_model_sha256": "8d9315c22b260c52f4f22d631a84a37fcc31bab10af116c93d48d9cf877e030a",
+  "conifer_json_sha256": "252a9e5aa03c81ab979205059d17737777ace92f821dd21a080510677147c9cf",
+  "validation_report_sha256": "647cc5e1f340254399258ae06a45567fb196ace80c1c69144e1538bc3c43f327",
+  "finite_binary32_inputs_only": true,
+  "score": "increasing raw signal margin",
+  "source": "fpga_handoff/v3/xgboost_reference/model.json",
+  "configuration": "configs/conifer_xgboost_emulation.json",
+  "versions": {
+    "conifer": "1.11",
+    "xgboost-cpu": "3.2.0",
+    "numpy": "1.26.4",
+    "scikit-learn": "1.7.2",
+    "pandas": "2.3.3",
+    "pybind11": "2.13.6"
+  },
+  "ranges": {
+    "training_max_abs_input": 8.960660934448242,
+    "max_abs_threshold": 4.726310729980469,
+    "conservative_float_score_bound": 15.092841032891883,
+    "input_integer_bits": 5,
+    "score_integer_bits": 6,
+    "selection": "training inputs, model thresholds, conservative leaf-sum bound; no validation tuning"
+  },
+  "precision_profiles": [
+    {
+      "name": "double",
+      "input": "double",
+      "score": "double",
+      "weight": "double"
+    },
+    {
+      "name": "float",
+      "input": "float",
+      "score": "float",
+      "weight": "float"
+    },
+    {
+      "name": "fixed_f18",
+      "fractional_bits": 18,
+      "input": "ap_fixed<23,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f12",
+      "fractional_bits": 12,
+      "input": "ap_fixed<17,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f10",
+      "fractional_bits": 10,
+      "input": "ap_fixed<15,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<16,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f8",
+      "fractional_bits": 8,
+      "input": "ap_fixed<13,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f6",
+      "fractional_bits": 6,
+      "input": "ap_fixed<11,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<12,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    },
+    {
+      "name": "fixed_f4",
+      "fractional_bits": 4,
+      "input": "ap_fixed<9,5,AP_RND_CONV,AP_SAT>",
+      "score": "ap_fixed<10,6,AP_RND_CONV,AP_SAT>",
+      "weight": "ap_fixed<2,2,AP_TRN,AP_WRAP>"
+    }
+  ],
+  "note": "A separate XGBoost reference export. The v3 Compact refit default is unchanged."
+}
