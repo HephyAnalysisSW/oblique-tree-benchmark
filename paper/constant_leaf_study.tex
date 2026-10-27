@@ -1,0 +1,90 @@
+\subsection{Constant-leaf forests}
+\label{sec:constant}
+Constant predictions simplify the hardware leaf stage and permit comparison
+with scalar-leaf FPGA tree architectures~\cite{conifer2020}. To study the
+accuracy cost, we scan $T\in\{1,3,5\}$ trees, $D\in\{2,3,4\}$ and
+$\lambda_s\in\{0,10^{-7},10^{-5}\}$, giving 27 configurations. Each uses the
+same CART initialization seed, training partition and numerical stopping rules
+as the factorial architecture study. Constant leaves have no feature weights,
+so their nominal leaf penalty does not affect Eq.~\eqref{eq:objective}.
+We select the saved checkpoint with the highest validation efficiency at
+1\% background from each converged source run, and then select among
+penalties for each layout.
+
+\ifnum\ConstantCompleted<\ConstantTotal\relax
+At this snapshot, \ConstantCompleted{} of \ConstantTotal{} source runs have
+converged. The remaining five-tree, depth-four run with $\lambda_s=10^{-7}$
+is still training and contributes no selected result. Table~\ref{tab:constant}
+therefore reports the best eligible completed case per layout.
+\else
+All \ConstantTotal{} source runs have converged.
+Table~\ref{tab:constant} reports the best selected penalty per layout.
+\fi
+The interpolated efficiency follows the common ROC convention. We also report
+a strict threshold on the binary64 signal margin that accepts at most 525
+background events. This distinction matters for shallow constant trees:
+a single depth-$D$ tree has at most $2^D$ score levels, and even its highest
+level can exceed the background budget. Connecting ROC vertices then gives
+an interpolated efficiency that a deterministic threshold cannot realize.
+
+\begin{table}[htbp]\centering\small
+\caption{Constant-leaf forests: the best eligible penalty per layout.
+$\epsilon_s$ is interpolated at 1\% background; $\epsilon_s^{\rm strict}$ uses
+a realizable strict margin threshold with background efficiency at most 1\%.
+Both coefficient counts include biases.}
+\label{tab:constant}\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrr@{}}\toprule
+Layout & $\lambda_s$ & $P_{\rm dense}$ & $P_{\rm nz}$ & $\epsilon_s$ [\%] & $\epsilon_s^{\rm strict}$ [\%] & AUC\\\midrule
+\input{generated/constant_leaf_results.tex}\end{tabular}
+\end{table}
+
+The best completed constant configuration has \ConstantWinnerTrees{} trees of
+depth \ConstantWinnerDepth{}, with \ConstantWinnerNonzero{} nonzeros in
+\ConstantWinnerDense{} allocated slots. It reaches
+\ConstantWinnerEfficiency\% interpolated signal efficiency; its realizable
+strict-threshold efficiency is \ConstantWinnerStrict\%.
+Figure~\ref{fig:constant} compares the depth-four constant forests with XGBoost
+and the sparse linear-leaf Compact refit. These are comparisons of selected
+configurations: their penalty and refitting histories differ, so the comparison
+is not a leaf-type ablation at identical support.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\textwidth]{figures/constant_leaf_roc.pdf}
+\caption{Validation ROCs for the best completed constant-leaf configuration at
+each depth-four layout, compared with XGBoost and linear-leaf Compact refit.
+The low-background panel exposes the coarse score steps of small constant
+forests. Eligibility requires convergence of the source run; selection can
+choose an earlier saved epoch. Parenthetical times are bulk CPU wall time per
+event on the 132,800-event batch: one thread, median of nine repeats. TAO uses
+the NumPy prediction API on binary64 inputs and XGBoost uncached compiled
+prediction on preconverted binary32 inputs. These follow-up measurements are separate from Table~\ref{tab:main}
+and are not FPGA or single-event latency.}
+\label{fig:constant}
+\end{figure}
+
+\begin{implementation}
+\textbf{Controlled cohort and exact snapshots.}
+The constant subset of \file{configs/tao_hyper_scan_v1.json} comprises cases
+3--5, 9--11, 15--17, 21--23, 27--29, 33--35, 39--41, 45--47 and 51--53.
+These use CART initialization and hard-threshold search. They are separate
+from the earlier seven-layout, randomly initialized constant study.
+\file{scripts/build_constant_leaf_study.py} re-evaluates eligible checkpoints,
+archives them under \code{models/constant_study_v1_selected/<sha256>.pkl},
+and records selected and terminal epochs, metrics, configurations, convergence
+checks and hashes in \code{paper/sources/constant_leaf_study.json}.
+The selected constant model is also exported in
+\code{paper/sources/constant_leaf_winner.json}; this does not alter the v3
+handover or its default. Its selected epoch is \ConstantWinnerEpoch{}, while
+the source run terminates at epoch \ConstantWinnerTerminalEpoch{}.
+
+Regenerate with the pinned training environment:
+\begin{lstlisting}[language=bash]
+PYTHONPATH=src:. python scripts/build_constant_leaf_study.py
+# Final gate: exits unsuccessfully while any source case is incomplete.
+PYTHONPATH=src:. python scripts/build_constant_leaf_study.py --require-complete
+\end{lstlisting}
+Training compute times and both probability-based and binary64-margin strict
+working points are retained in the snapshot and
+\file{docs/constant_leaf_study_v1.md}. Incomplete cases remain visible and are
+never labelled converged or promoted into the table.
+\end{implementation}

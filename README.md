@@ -60,6 +60,13 @@ CMSSW workspaces and Python environments live in ignored `workspaces/` directori
 The validated chain uses conifer 1.11 for conversion/HLS and the actual CMSSW 1.7
 external for this axis-aligned reference. It does not yet report FPGA synthesis resources.
 
+The [controlled constant-leaf study](docs/constant_leaf_study_v1.md) currently
+has **26/27 converged source runs**. Its best completed configuration is five
+D4 trees (1355 dense / 1250 nonzero coefficients), with 55.40% interpolated
+signal efficiency and 54.75% at a realizable threshold accepting at most 1%
+background. The remaining five-D4, split-L1 `1e-7` case is still training and
+excluded. This study does not replace the Compact refit handover default.
+
 ## Technical writeup
 
 The [research paper](paper/main.pdf) describes the architecture, TAO updates,

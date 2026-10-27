@@ -17,6 +17,25 @@ All metrics in this handover use the unchanged validation split. The oblique stu
 
 Compact refit remains the pinned v3 default; its coefficients and the two v3 alternatives are unchanged. The L1 path study is complete (16/16), the support-refit scan is terminal (6 converged full refits and 4 held outcomes), and the broader architecture scan has 37/58 converged cases with three jobs running in the checked snapshot. The provisional five-tree 57.13% result is not a new handover model. See the [dated research update and checkpoint provenance](handover_status_2026-10-26.md).
 
+## Conifer reference and constant leaves (27 October 2026)
+
+The [XGBoost emulator chain](conifer_xgboost_v1/README.md) is validated in EL9:
+conifer 1.11 conversion/HLS C++ and the actual CMSSW conifer 1.7 external.
+[Precision results](conifer_xgboost_v1/results.md) include realizable 1% background
+thresholds and exact cross-emulator checks. No synthesis has been run. The old
+CMSSW external supports axis-aligned cuts; oblique inference needs an updated
+bridge, and linear leaves need an extension beyond the scalar-leaf converter.
+
+The [controlled constant-leaf study](constant_leaf_study_v1.md) is **26/27
+converged**, with the last five-D4, split-L1 `1e-7` configuration still training.
+The best completed constant forest is five D4 trees: 1355 dense slots, 1250 exact
+nonzero coefficients, 55.40% interpolated / 54.75% realizable signal efficiency
+at at most 1% background. Its portable model and exact checkpoint provenance
+are in `paper/sources/constant_leaf_winner.json` and `constant_leaf_study.json`.
+It is a research comparison; **Compact refit remains the implementation default**.
+The [paper](../paper/main.pdf) and [annotated edition](../paper/annotated.pdf)
+include the constant scan and fixed-point reference.
+
 ## Implementation files and verification
 
 For the default, use either `fpga_handoff/v3/compact_refit_3t_d4/standardized/` **or** `raw/` consistently:

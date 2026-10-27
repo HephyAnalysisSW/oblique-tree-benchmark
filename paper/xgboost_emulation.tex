@@ -1,0 +1,76 @@
+\subsection{A fixed-point XGBoost reference}
+\label{sec:fixedpoint}
+As a first numerical implementation check, we emulate the XGBoost reference
+with signed fixed-point inputs, thresholds and scores. A format with total
+width $W_b$ and integer width $I_b$ has $F_b=W_b-I_b$ fractional bits and
+representable range
+$[-2^{I_b-1},\,2^{I_b-1}-2^{-F_b}]$. Define its quantizer by
+\begin{equation}
+ Q_{W_b,I_b}(u)=\operatorname{clip}_{W_b,I_b}
+ \!\left(2^{-F_b}\operatorname{round}_{\rm even}(2^{F_b}u)\right),
+ \label{eq:quantizer}
+\end{equation}
+where rounding chooses the nearest integer with ties to even, and clipping
+saturates at the format's endpoints. We quantize inputs and thresholds before
+evaluating the strict-left XGBoost cuts. Let $s_{t\ell}$ denote a scalar leaf contribution with the learning rate
+absorbed, and $s_0$ the initial margin. These values
+use the score format; tree scores are combined by a balanced adder tree with
+casts to that format after additions. Its result is added to the quantized
+initial margin and cast once more. No sigmoid is needed for selection.
+
+The maximum absolute training input is 8.96 and the largest absolute tree
+threshold is 4.73, so we use $I_b=5$ for inputs and thresholds. For the
+$T=100$ tree scores, define
+\begin{equation}
+ A=|s_0|+\sum_{t=1}^{T}\max_\ell|s_{t\ell}|\simeq15.09.
+ \label{eq:score-bound}
+\end{equation}
+At the coarsest fractional width $F_{\min}=4$, rounding the $T$ leaf values
+and initial margin can add at most $(T+1)2^{-F_{\min}-1}$ to this bound.
+Their quantized sum and all partial sums therefore fit within an absolute
+bound of 18.25, covered by $I_b=6$ for scores. With no overflow, sums of values
+on this common fixed-point grid introduce no further fractional rounding.
+No validation input lies outside the chosen input range. We vary the common
+fractional width while keeping these integer widths fixed. Table~\ref{tab:fixedpoint}
+shows the resulting validation performance. The 17/18-bit input/score pair
+retains the reference working-point efficiency; the coarsest 9/10-bit pair
+loses performance and produces more substantial score ties. Small positive
+changes in the interpolated point are not interpreted as an established
+accuracy gain.
+
+\begin{table}[htbp]\centering\small
+\caption{XGBoost fixed-point emulation on the same validation partition.
+Widths include the sign bit; input and threshold formats are identical.
+The native reference has $\epsilon_s=55.48\%$ and AUC 0.92056.
+The strict-threshold column uses background efficiency at most 1\%.}
+\label{tab:fixedpoint}\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}rrrrr@{}}\toprule
+Input bits & Score bits & $\epsilon_s$ [\%] & $\epsilon_s^{\rm strict}$ [\%] & AUC\\\midrule
+\input{generated/xgboost_precision_results.tex}\end{tabular}
+\end{table}
+Independent C++ executions agree exactly for the tested fixed-point outputs.
+This establishes numerical agreement of the emulators; FPGA resource use,
+latency and initiation interval require synthesis for a specified device,
+clock and interface.
+
+\begin{implementation}
+\textbf{Tested chain.} \file{docs/conifer_xgboost_v1/README.md} specifies the
+EL9 container, CMSSW workspace, dependency pins and commands. Conversion and
+HLS C++ generation use conifer 1.11; the axis-aligned reference is also evaluated
+with the actual CMSSW conifer 1.7 external. Its bridge rejects oblique weights.
+The full validation compares 13,280,000 native/exported leaf IDs, plus boundary
+checks. Each of eight C++ profiles is checked on 512 HLS vectors, including all
+324 frozen XGBoost handover vectors. Every fixed-point comparison is exact.
+\file{fpga/conifer/compat.py} reconciles native binary32 thresholds, leaf
+values, initial margin and actual depth; upstream conversion is retained
+as a diagnostic. It is important to preserve XGBoost's input rounding and
+strict-left equality convention. The score-type settings in the table are
+\code{AP_RND_CONV, AP_SAT}; axis weights are exact one-hot constants.
+
+\file{docs/conifer_xgboost_v1/validation.json} contains full provenance and
+per-profile metrics. \file{scripts/validate_xgboost_conifer.py} reads training
+inputs for range selection and validation arrays for evaluation; test arrays
+are not loaded. Generated projects use conifer's default device/clock only as
+export placeholders. No FPGA synthesis has been run, and CPU timings that
+include file I/O are not reported as hardware latency.
+\end{implementation}

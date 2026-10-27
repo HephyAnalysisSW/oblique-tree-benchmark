@@ -43,6 +43,7 @@
 \lstdefinestyle{treeblock}{style=codeblock,basicstyle=\ttfamily\scriptsize,breakindent=0pt,aboveskip=0pt,belowskip=2pt,frame=none,xleftmargin=0pt,xrightmargin=0pt}
 \lstset{style=codeblock}
 \input{generated/provenance.tex}
+\input{generated/constant_leaf_macros.tex}
 \title{Sparse hard oblique forests for jet classification}
 \author{}
 \date{26 October 2026}
@@ -766,6 +767,11 @@ Table~\ref{tab:sfr}.}
 \label{fig:tradeoff}
 \end{figure}
 
+\FloatBarrier
+\input{constant_leaf_study.tex}
+\FloatBarrier
+\input{xgboost_emulation.tex}
+\FloatBarrier
 \subsection{Uncertainty and inference cost}
 A paired class-stratified bootstrap with 1,000 replicates, seed 20261025,
 recomputes the interpolated working point in each replicate.
