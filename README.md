@@ -74,6 +74,25 @@ both, their exact model files, and reproduction commands. Arithmetic/storage
 counts and CPU emulation are available without a vendor license; FPGA resources
 and latency require synthesis. The historical v3 Compact refit default is retained.
 
+## Axis-aligned cuts with linear leaves: new experiment
+
+The [axis/linear study](docs/axis_linear_v1/README.md) tests **one and three trees,
+depths three and four**, using the original fixed split. At each TAO node it
+searches all features, both directions and exact hard-loss thresholds against
+the current linear-leaf subtrees. Leaf L1 starts at `1e-5`; split directions are
+fixed unit coefficients and have no split L1. Each fully converged source is
+followed by unpenalized, frozen-support leaf-only refitting with unchanged cuts.
+
+`configs/axis_linear_v1.json` lists the four cases. The isolated subclass
+`src/tao/axis.py` leaves the existing oblique implementation unchanged.
+`scripts/monitor_axis_study.py` runs at most two jobs, resumes only clean exit 75,
+and publishes a final comparison after convergence or an explicit held outcome.
+Incomplete checkpoints cannot become winners. Continuous scalar parameters are
+counted separately from feature indices, direction bits and fixed unit weights.
+The dense continuous budgets are 143 / 287 / 429 / 861 for 1×D3 / 1×D4 / 3×D3 /
+3×D4, plus discrete cut choices. This experiment does not replace either frozen
+handover candidate.
+
 ## Technical writeup
 
 The [research paper](paper/main.pdf) describes the architecture, TAO updates,

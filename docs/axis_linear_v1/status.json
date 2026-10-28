@@ -1,0 +1,142 @@
+{
+  "updated_utc": "2026-10-28T19:15:57.092691+00:00",
+  "scan": {
+    "scan_name": "axis_linear_v1",
+    "concurrency": 2,
+    "cases": [
+      {
+        "index": 0,
+        "trees": 1,
+        "depth": 3,
+        "config": "configs/axis_linear_v1/case_0.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d3_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n1_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_0.json"
+      },
+      {
+        "index": 1,
+        "trees": 1,
+        "depth": 4,
+        "config": "configs/axis_linear_v1/case_1.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n1_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_1.json"
+      },
+      {
+        "index": 2,
+        "trees": 3,
+        "depth": 3,
+        "config": "configs/axis_linear_v1/case_2.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n3_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_2.json"
+      },
+      {
+        "index": 3,
+        "trees": 3,
+        "depth": 4,
+        "config": "configs/axis_linear_v1/case_3.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n3_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_3.json"
+      }
+    ]
+  },
+  "models": [
+    {
+      "case": {
+        "index": 0,
+        "trees": 1,
+        "depth": 3,
+        "config": "configs/axis_linear_v1/case_0.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d3_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n1_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_0.json"
+      },
+      "training": {
+        "run_name": "qg_vs_wzt_hardtao_linear_d3_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "phase": "initial_refit",
+        "converged": false,
+        "epochs": 0,
+        "stable_epochs": 0,
+        "training_seconds": 161.31413040240295,
+        "leaf_max_iter": 300,
+        "last_convergence": null,
+        "epoch_progress": {},
+        "updated_utc": "2026-10-28T19:15:45.070880+00:00",
+        "test_evaluated": false
+      },
+      "refit": {},
+      "source_converged": false,
+      "latest_provisional_validation": null,
+      "selected": null
+    },
+    {
+      "case": {
+        "index": 1,
+        "trees": 1,
+        "depth": 4,
+        "config": "configs/axis_linear_v1/case_1.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n1_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_1.json"
+      },
+      "training": {
+        "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la1e-05_seed42_axis_linear_v1",
+        "phase": "initial_refit",
+        "converged": false,
+        "epochs": 0,
+        "stable_epochs": 0,
+        "training_seconds": 124.48181359074079,
+        "leaf_max_iter": 300,
+        "last_convergence": null,
+        "epoch_progress": {},
+        "updated_utc": "2026-10-28T19:15:07.123964+00:00",
+        "test_evaluated": false
+      },
+      "refit": {},
+      "source_converged": false,
+      "latest_provisional_validation": null,
+      "selected": null
+    },
+    {
+      "case": {
+        "index": 2,
+        "trees": 3,
+        "depth": 3,
+        "config": "configs/axis_linear_v1/case_2.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n3_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_2.json"
+      },
+      "training": {},
+      "refit": {},
+      "source_converged": false,
+      "latest_provisional_validation": null,
+      "selected": null
+    },
+    {
+      "case": {
+        "index": 3,
+        "trees": 3,
+        "depth": 4,
+        "config": "configs/axis_linear_v1/case_3.json",
+        "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa0_la1e-05_seed42_axis_linear_v1",
+        "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n3_leaf_refit",
+        "refit_config": "configs/axis_linear_v1/refit_3.json"
+      },
+      "training": {},
+      "refit": {},
+      "source_converged": false,
+      "latest_provisional_validation": null,
+      "selected": null
+    }
+  ],
+  "best_eligible_case": null,
+  "complete": false,
+  "converged_sources": 0,
+  "converged_refits": 0,
+  "test_evaluated": false,
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "host": "clip-login-0.cbe.vbc.ac.at"
+}

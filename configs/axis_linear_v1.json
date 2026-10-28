@@ -1,0 +1,42 @@
+{
+  "scan_name": "axis_linear_v1",
+  "concurrency": 2,
+  "cases": [
+    {
+      "index": 0,
+      "trees": 1,
+      "depth": 3,
+      "config": "configs/axis_linear_v1/case_0.json",
+      "run_name": "qg_vs_wzt_hardtao_linear_d3_n1_sa0_la1e-05_seed42_axis_linear_v1",
+      "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n1_leaf_refit",
+      "refit_config": "configs/axis_linear_v1/refit_0.json"
+    },
+    {
+      "index": 1,
+      "trees": 1,
+      "depth": 4,
+      "config": "configs/axis_linear_v1/case_1.json",
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n1_sa0_la1e-05_seed42_axis_linear_v1",
+      "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n1_leaf_refit",
+      "refit_config": "configs/axis_linear_v1/refit_1.json"
+    },
+    {
+      "index": 2,
+      "trees": 3,
+      "depth": 3,
+      "config": "configs/axis_linear_v1/case_2.json",
+      "run_name": "qg_vs_wzt_hardtao_linear_d3_n3_sa0_la1e-05_seed42_axis_linear_v1",
+      "refit_run_name": "qg_vs_wzt_axis_linear_v1_d3_n3_leaf_refit",
+      "refit_config": "configs/axis_linear_v1/refit_2.json"
+    },
+    {
+      "index": 3,
+      "trees": 3,
+      "depth": 4,
+      "config": "configs/axis_linear_v1/case_3.json",
+      "run_name": "qg_vs_wzt_hardtao_linear_d4_n3_sa0_la1e-05_seed42_axis_linear_v1",
+      "refit_run_name": "qg_vs_wzt_axis_linear_v1_d4_n3_leaf_refit",
+      "refit_config": "configs/axis_linear_v1/refit_3.json"
+    }
+  ]
+}
