@@ -1,0 +1,30 @@
+{
+  "compiler": "g++ (GCC) 12.3.1 20230527",
+  "all_passed": true,
+  "checks": [
+    {
+      "candidate": "constant_5t_d4",
+      "input_space": "standardized",
+      "vectors": 458,
+      "max_absolute_margin_error": 0.0
+    },
+    {
+      "candidate": "constant_5t_d4",
+      "input_space": "raw",
+      "vectors": 458,
+      "max_absolute_margin_error": 0.0
+    },
+    {
+      "candidate": "compact_refit_3t_d4",
+      "input_space": "standardized",
+      "vectors": 270,
+      "max_absolute_margin_error": 7.105427357601002e-15
+    },
+    {
+      "candidate": "compact_refit_3t_d4",
+      "input_space": "raw",
+      "vectors": 270,
+      "max_absolute_margin_error": 2.4868995751603507e-14
+    }
+  ]
+}

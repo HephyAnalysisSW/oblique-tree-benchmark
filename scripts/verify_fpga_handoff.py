@@ -22,7 +22,20 @@ def main():
     with tempfile.TemporaryDirectory() as temporary:
         for case in manifest['candidates']:
             for space in ['standardized','raw']:
-                folder=bundle/case['id']/space;binary=Path(temporary)/(case['id']+'_'+space)
+                if 'model' in case:
+                    folder=(repository/case['model' if space=='standardized' else 'raw_model']).parent
+                    if space=='standardized':
+                        assert hashlib.sha256((folder/'model.json').read_bytes()).hexdigest()==case['model_sha256']
+                    # External candidates remain in their original immutable bundle.
+                    owner=next(parent for parent in folder.parents if (parent/'manifest.json').is_file())
+                    owner_manifest=json.loads((owner/'manifest.json').read_text())
+                    for relative,digest in owner_manifest['files'].items():
+                        path=owner/relative
+                        if path.parent==folder:
+                            assert hashlib.sha256(path.read_bytes()).hexdigest()==digest,'Checksum mismatch: '+str(path)
+                else:
+                    folder=bundle/case['id']/space
+                binary=Path(temporary)/(case['id']+'_'+space)
                 subprocess.run([compiler,'-std=c++17','-O2','-ffp-contract=off','-I',str(folder),str(reference),'-o',str(binary)],check=True)
                 result=subprocess.run([str(binary)],input=(folder/'vectors.tsv').read_text(),text=True,capture_output=True,check=True)
                 actual=[line.split() for line in result.stdout.splitlines()]

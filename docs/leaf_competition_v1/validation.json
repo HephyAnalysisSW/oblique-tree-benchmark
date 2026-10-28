@@ -1,0 +1,507 @@
+{
+  "cpp_fixture_checks": [
+    {
+      "leaf_mode": "constant",
+      "constant_cut": false,
+      "profile": "double",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": false,
+      "profile": "f18",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": false,
+      "profile": "f12",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": false,
+      "profile": "f8",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": true,
+      "profile": "double",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": true,
+      "profile": "f18",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": true,
+      "profile": "f12",
+      "passed": true
+    },
+    {
+      "leaf_mode": "constant",
+      "constant_cut": true,
+      "profile": "f8",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": false,
+      "profile": "double",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": false,
+      "profile": "f18",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": false,
+      "profile": "f12",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": false,
+      "profile": "f8",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": true,
+      "profile": "double",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": true,
+      "profile": "f18",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": true,
+      "profile": "f12",
+      "passed": true
+    },
+    {
+      "leaf_mode": "linear",
+      "constant_cut": true,
+      "profile": "f8",
+      "passed": true
+    }
+  ],
+  "complete": true,
+  "scope": "full_validation",
+  "events": 132800,
+  "test_evaluated": false,
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "manifest_sha256": "fabdb25cf8022e4abadc48355da7364eac7a0ef3db0ff181e17b634a1951f2a4",
+  "host": "clip-c2-40.cbe.vbc.ac.at",
+  "conifer_version": "1.11",
+  "compiler": "g++ (GCC) 12.3.1 20230527",
+  "source_hashes": {
+    "scripts/validate_leaf_competition.py": "3e8e11142bc65239c188135d9d611bf96319a2305050818563fab61665d88cab",
+    "fpga/leaf_competition/emulate.cc": "cff4b52f8b97e28a9e34f000c54ee9f59ac9fdc409cb1cfec2c83cae7e2bb61b",
+    "fpga/leaf_competition/models.py": "662c26349590b2eec26952a04c06e91e6516afa8507dff8b26d1817d673b6f1a"
+  },
+  "header_sha256": "6621fb4d1e29c0d88345dcebd45fe0cc856dc0631bb11ec46bf54594055a4aef",
+  "candidates": [
+    {
+      "id": "constant_5t_d4",
+      "leaf_mode": "constant",
+      "model_sha256": "b4be7c85465a7fe567e1a514955bde9b6e7e94cc02ac1017f47d970a957a6905",
+      "arithmetic": {
+        "dense_slots": 1355,
+        "nonzero_coefficients": 1250,
+        "reachable_nonzero_coefficients": 1250,
+        "split_feature_weights": 1095,
+        "leaf_feature_weights": 0,
+        "biases_or_constants": 155,
+        "reachable_all_node_multiplications": 1095,
+        "reachable_all_node_comparisons": 75,
+        "sparse_path_multiplications_bound": 275,
+        "sparse_path_comparisons_bound": 20,
+        "coefficient_value_bits_binary64": 80000,
+        "note": "Coefficient payload excludes topology/indices/padding. Arithmetic counts are not DSP/LUT counts or latency."
+      },
+      "source_validation": {
+        "accuracy": 0.8533057228915663,
+        "macro_auc": 0.9261036426056176,
+        "per_class_auc": {
+          "quark/gluon": 0.9261036442066402,
+          "W/Z/top": 0.9261036410045951
+        },
+        "macro_average_precision": 0.9145837612632549,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8740812598882018,
+          "W/Z/top": 0.955086262638308
+        },
+        "cross_entropy": 0.3302065292331683,
+        "multiclass_brier_score": 0.20951782166957855,
+        "expected_calibration_error": 0.0027437659370970918,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8533057228915663
+          },
+          "0.7": {
+            "coverage": 0.7983960843373494,
+            "accuracy": 0.9117394625897177
+          },
+          "0.8": {
+            "coverage": 0.6679292168674699,
+            "accuracy": 0.9413422622067394
+          },
+          "0.9": {
+            "coverage": 0.5150150602409639,
+            "accuracy": 0.9713717577565284
+          },
+          "0.95": {
+            "coverage": 0.4049246987951807,
+            "accuracy": 0.9846580131662142
+          }
+        },
+        "confusion_matrix": [
+          [
+            45866,
+            6645
+          ],
+          [
+            12836,
+            67453
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5540031480028398,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.25899306811906075,
+          "W/Z/top": 0.5540031480028398
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.08134893879377655,
+            "0.01": 0.25899306811906075,
+            "0.1": 0.7348444741448112
+          },
+          "W/Z/top": {
+            "0.001": 0.2129711292954203,
+            "0.01": 0.5540031480028398,
+            "0.1": 0.8195898566428776
+          }
+        },
+        "signal_auc": 0.9261036410045951
+      },
+      "native_margin_metrics": {
+        "signal_efficiency_at_1pct_background": 0.5540031480028398,
+        "auc": 0.9261036412417836,
+        "strict_threshold": 3.0789135240382617,
+        "accepted_background": 506,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009636076250690332,
+        "strict_signal_efficiency": 0.5475469865112282
+      },
+      "profiles": [
+        {
+          "checksum": 172242.3295053188,
+          "events": 132800,
+          "median_microseconds_per_event": 0.5101267695783133,
+          "repeats": 9,
+          "stock_conifer_exact_mismatches": 22827,
+          "stock_conifer_max_error": 8.881784197001252e-16,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "double",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5540031480028398,
+            "auc": 0.9261036412417836,
+            "strict_threshold": 3.0789135240382617,
+            "accepted_background": 506,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009636076250690332,
+            "strict_signal_efficiency": 0.5475469865112282
+          },
+          "native_margin_error": {
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "exact_mismatches": 0
+          },
+          "leaf_assignment_mismatches": 0
+        },
+        {
+          "events": 132800,
+          "stock_conifer_exact_mismatches": 0,
+          "stock_conifer_max_error": 0.0,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f18",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5540031480028398,
+            "auc": 0.9261050812132787,
+            "strict_threshold": 3.07891845703125,
+            "accepted_background": 506,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009636076250690332,
+            "strict_signal_efficiency": 0.5475469865112282
+          },
+          "native_margin_error": {
+            "max_abs": 4.59716583702458,
+            "mean_abs": 0.0001336572032886883,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 40,
+          "types": {
+            "input": "ap_fixed<28,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<34,16,AP_RND_CONV,AP_SAT>"
+          }
+        },
+        {
+          "events": 132800,
+          "stock_conifer_exact_mismatches": 0,
+          "stock_conifer_max_error": 0.0,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f12",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.553973396106565,
+            "auc": 0.9260542565761499,
+            "strict_threshold": 3.078857421875,
+            "accepted_background": 506,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009636076250690332,
+            "strict_signal_efficiency": 0.5475469865112282
+          },
+          "native_margin_error": {
+            "max_abs": 5.007547154163252,
+            "mean_abs": 0.007767037756633676,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 2457,
+          "types": {
+            "input": "ap_fixed<22,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<28,16,AP_RND_CONV,AP_SAT>"
+          }
+        },
+        {
+          "events": 132800,
+          "stock_conifer_exact_mismatches": 0,
+          "stock_conifer_max_error": 0.0,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f8",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5518158926739223,
+            "auc": 0.9254833808137665,
+            "strict_threshold": 3.08203125,
+            "accepted_background": 505,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009617032621736398,
+            "strict_signal_efficiency": 0.5438353946368742
+          },
+          "native_margin_error": {
+            "max_abs": 5.347879185413252,
+            "mean_abs": 0.10346703811927856,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 33540,
+          "types": {
+            "input": "ap_fixed<18,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<24,16,AP_RND_CONV,AP_SAT>"
+          }
+        }
+      ],
+      "training_box_bounds": {
+        "split_partial_abs_bound": 33.10618264605348,
+        "forest_partial_abs_bound": 11.514843149496048
+      },
+      "normalization": "Positive power-of-two cut scaling, constrained to preserve every nonzero binary64 coefficient; canonical handover coefficients unchanged",
+      "hls_cpp_checks": [
+        {
+          "profile": "double",
+          "events": 512,
+          "error": {
+            "max_abs": 8.881784197001252e-16,
+            "mean_abs": 8.120674271916428e-17,
+            "exact_mismatches": 97
+          },
+          "backend_modified": false
+        },
+        {
+          "profile": "f12",
+          "events": 512,
+          "error": {
+            "max_abs": 0.0,
+            "mean_abs": 0.0,
+            "exact_mismatches": 0
+          },
+          "backend_modified": false
+        }
+      ]
+    },
+    {
+      "id": "compact_refit_3t_d4",
+      "leaf_mode": "linear",
+      "model_sha256": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+      "arithmetic": {
+        "dense_slots": 1581,
+        "nonzero_coefficients": 418,
+        "reachable_nonzero_coefficients": 379,
+        "split_feature_weights": 97,
+        "leaf_feature_weights": 261,
+        "biases_or_constants": 60,
+        "reachable_all_node_multiplications": 327,
+        "reachable_all_node_comparisons": 23,
+        "sparse_path_multiplications_bound": 80,
+        "sparse_path_comparisons_bound": 12,
+        "coefficient_value_bits_binary64": 26752,
+        "note": "Coefficient payload excludes topology/indices/padding. Arithmetic counts are not DSP/LUT counts or latency."
+      },
+      "source_validation": {
+        "primary_metric": "signal_efficiency_at_fixed_fpr",
+        "fixed_fpr": 0.01,
+        "signal_efficiency": 0.5620197038199505,
+        "signal_auc": 0.9273325252733219
+      },
+      "native_margin_metrics": {
+        "signal_efficiency_at_1pct_background": 0.5620197038199505,
+        "auc": 0.9273325265778587,
+        "strict_threshold": 3.1156953153105,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5620197038199505
+      },
+      "profiles": [
+        {
+          "checksum": 171982.8616707456,
+          "events": 132800,
+          "median_microseconds_per_event": 0.18101543674698797,
+          "repeats": 9,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "double",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5620197038199505,
+            "auc": 0.9273325265778587,
+            "strict_threshold": 3.115695315310499,
+            "accepted_background": 525,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009997905200815067,
+            "strict_signal_efficiency": 0.5620197038199505
+          },
+          "native_margin_error": {
+            "max_abs": 1.4210854715202004e-14,
+            "mean_abs": 9.424529011955572e-16,
+            "exact_mismatches": 96707
+          },
+          "leaf_assignment_mismatches": 0
+        },
+        {
+          "events": 132800,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f18",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5620197038199505,
+            "auc": 0.9273324622997703,
+            "strict_threshold": 3.115673065185547,
+            "accepted_background": 525,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009997905200815067,
+            "strict_signal_efficiency": 0.5620197038199505
+          },
+          "native_margin_error": {
+            "max_abs": 1.0086661468980225,
+            "mean_abs": 1.8300249259728994e-05,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 1,
+          "types": {
+            "input": "ap_fixed<28,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<24,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<34,16,AP_RND_CONV,AP_SAT>"
+          }
+        },
+        {
+          "events": 132800,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f12",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5621345389779422,
+            "auc": 0.9273499867362638,
+            "strict_threshold": 3.114990234375,
+            "accepted_background": 525,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009997905200815067,
+            "strict_signal_efficiency": 0.5621317988765584
+          },
+          "native_margin_error": {
+            "max_abs": 3.0932944406120746,
+            "mean_abs": 0.0012756507870032379,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 116,
+          "types": {
+            "input": "ap_fixed<22,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<18,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<28,16,AP_RND_CONV,AP_SAT>"
+          }
+        },
+        {
+          "events": 132800,
+          "timing_note": "Single-thread in-memory sparse path traversal, input conversion and I/O excluded; not FPGA latency",
+          "name": "f8",
+          "metrics": {
+            "signal_efficiency_at_1pct_background": 0.5600470799237753,
+            "auc": 0.9272967513150341,
+            "strict_threshold": 3.14453125,
+            "accepted_background": 525,
+            "background_budget": 525,
+            "strict_background_efficiency": 0.009997905200815067,
+            "strict_signal_efficiency": 0.5599895377947166
+          },
+          "native_margin_error": {
+            "max_abs": 7.8636839341972,
+            "mean_abs": 0.02130092518228662,
+            "exact_mismatches": 132800
+          },
+          "leaf_assignment_mismatches": 2457,
+          "types": {
+            "input": "ap_fixed<18,10,AP_RND_CONV,AP_SAT>",
+            "weight": "ap_fixed<14,6,AP_RND_CONV,AP_SAT>",
+            "score": "ap_fixed<24,16,AP_RND_CONV,AP_SAT>"
+          }
+        }
+      ],
+      "training_box_bounds": {
+        "split_partial_abs_bound": 13.821821964254955,
+        "forest_partial_abs_bound": 350.2425959977972
+      },
+      "normalization": "Positive power-of-two cut scaling, constrained to preserve every nonzero binary64 coefficient; canonical handover coefficients unchanged"
+    }
+  ],
+  "synthesis_run": false,
+  "limitations": [
+    "CPU timings are single-thread in-memory C++ path traversal, not FPGA latency.",
+    "Stock conifer HLS evaluates all nodes; its resource counts differ from path traversal.",
+    "Coefficient payload excludes topology, indices and padding; not BRAM/DSP/LUT utilization.",
+    "Common fixed-point formats are exploratory and not independently minimized for either model."
+  ],
+  "xgboost_metrics": {
+    "signal_efficiency_at_1pct_background": 0.5548207101844587,
+    "auc": 0.9205588061447421,
+    "strict_threshold": 2.8196048736572266,
+    "accepted_background": 525,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009997905200815067,
+    "strict_signal_efficiency": 0.5548207101844587
+  }
+}

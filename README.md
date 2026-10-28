@@ -60,12 +60,19 @@ CMSSW workspaces and Python environments live in ignored `workspaces/` directori
 The validated chain uses conifer 1.11 for conversion/HLS and the actual CMSSW 1.7
 external for this axis-aligned reference. It does not yet report FPGA synthesis resources.
 
-The [controlled constant-leaf study](docs/constant_leaf_study_v1.md) currently
-has **26/27 converged source runs**. Its best completed configuration is five
-D4 trees (1355 dense / 1250 nonzero coefficients), with 55.40% interpolated
-signal efficiency and 54.75% at a realizable threshold accepting at most 1%
-background. The remaining five-D4, split-L1 `1e-7` case is still training and
-excluded. This study does not replace the Compact refit handover default.
+The [controlled constant-leaf study](docs/constant_leaf_study_v1.md) is complete:
+**27/27 converged source runs**. Its winner is five D4 trees with constant leaves
+(1355 dense / 1250 nonzero coefficients): 55.40% interpolated signal efficiency,
+54.75% at a realizable threshold accepting at most 1% background.
+
+**Two candidates now compete for implementation:** this constant-leaf winner,
+which uses stock conifer 1.11 weighted cuts/scalar leaves, and the linear-leaf
+Compact refit (three D4 trees, 418 nonzeros, 56.20% signal efficiency), which
+needs a linear-leaf backend extension. [Current candidate pointers](fpga_handoff/CURRENT_CANDIDATES.json)
+and the [implementation comparison](docs/leaf_competition_v1/README.md) identify
+both, their exact model files, and reproduction commands. Arithmetic/storage
+counts and CPU emulation are available without a vendor license; FPGA resources
+and latency require synthesis. The historical v3 Compact refit default is retained.
 
 ## Technical writeup
 

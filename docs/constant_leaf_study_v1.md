@@ -1,6 +1,6 @@
 # Constant-leaf factorial study
 
-Converged source runs: 26/27.
+Converged source runs: 27/27.
 
 | Trees | Depth | Split L1 | Dense / nonzero | Interpolated signal efficiency [%] | Realizable signal efficiency [%] | Training compute [min] |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -16,7 +16,7 @@ Converged source runs: 26/27.
 
 Every selected snapshot is archived by SHA-256. Selected and terminal epochs, convergence flags, configuration and metrics are separate in the JSON.
 
-Pending cases: 52.
+Pending cases: none.
 
 Constant leaves have no penalized feature weights. The nominal leaf penalty does not affect their objective.
 

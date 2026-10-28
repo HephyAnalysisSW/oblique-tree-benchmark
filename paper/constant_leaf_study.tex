@@ -38,7 +38,7 @@ Layout & $\lambda_s$ & $P_{\rm dense}$ & $P_{\rm nz}$ & $\epsilon_s$ [\%] & $\ep
 \input{generated/constant_leaf_results.tex}\end{tabular}
 \end{table}
 
-The best completed constant configuration has \ConstantWinnerTrees{} trees of
+The selected constant configuration has \ConstantWinnerTrees{} trees of
 depth \ConstantWinnerDepth{}, with \ConstantWinnerNonzero{} nonzeros in
 \ConstantWinnerDense{} allocated slots. It reaches
 \ConstantWinnerEfficiency\% interpolated signal efficiency; its realizable
@@ -47,7 +47,6 @@ Figure~\ref{fig:constant} compares the depth-four constant forests with XGBoost
 and the sparse linear-leaf Compact refit. These are comparisons of selected
 configurations: their penalty and refitting histories differ, so the comparison
 is not a leaf-type ablation at identical support.
-
 \begin{figure}[htbp]\centering
 \includegraphics[width=\textwidth]{figures/constant_leaf_roc.pdf}
 \caption{Validation ROCs for the best completed constant-leaf configuration at
@@ -61,6 +60,64 @@ prediction on preconverted binary32 inputs. These follow-up measurements are sep
 and are not FPGA or single-event latency.}
 \label{fig:constant}
 \end{figure}
+\FloatBarrier
+
+For these candidates, linear predictions reduce the number of nonzero
+coefficients from 1250 to 418, a factor of 2.99, while increasing the
+interpolated signal efficiency from 55.40\% to 56.20\%.
+After eliminating only input-independent branches and exact-zero terms,
+the respective all-node multiplication counts are 1095 and 327; selected-path
+upper bounds are 275 and 80. The additional leaf arithmetic is therefore
+more than offset by the sparser, smaller forest in this comparison.
+These scalar operation counts do not determine synthesized resource use:
+precision, scheduling, constant-multiplier optimization and storage layout
+must also be specified.
+
+
+
+
+A matched compiled sparse traversal provides an additional CPU check. With
+one thread and the full 132,800-event validation batch, the median of nine
+repeats after one warmup is \LeafConstantCPU{} microseconds per event for
+the constant forest and \LeafLinearCPU{} for the linear forest.
+Both use binary64 arithmetic and the same traversal strategy; input conversion
+and file I/O are excluded. These are CPU batch measurements, with no inference
+about FPGA latency.
+
+For an exploratory reduced-precision comparison, each cut is first multiplied
+by a positive power of two, $w'_{tv}=2^{k_{tv}}w_{tv}$ and
+$b'_{tv}=2^{k_{tv}}b_{tv}$. This preserves its real-arithmetic decision; the
+exported binary64 scaling is constrained to retain every nonzero coefficient,
+and validation leaf assignments are checked before quantization.
+We use the nearest-even, saturating quantizer of Eq.~\eqref{eq:quantizer}, with
+10 integer bits for inputs, thresholds and cut accumulators, 6 for weights,
+and 16 for scores and leaf biases, all including sign. Every type uses the
+same fractional width $F$. Cast inputs and coefficients precede multiplication;
+cut products accumulate in feature order, with a cast to the cut-accumulator
+format after each addition. For a linear leaf, products accumulate similarly
+in the score format, followed by the leaf bias. The negative tree outputs are
+summed in the score format. Integer widths are conservatively checked against
+absolute partial-sum bounds in the observed training box; they have not been
+minimized separately for the two candidates.
+
+\begin{table}[htbp]\centering\small
+\caption{Common-format fixed-point emulation of the two selected leaf
+architectures. Efficiencies are percentages at 1\% background. Total widths
+are $F+10$ input/threshold bits, $F+6$ weight bits and $F+16$ score bits.}
+\label{tab:leafprecision}
+\begin{tabular}{@{}lrrr@{}}\toprule
+Leaf type & $F$ & $\epsilon_s$ [\%] & $\epsilon_s^{\rm strict}$ [\%]\\\midrule
+\input{generated/leaf_competition_precision.tex}\end{tabular}
+\end{table}
+At $F=12$, both architectures remain within 0.02 percentage points of their
+floating-point interpolated working-point efficiency (Table~\ref{tab:leafprecision}).
+For constant leaves, independent fixed-point path traversal and the existing
+weighted-cut backend agree exactly on all validation scores. The generated
+all-node HLS C++ implementation also agrees exactly on a 512-vector check at
+$F=12$. The linear-leaf evaluation uses an independent affine-leaf reference;
+a corresponding HLS backend extension and synthesis remain to be completed.
+These checks establish numerical feasibility at common precision, rather than
+an optimized FPGA resource comparison.
 
 \begin{implementation}
 \textbf{Controlled cohort and exact snapshots.}
@@ -83,6 +140,19 @@ PYTHONPATH=src:. python scripts/build_constant_leaf_study.py
 # Final gate: exits unsuccessfully while any source case is incomplete.
 PYTHONPATH=src:. python scripts/build_constant_leaf_study.py --require-complete
 \end{lstlisting}
+The two-candidate entry point is
+\file{fpga_handoff/CURRENT_CANDIDATES.json}. The constant winner is frozen in
+\code{fpga_handoff/leaf_competition_v1/constant_5t_d4/}; the linear candidate
+points to the unchanged v3 Compact refit. Both input spaces have canonical
+JSON, hexadecimal coefficients and golden vectors.
+\file{docs/leaf_competition_v1/README.md} records CPU/precision results and
+\file{scripts/run_leaf_competition.sh} reproduces them in the pinned EL9
+container. The scalar-leaf adapter uses unmodified conifer 1.11; the CMSSW
+1.7 external cannot evaluate oblique weights. The affine-leaf reference is
+\file{fpga/leaf_competition/emulate.cc}, not a conifer HLS backend extension.
+\file{scripts/verify_fpga_handoff.py} checks both candidates and both input
+spaces without a Python training stack.
+
 Training compute times and both probability-based and binary64-margin strict
 working points are retained in the snapshot and
 \file{docs/constant_leaf_study_v1.md}. Incomplete cases remain visible and are

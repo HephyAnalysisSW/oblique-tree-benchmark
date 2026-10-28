@@ -1,0 +1,143 @@
+{
+  "id": "constant_5t_d4",
+  "role": "constant_leaf_winner",
+  "model": "fpga_handoff/leaf_competition_v1/constant_5t_d4/standardized/model.json",
+  "model_sha256": "b4be7c85465a7fe567e1a514955bde9b6e7e94cc02ac1017f47d970a957a6905",
+  "raw_model": "fpga_handoff/leaf_competition_v1/constant_5t_d4/raw/model.json",
+  "checkpoint_sha256": "f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1",
+  "checkpoint": "models/constant_study_v1_selected/f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1.pkl",
+  "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51",
+  "configuration": {
+    "scan_name": "tao_hyper_scan_v1_c51",
+    "source_scan": null,
+    "task": "qg_vs_wzt",
+    "seed": 42,
+    "split_alpha": 0.0,
+    "leaf_alpha": 0.0,
+    "leaf_mode": "constant",
+    "local_leaf_max_iter": 300,
+    "global_leaf_chunk_iter": 250,
+    "split_max_iter": 300,
+    "leaf_ftol": 1e-12,
+    "leaf_gtol": 1e-08,
+    "convergence": {
+      "loss_rtol": 1e-05,
+      "kkt_tol": 1e-06,
+      "route_tol": 0.0001,
+      "patience": 3
+    },
+    "minimum_continuation_epochs": 5,
+    "layouts": [
+      {
+        "trees": 5,
+        "depth": 4
+      }
+    ],
+    "split_search": "hard_threshold",
+    "run_suffix": "hyper_scan_v1_c51",
+    "publication_prefix": "hyper_scan_v1",
+    "initialization": "cart",
+    "label": "CART sa=0 la=0",
+    "primary_metric": "signal_efficiency_at_fixed_fpr"
+  },
+  "selected_epoch": 23,
+  "source_terminal_epoch": 36,
+  "source_converged": true,
+  "selected_converged_at_save": false,
+  "validation": {
+    "accuracy": 0.8533057228915663,
+    "macro_auc": 0.9261036426056176,
+    "per_class_auc": {
+      "quark/gluon": 0.9261036442066402,
+      "W/Z/top": 0.9261036410045951
+    },
+    "macro_average_precision": 0.9145837612632549,
+    "per_class_average_precision": {
+      "quark/gluon": 0.8740812598882018,
+      "W/Z/top": 0.955086262638308
+    },
+    "cross_entropy": 0.3302065292331683,
+    "multiclass_brier_score": 0.20951782166957855,
+    "expected_calibration_error": 0.0027437659370970918,
+    "confidence_coverage": {
+      "0.5": {
+        "coverage": 1.0,
+        "accuracy": 0.8533057228915663
+      },
+      "0.7": {
+        "coverage": 0.7983960843373494,
+        "accuracy": 0.9117394625897177
+      },
+      "0.8": {
+        "coverage": 0.6679292168674699,
+        "accuracy": 0.9413422622067394
+      },
+      "0.9": {
+        "coverage": 0.5150150602409639,
+        "accuracy": 0.9713717577565284
+      },
+      "0.95": {
+        "coverage": 0.4049246987951807,
+        "accuracy": 0.9846580131662142
+      }
+    },
+    "confusion_matrix": [
+      [
+        45866,
+        6645
+      ],
+      [
+        12836,
+        67453
+      ]
+    ],
+    "fixed_fpr": 0.01,
+    "fixed_fpr_points": [
+      0.001,
+      0.01,
+      0.1
+    ],
+    "signal_efficiency_at_fixed_fpr": 0.5540031480028398,
+    "per_class_efficiency_at_fixed_fpr": {
+      "quark/gluon": 0.25899306811906075,
+      "W/Z/top": 0.5540031480028398
+    },
+    "per_class_efficiency_points": {
+      "quark/gluon": {
+        "0.001": 0.08134893879377655,
+        "0.01": 0.25899306811906075,
+        "0.1": 0.7348444741448112
+      },
+      "W/Z/top": {
+        "0.001": 0.2129711292954203,
+        "0.01": 0.5540031480028398,
+        "0.1": 0.8195898566428776
+      }
+    },
+    "signal_auc": 0.9261036410045951
+  },
+  "working_point": {
+    "signal_margin_threshold": 3.0789135240382617,
+    "comparison": ">",
+    "background_count": 52511,
+    "maximum_false_positives": 525,
+    "false_positives": 506,
+    "achieved_background_efficiency": 0.009636076250690332,
+    "signal_efficiency": 0.5475469865112282
+  },
+  "arithmetic": {
+    "dense_slots": 1355,
+    "nonzero_coefficients": 1250,
+    "reachable_nonzero_coefficients": 1250,
+    "split_feature_weights": 1095,
+    "leaf_feature_weights": 0,
+    "biases_or_constants": 155,
+    "reachable_all_node_multiplications": 1095,
+    "reachable_all_node_comparisons": 75,
+    "sparse_path_multiplications_bound": 275,
+    "sparse_path_comparisons_bound": 20,
+    "coefficient_value_bits_binary64": 80000,
+    "note": "Coefficient payload excludes topology/indices/padding. Arithmetic counts are not DSP/LUT counts or latency."
+  },
+  "conifer": "Stock conifer 1.11 weighted-cut/scalar-leaf backend; adapter required, no backend changes"
+}

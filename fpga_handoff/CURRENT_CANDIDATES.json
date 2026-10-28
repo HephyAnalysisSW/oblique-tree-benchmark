@@ -1,0 +1,8 @@
+{
+  "schema": "tree-benchmark.current-candidates.v1",
+  "manifest": "fpga_handoff/leaf_competition_v1/manifest.json",
+  "manifest_sha256": "fabdb25cf8022e4abadc48355da7364eac7a0ef3db0ff181e17b634a1951f2a4",
+  "linear_candidate": "compact_refit_3t_d4",
+  "constant_candidate": "constant_5t_d4",
+  "note": "Two competing algorithms. CURRENT_MODEL.json retains the historical linear implementation default. Neither is a synthesized resource winner."
+}

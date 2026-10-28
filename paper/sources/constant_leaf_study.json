@@ -1,53 +1,11 @@
 {
-  "updated_utc": "2026-10-27T15:05:01.042800+00:00",
+  "updated_utc": "2026-10-28T14:22:41.987029+00:00",
   "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
   "test_evaluated": false,
-  "complete": false,
-  "completed": 26,
+  "complete": true,
+  "completed": 27,
   "total": 27,
-  "pending": [
-    {
-      "case": {
-        "trees": 5,
-        "depth": 4,
-        "leaf_mode": "constant",
-        "split_alpha": 1e-07,
-        "leaf_alpha": 1e-07,
-        "kind": "factorial",
-        "index": 52,
-        "config": "configs/hyper_scan_v1/case_52.json",
-        "scan_name": "tao_hyper_scan_v1_c52",
-        "priority": 1
-      },
-      "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa1e-07_la1e-07_seed42_hyper_scan_v1_c52",
-      "status": {
-        "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa1e-07_la1e-07_seed42_hyper_scan_v1_c52",
-        "phase": "epoch",
-        "converged": false,
-        "epochs": 11,
-        "stable_epochs": 0,
-        "training_seconds": 46352.47337621008,
-        "leaf_max_iter": 300,
-        "last_convergence": {
-          "relative_objective_gain": 0.0003521389722815953,
-          "leaf_kkt_residual": 1.5177872073683456e-07,
-          "routing_change_fraction": 0.06747552710843374,
-          "inner_fits_converged": true,
-          "stable": false,
-          "stable_epochs": 0,
-          "converged": false
-        },
-        "epoch_progress": {
-          "tree_index": 2,
-          "stage": "split",
-          "leaf_index": 16,
-          "node_index": 13
-        },
-        "updated_utc": "2026-10-27T15:05:00.084905+00:00",
-        "test_evaluated": false
-      }
-    }
-  ],
+  "pending": [],
   "primary_metric": "interpolated signal efficiency at 1% background; signal AUC secondary",
   "selection": "best available saved checkpoint from a numerically converged source run; incomplete runs excluded",
   "models": [
@@ -291,9 +249,246 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 1.9332215453621493,
-        "median_cpu_seconds": 0.25672379500000275,
+        "median_microseconds_per_event": 1.8877310994647847,
+        "median_cpu_seconds": 0.25068175900000256,
         "note": "Bulk API throughput; not FPGA or single-event latency"
+      }
+    },
+    {
+      "case": {
+        "trees": 5,
+        "depth": 4,
+        "leaf_mode": "constant",
+        "split_alpha": 1e-07,
+        "leaf_alpha": 1e-07,
+        "kind": "factorial",
+        "index": 52,
+        "config": "configs/hyper_scan_v1/case_52.json",
+        "scan_name": "tao_hyper_scan_v1_c52",
+        "priority": 1
+      },
+      "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa1e-07_la1e-07_seed42_hyper_scan_v1_c52",
+      "configuration": {
+        "scan_name": "tao_hyper_scan_v1_c52",
+        "source_scan": null,
+        "task": "qg_vs_wzt",
+        "seed": 42,
+        "split_alpha": 1e-07,
+        "leaf_alpha": 1e-07,
+        "leaf_mode": "constant",
+        "local_leaf_max_iter": 300,
+        "global_leaf_chunk_iter": 250,
+        "split_max_iter": 300,
+        "leaf_ftol": 1e-12,
+        "leaf_gtol": 1e-08,
+        "convergence": {
+          "loss_rtol": 1e-05,
+          "kkt_tol": 1e-06,
+          "route_tol": 0.0001,
+          "patience": 3
+        },
+        "minimum_continuation_epochs": 5,
+        "layouts": [
+          {
+            "trees": 5,
+            "depth": 4
+          }
+        ],
+        "split_search": "hard_threshold",
+        "run_suffix": "hyper_scan_v1_c52",
+        "publication_prefix": "hyper_scan_v1",
+        "initialization": "cart",
+        "label": "CART sa=1e-07 la=1e-07",
+        "primary_metric": "signal_efficiency_at_fixed_fpr"
+      },
+      "source_checkpoint": "models/qg_vs_wzt_hardtao_constant_d4_n5_sa1e-07_la1e-07_seed42_hyper_scan_v1_c52_best_efficiency.pkl",
+      "checkpoint_sha256": "d9e6ae81be296431f0334fedb0a05466bea77fb7d2c9d023eaedeef1149ac1f2",
+      "immutable_checkpoint": "models/constant_study_v1_selected/d9e6ae81be296431f0334fedb0a05466bea77fb7d2c9d023eaedeef1149ac1f2.pkl",
+      "selected_epoch": 17,
+      "source_terminal_epoch": 23,
+      "source_converged": true,
+      "selected_converged_at_save": false,
+      "terminal_metrics": {
+        "accuracy": 0.8535918674698795,
+        "macro_auc": 0.9258954381090849,
+        "per_class_auc": {
+          "quark/gluon": 0.9258953401502268,
+          "W/Z/top": 0.925895536067943
+        },
+        "macro_average_precision": 0.9141008753094046,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8733499454048872,
+          "W/Z/top": 0.9548518052139221
+        },
+        "cross_entropy": 0.3311039629704285,
+        "multiclass_brier_score": 0.20986568927764893,
+        "expected_calibration_error": 0.003720784253743743,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8535918674698795
+          },
+          "0.7": {
+            "coverage": 0.8129292168674699,
+            "accuracy": 0.9077317820984281
+          },
+          "0.8": {
+            "coverage": 0.6777861445783132,
+            "accuracy": 0.9388290189978892
+          },
+          "0.9": {
+            "coverage": 0.5070256024096386,
+            "accuracy": 0.9717820385249432
+          },
+          "0.95": {
+            "coverage": 0.389894578313253,
+            "accuracy": 0.9851481324114488
+          }
+        },
+        "confusion_matrix": [
+          [
+            45989,
+            6522
+          ],
+          [
+            12921,
+            67368
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.543737124637248,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.25580887813981834,
+          "W/Z/top": 0.543737124637248
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07245780884005255,
+            "0.01": 0.25580887813981834,
+            "0.1": 0.7375071889699302
+          },
+          "W/Z/top": {
+            "0.001": 0.22365013420269278,
+            "0.01": 0.543737124637248,
+            "0.1": 0.8199568345067729
+          }
+        },
+        "signal_auc": 0.925895536067943
+      },
+      "selected_metrics": {
+        "accuracy": 0.8535918674698795,
+        "macro_auc": 0.9258911047934478,
+        "per_class_auc": {
+          "quark/gluon": 0.925891108114087,
+          "W/Z/top": 0.9258911014728086
+        },
+        "macro_average_precision": 0.9140885997518653,
+        "per_class_average_precision": {
+          "quark/gluon": 0.8733095980753025,
+          "W/Z/top": 0.9548676014284281
+        },
+        "cross_entropy": 0.33108791832046797,
+        "multiclass_brier_score": 0.20985881984233856,
+        "expected_calibration_error": 0.003666899474449884,
+        "confidence_coverage": {
+          "0.5": {
+            "coverage": 1.0,
+            "accuracy": 0.8535918674698795
+          },
+          "0.7": {
+            "coverage": 0.8118298192771084,
+            "accuracy": 0.9081355334798861
+          },
+          "0.8": {
+            "coverage": 0.6778539156626506,
+            "accuracy": 0.9386573945500394
+          },
+          "0.9": {
+            "coverage": 0.5044879518072289,
+            "accuracy": 0.9722371484864768
+          },
+          "0.95": {
+            "coverage": 0.3902183734939759,
+            "accuracy": 0.9852955365585381
+          }
+        },
+        "confusion_matrix": [
+          [
+            46006,
+            6505
+          ],
+          [
+            12938,
+            67351
+          ]
+        ],
+        "fixed_fpr": 0.01,
+        "fixed_fpr_points": [
+          0.001,
+          0.01,
+          0.1
+        ],
+        "signal_efficiency_at_fixed_fpr": 0.5443467292587346,
+        "per_class_efficiency_at_fixed_fpr": {
+          "quark/gluon": 0.2570837538801394,
+          "W/Z/top": 0.5443467292587346
+        },
+        "per_class_efficiency_points": {
+          "quark/gluon": {
+            "0.001": 0.07251394945820876,
+            "0.01": 0.2570837538801394,
+            "0.1": 0.7370054932213338
+          },
+          "W/Z/top": {
+            "0.001": 0.22360031417753368,
+            "0.01": 0.5443467292587346,
+            "0.1": 0.8200404609775757
+          }
+        },
+        "signal_auc": 0.9258911014728086
+      },
+      "strict_probability_working_point": {
+        "threshold": 0.956334114074707,
+        "accepted_background": 524,
+        "background_efficiency": 0.009978861571861133,
+        "signal_efficiency": 0.5442713198570165,
+        "budget": 525
+      },
+      "strict_working_point": {
+        "threshold": 3.0865404360809134,
+        "accepted_background": 524,
+        "background_efficiency": 0.009978861571861133,
+        "signal_efficiency": 0.5442713198570165,
+        "budget": 525
+      },
+      "sparsity": {
+        "dense_parameter_slots": 1355,
+        "nonzero_coefficients": 1264,
+        "nonzero_split_feature_weights": 1109,
+        "nonzero_leaf_feature_weights": 0,
+        "zero_coefficients": 91,
+        "structurally_reachable_internal_nodes": 75,
+        "structurally_reachable_leaves": 80,
+        "reachable_nonzero_coefficients": 1264,
+        "reachable_all_node_multiplications": 1109,
+        "selected_path_multiplications_upper_bound": 275,
+        "selected_path_comparisons_upper_bound": 20,
+        "note": "Exact zeros only. Unreachable branches removed only for identically constant split decisions. Counts are not FPGA latency/DSP estimates."
+      },
+      "training_compute_seconds": 87946.81444999971,
+      "terminal_convergence": {
+        "relative_objective_gain": 5.084129647951812e-13,
+        "leaf_kkt_residual": 5.094198543232959e-08,
+        "routing_change_fraction": 0.0,
+        "inner_fits_converged": true,
+        "stable": true,
+        "stable_epochs": 3,
+        "converged": true
       }
     },
     {
@@ -536,8 +731,8 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 1.2084305586562638,
-        "median_cpu_seconds": 0.16047184600000008,
+        "median_microseconds_per_event": 1.0746697439736383,
+        "median_cpu_seconds": 0.1427081589999979,
         "note": "Bulk API throughput; not FPGA or single-event latency"
       }
     },
@@ -3151,8 +3346,8 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 0.4479531142636236,
-        "median_cpu_seconds": 0.05948119700000021,
+        "median_microseconds_per_event": 0.42616237948665464,
+        "median_cpu_seconds": 0.05658869000000166,
         "note": "Bulk API throughput; not FPGA or single-event latency"
       }
     },
@@ -6953,8 +7148,8 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 0.4479531142636236,
-        "median_cpu_seconds": 0.05948119700000021,
+        "median_microseconds_per_event": 0.42616237948665464,
+        "median_cpu_seconds": 0.05658869000000166,
         "note": "Bulk API throughput; not FPGA or single-event latency"
       }
     },
@@ -7672,8 +7867,8 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 1.2084305586562638,
-        "median_cpu_seconds": 0.16047184600000008,
+        "median_microseconds_per_event": 1.0746697439736383,
+        "median_cpu_seconds": 0.1427081589999979,
         "note": "Bulk API throughput; not FPGA or single-event latency"
       }
     },
@@ -8391,8 +8586,8 @@
         "batch": 132800,
         "repeats": 9,
         "threads": 1,
-        "median_microseconds_per_event": 1.9332215453621493,
-        "median_cpu_seconds": 0.25672379500000275,
+        "median_microseconds_per_event": 1.8877310994647847,
+        "median_cpu_seconds": 0.25068175900000256,
         "note": "Bulk API throughput; not FPGA or single-event latency"
       }
     }
@@ -8637,8 +8832,8 @@
       "batch": 132800,
       "repeats": 9,
       "threads": 1,
-      "median_microseconds_per_event": 1.9332215453621493,
-      "median_cpu_seconds": 0.25672379500000275,
+      "median_microseconds_per_event": 1.8877310994647847,
+      "median_cpu_seconds": 0.25068175900000256,
       "note": "Bulk API throughput; not FPGA or single-event latency"
     }
   },
@@ -8648,24 +8843,24 @@
     "src/tao/initialization.py": "9ff360a6bfbaf27b6744cc288431f64b2973e050e15ea3c4d03b5d1fb5698d60",
     "src/tao/convergence.py": "7d41d2f192c45323742f4dd3174fd9bde843461289d5dbe9ad161164860a294e",
     "scripts/train_tao_fully.py": "7afdb59cbf2acaa5a02aa62a537187f3a55985d7a041eda5394ec49934699ce0",
-    "scripts/build_constant_leaf_study.py": "87f123c9cb83fd031e814ebe5c05dcb48ec62a2325ed8e49a562bb05efd51c29"
+    "scripts/build_constant_leaf_study.py": "168b81c6fd157f90c92be584435272cf4a6fb91cb35a582e28b67eae2afd0b93"
   },
   "comparison_timing": {
-    "host": "clip-login-1.cbe.vbc.ac.at",
+    "host": "clip-login-0.cbe.vbc.ac.at",
     "xgboost": {
       "batch": 132800,
       "repeats": 9,
       "threads": 1,
-      "median_microseconds_per_event": 1.1655157684427069,
-      "median_cpu_seconds": 0.15476214099999908,
+      "median_microseconds_per_event": 1.1894495032884809,
+      "median_cpu_seconds": 0.15795309499999988,
       "note": "Bulk API throughput; not FPGA or single-event latency"
     },
     "compact_refit": {
       "batch": 132800,
       "repeats": 9,
       "threads": 1,
-      "median_microseconds_per_event": 1.2215170083589941,
-      "median_cpu_seconds": 0.16220844000000056,
+      "median_microseconds_per_event": 1.0363096383565769,
+      "median_cpu_seconds": 0.13761465600000022,
       "note": "Bulk API throughput; not FPGA or single-event latency"
     },
     "input_dtype": "float64",
@@ -8676,7 +8871,7 @@
   "asset_hashes": {
     "sources/constant_leaf_winner.json": "5fd18cffd08b0cca904cf923fb6e0334db6e830e715bb616d3963b601cf7d59d",
     "generated/constant_leaf_results.tex": "106cc6fee631d217c9725bdd041fc97ea1e42f4ef8a8cf7677ce69689e31cea0",
-    "generated/constant_leaf_macros.tex": "d494df0003cf55e0a0aef058da3173a07a1d80808cfc7c3cc064f7d9ea4f3183",
-    "figures/constant_leaf_roc.pdf": "3952935abfbf580c4476ee1af3197d727c88e04cde9c6ca936de89b6c8d55057"
+    "generated/constant_leaf_macros.tex": "eed9359a8372606d1e9163d75d0fd841f04e57efe1cd7108d316957b5a2ea17d",
+    "figures/constant_leaf_roc.pdf": "c92c56d4c8588bdc343ebe36f189c378eb448c3ac95c7c1ae1e56eb2b2f82a30"
   }
 }

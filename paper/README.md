@@ -71,12 +71,14 @@ The paper distinguishes the validation-only oblique study from the historical
 XGBoost reproduction check, which evaluated the test split. The frozen model
 selection, coefficients and numerical training code are unchanged by this revision.
 
-## Constant leaves and fixed-point reference (27 October 2026)
+## Constant leaves and fixed-point reference (28 October 2026)
 
-The constant-leaf section is an explicitly provisional snapshot: **26/27**
-controlled CART-initialized configurations have converged. Case 52 (five trees,
-depth four, split L1 `1e-7`) is still training and is excluded. The best eligible
-constant model is separate from the frozen v3 Compact refit handover default.
+All **27/27** controlled CART-initialized constant-leaf configurations have
+converged. The last case (five trees, depth four, split L1 `1e-7`) did not change
+the winner. The best constant forest and sparse linear Compact refit are now
+identified together in `fpga_handoff/CURRENT_CANDIDATES.json`; their exact
+models and training provenance are linked by the competition manifest.
+The v3 linear model and its original pointer remain unchanged.
 
 `constant_leaf_study.tex` reads tables/macros from `generated/` and provenance
 from `sources/constant_leaf_study.json`. With the archived checkpoints and fixed
@@ -95,9 +97,9 @@ ROC timing labels use nine uncached prediction repeats; XGBoost uses
 on float64 inputs. They measure current batch APIs, not FPGA latency.
 
 The focused continuation monitor `scripts/prioritize_constant_scan.py` coordinates
-clean continuations through the existing scheduler. It regenerates numerical
-assets after all 27 constant cases converge, but does not compile, commit or
-publish a new paper automatically. Review the regenerated results, rebuild both
+clean continuations through the existing scheduler. It regenerated numerical
+assets when all 27 constant cases converged, then exited. It does not compile,
+commit or publish a new paper automatically. Review the regenerated results, rebuild both
 editions and inspect their rendered pages before publishing an updated snapshot.
 
 `xgboost_emulation.tex` documents the fixed-point quantizer, range bounds and
@@ -105,3 +107,14 @@ precision comparison. Regenerate its table with `python3 paper/build_precision_t
 Its numbers are frozen from
 `docs/conifer_xgboost_v1/validation.json`; the full reproduction commands are in
 `docs/conifer_xgboost_v1/README.md`. No FPGA synthesis result is claimed.
+
+## Two-candidate emulator comparison
+
+`generated/leaf_competition_precision.tex` and `leaf_competition_macros.tex`
+come from the completed shared C++ emulator run. Regenerate them and the
+reviewable report with `python3 scripts/publish_leaf_competition.py` from the
+repository root, after reproducing `scripts/run_leaf_competition.sh`.
+The full scientific section specifies the common quantizer and accumulation
+rules. Blue notes give backend names, versions, model pointers and commands.
+This measures CPU batch time and arithmetic/storage proxies; synthesized FPGA
+resource consumption and latency are pending.

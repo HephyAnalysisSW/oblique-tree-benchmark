@@ -148,7 +148,7 @@ def main():
  for r in best_by_layout:
   c=r['case'];s=r['sparsity'];lines.append(f"| {c['trees']} | {c['depth']} | {c['split_alpha']:g} | {s['dense_parameter_slots']} / {s['nonzero_coefficients']} | {100*efficiency(r['selected_metrics']):.3f} | {100*r['strict_working_point']['signal_efficiency']:.3f} | {r['training_compute_seconds']/60:.1f} |")
  lines+=['','Every selected snapshot is archived by SHA-256. Selected and terminal epochs, convergence flags, configuration and metrics are separate in the JSON.',
-  '', 'Pending cases: '+', '.join(str(r['case']['index']) for r in pending)+'.',
+  '', 'Pending cases: '+(', '.join(str(r['case']['index']) for r in pending) or 'none')+'.',
   '', 'Constant leaves have no penalized feature weights. The nominal leaf penalty does not affect their objective.',
   '', 'Validation only. This controlled CART-initialized cohort is separate from the older seven-layout random-initialization study.']
  (ROOT/'docs/constant_leaf_study_v1.md').write_text('\n'.join(lines)+'\n')

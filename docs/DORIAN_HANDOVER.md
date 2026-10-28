@@ -1,12 +1,18 @@
-# Dorian: implement Compact refit from FPGA bundle v3
+# Dorian: compare constant and linear leaf winners
 
-**Start with `fpga_handoff/v3/compact_refit_3t_d4/`. This is the implementation default chosen by Robert.** The higher-efficiency model is an alternative, not the default. `fpga_handoff/CURRENT_MODEL.json` is authoritative. v1 and v2 are historical immutable snapshots.
+**Implement and compare two candidates:** `constant_5t_d4` (constant leaves,
+stock conifer 1.11 backend) and `compact_refit_3t_d4` (linear leaves, requires a
+backend extension). Their authoritative joint entry point is
+[`fpga_handoff/CURRENT_CANDIDATES.json`](../fpga_handoff/CURRENT_CANDIDATES.json).
+Neither is yet a synthesized resource winner. `CURRENT_MODEL.json` retains the
+historical Compact refit default; the frozen v3 bundle is unchanged.
 
 Repository: https://github.com/HephyAnalysisSW/oblique-tree-benchmark (branch `main`). Reference CLIP checkout: `/users/robert.schoefbeck/CMS/tree_benchmark`. Use your own checkout for training; the reference checkout contains archived checkpoints and ongoing independent studies.
 
-| Role | v3 candidate directory | Architecture | Dense / nonzero coefficients | Reachable nonzero | Sparse path MAC bound | Signal efficiency at 1% background | AUC |
+| Role | Candidate directory (v3 unless stated) | Architecture | Dense / nonzero coefficients | Reachable nonzero | Sparse path MAC bound | Signal efficiency at 1% background | AUC |
 |---|---|---|---:|---:|---:|---:|---:|
-| **DEFAULT: Compact refit** | `compact_refit_3t_d4` | 3 hard oblique trees, depth 4, linear leaves | 1581 / 418 | 379 | 80 | **56.20%** | 0.92733 |
+| **Linear winner: Compact refit** | `compact_refit_3t_d4` | 3 hard oblique trees, depth 4, linear leaves | 1581 / 418 | 379 | 80 | **56.20%** | 0.92733 |
+| **Constant winner** | `leaf_competition_v1/constant_5t_d4` (outside v3) | 5 hard oblique trees, depth 4, scalar leaves | 1355 / 1250 | 1250 | 275 | **55.40%** | 0.92610 |
 | Higher efficiency alternative | `highest_efficiency_3t_d4` | 3 hard oblique trees, depth 4, linear leaves | 1581 / 837 | 837 | 163 | 57.12% | 0.92967 |
 | One-tree alternative | `single_tree_1t_d4` | 1 hard oblique tree, depth 4, linear leaves | 527 / 452 | 452 | 65 | 55.63% | 0.92704 |
 | XGBoost reference | `xgboost_reference` | 100 axis-aligned trees, depth 4, constant leaves | 3099 / not counted | — | — | 55.48% | 0.92056 |
@@ -17,24 +23,49 @@ All metrics in this handover use the unchanged validation split. The oblique stu
 
 Compact refit remains the pinned v3 default; its coefficients and the two v3 alternatives are unchanged. The L1 path study is complete (16/16), the support-refit scan is terminal (6 converged full refits and 4 held outcomes), and the broader architecture scan has 37/58 converged cases with three jobs running in the checked snapshot. The provisional five-tree 57.13% result is not a new handover model. See the [dated research update and checkpoint provenance](handover_status_2026-10-26.md).
 
-## Conifer reference and constant leaves (27 October 2026)
+## Competing leaf algorithms (28 October 2026)
 
-The [XGBoost emulator chain](conifer_xgboost_v1/README.md) is validated in EL9:
-conifer 1.11 conversion/HLS C++ and the actual CMSSW conifer 1.7 external.
-[Precision results](conifer_xgboost_v1/results.md) include realizable 1% background
-thresholds and exact cross-emulator checks. No synthesis has been run. The old
-CMSSW external supports axis-aligned cuts; oblique inference needs an updated
-bridge, and linear leaves need an extension beyond the scalar-leaf converter.
+All **27/27** controlled constant-leaf scan configurations converged. The last
+case did not change the winner. The [final scan table](constant_leaf_study_v1.md)
+and [paper](../paper/main.pdf) document the selection and its convergence.
 
-The [controlled constant-leaf study](constant_leaf_study_v1.md) is **26/27
-converged**, with the last five-D4, split-L1 `1e-7` configuration still training.
-The best completed constant forest is five D4 trees: 1355 dense slots, 1250 exact
-nonzero coefficients, 55.40% interpolated / 54.75% realizable signal efficiency
-at at most 1% background. Its portable model and exact checkpoint provenance
-are in `paper/sources/constant_leaf_winner.json` and `constant_leaf_study.json`.
-It is a research comparison; **Compact refit remains the implementation default**.
-The [paper](../paper/main.pdf) and [annotated edition](../paper/annotated.pdf)
-include the constant scan and fixed-point reference.
+| Candidate | Architecture | Dense / nonzero | Signal efficiency at 1% bkg (interpolated / realizable) | Sparse path MUL / comparisons | All reachable MUL |
+|---|---|---:|---:|---:|---:|
+| Constant winner | 5 x D4, scalar leaves | 1355 / 1250 | 55.40% / 54.75% | 275 / 20 | 1095 |
+| Linear winner: Compact refit | 3 x D4, affine leaves | 1581 / 418 | 56.20% / 56.20% | 80 / 12 | 327 |
+
+The joint [competition manifest](../fpga_handoff/leaf_competition_v1/manifest.json)
+records exact model/checkpoint hashes, configuration, selected/terminal epochs,
+validation metrics and arithmetic counts. Its constant candidate is frozen at
+`fpga_handoff/leaf_competition_v1/constant_5t_d4/`; both `standardized/` and `raw/`
+contain `model.json`, hexadecimal `model_coefficients.h`, 458 golden `vectors.tsv`
+and `expected.tsv` (signal margin followed by five leaf indices). Row indices
+and labels are at candidate level. The shared feature order/scaler/ranges remain
+`fpga_handoff/v3/input_contract.json`. Constant leaf rows contain **one scalar**;
+linear leaf rows contain **16 weights plus bias**. Selected checkpoints can
+precede the converged source run's terminal epoch.
+
+The constant model needs an export adapter, supplied by
+`fpga.leaf_competition.models.conifer_constant`; it does **not** require changes
+to conifer 1.11's weighted-cut, scalar-leaf C++/HLS backends. The installed CMSSW
+conifer **1.7** external is older and axis-aligned: use the pinned 1.11 backend
+for the constant oblique model. Linear leaves require extending that backend.
+`fpga/leaf_competition/emulate.cc` provides an independent sparse reference for
+both leaf types, including exploratory fixed-point emulation. It is not a
+finished linear-leaf conifer/HLS extension.
+
+See the [emulator comparison and reproduction guide](leaf_competition_v1/README.md).
+It separates the matched C++ path-traversal timings, exact-zero coefficient
+payload and arithmetic bounds from stock conifer's all-node HLS evaluation.
+**No DSP/LUT/BRAM utilization, hardware latency or initiation interval is claimed.**
+Use the same target, clock, interface and precision/accuracy requirement when
+synthesis becomes available. Do not equate multiplication counts with DSPs.
+The models have different training/refit histories, so this is an implementation
+candidate comparison, not a controlled leaf-type ablation.
+
+The [XGBoost reference chain](conifer_xgboost_v1/README.md) remains the independent
+axis-aligned baseline. Its [precision results](conifer_xgboost_v1/results.md)
+include realizable thresholds and cross-emulator checks.
 
 ## Implementation files and verification
 
@@ -49,7 +80,7 @@ For the default, use either `fpga_handoff/v3/compact_refit_3t_d4/standardized/` 
 
 The shared `fpga_handoff/v3/input_contract.json` gives all 16 features in exact order and training-only scaler/ranges. The other two oblique candidates use the identical file layout. XGBoost is its native JSON plus standardized vectors and expected signal probabilities.
 
-Inference: right iff `dot(w,x)+bias > 0`; equality goes left. Heap root 0, left `2*j+1`, right `2*j+2`; leaf index is `node-(2**depth-1)`. Leaf row is `[16 weights,bias]`. **Signal margin is the negative sum of the selected leaf outputs**, with no averaging. Compare the margin directly; sigmoid is unnecessary. Standardized inputs are `(raw-mean)/scale`. The raw variant already folds this into its coefficients; do not standardize again. Raw here means high-level features, not detector inputs.
+Inference: right iff `dot(w,x)+bias > 0`; equality goes left. Heap root 0, left `2*j+1`, right `2*j+2`; leaf index is `node-(2**depth-1)`. A linear leaf row is `[16 weights,bias]`; a constant leaf row is one scalar. **Signal margin is the negative sum of the selected leaf outputs**, with no averaging. Compare the margin directly; sigmoid is unnecessary. Standardized inputs are `(raw-mean)/scale`. The raw variant already folds this into its coefficients; do not standardize again. Raw here means high-level features, not detector inputs.
 
 Each input-space JSON has its own implementable strict `>` threshold. Do not copy a threshold between raw and standardized variants or substitute the interpolated ROC point. The JSON records accepted validation background counts; quantized hardware needs a new validation of its operating point.
 
