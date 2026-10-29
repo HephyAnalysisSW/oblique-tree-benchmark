@@ -1,49 +1,44 @@
 # Tree Benchmark for OpenML 42468 Jet Classification
 
-This directory benchmarks XGBoost and hard oblique TAO forests on the fixed
-jet-classification splits from the low-precision FPGA benchmark. GOLLUM hard and
-soft tree sources are archived under `vendor/gollum/`; the hard TAO adapter is
-under `src/tao/`. Neural-network training and FPGA synthesis are not yet included.
+This repository compares axis-aligned trees with linear leaves, oblique trees
+with constant leaves, and oblique trees with linear leaves against the frozen
+XGBoost reference, on the original fixed jet-classification splits.
 
-## FPGA implementation default for Dorian — v3 Compact refit
+## Final paper comparison and FPGA handover — 29 October 2026
 
-**Implement `fpga_handoff/v3/compact_refit_3t_d4/`.** This is Robert's selected
-FPGA default: three depth-4 hard oblique trees with linear leaves, **418 nonzero
-coefficients in 1,581 dense slots**, 379 structurally reachable coefficients,
-and **56.20% signal efficiency at 1% background acceptance** (validation AUC
-0.92733). Its support was selected with split/leaf L1 `0.003/1e-5`, then surviving
-split and leaf coefficients were refitted without L1 inside immutable masks.
-The selected checkpoint is full-refit pass 8; its source stage converged at
-pass 15. The selected snapshot itself is not claimed stationary.
+Start with **[Dorian's final handover](docs/DORIAN_HANDOVER.md)** and
+[`CURRENT_COMPARISON.json`](fpga_handoff/CURRENT_COMPARISON.json). The immutable
+[`comparison_v1` manifest](fpga_handoff/comparison_v1/manifest.json) pins all ten
+selected entries, exact standardized coefficients, training/configuration
+pointers, golden vectors and measured C++/arithmetic results. No synthesized
+hardware winner is selected.
 
-**Status rechecked 2026-10-26:** the v3 Compact refit default is unchanged. L1 paths: 16/16 converged; support refits: 6 converged full stages plus 4 held cases; architecture scan: 37/58 converged, three jobs running in the checked snapshot. The new five-tree 57.13% point is provisional. See the [dated update](docs/handover_status_2026-10-26.md) for exact saved-checkpoint metrics and hashes.
+| Candidate | Layout | Learned nonzero scalars | Signal efficiency at 1% background | MUL path / all |
+|---|---|---:|---:|---:|
+| Axis/linear winner | 3 × D4 | 479 + 45 discrete cut choices | 56.32% | 35 / 386 |
+| Oblique/constant winner | 5 × D4 | 1250 | 55.40% (54.75% realizable) | 272 / 1088 |
+| Oblique/linear performance winner | 5 × D4 | 1275 | 57.73% | 212 / 1096 |
+| Compressed oblique/linear Compact refit | 3 × D4 | 418 | 56.20% | 78 / 325 |
+| XGBoost reference | 100 × D4 | 3099 + 1499 feature indices | 55.48% | 0 / 0 |
 
-Read **[Dorian's handover](docs/DORIAN_HANDOVER.md)** for exact coefficients,
-source checkpoint hashes, training scripts/configuration chain, Conda setup,
-reproduction commands and verification. The authoritative pointer is
-[`fpga_handoff/CURRENT_MODEL.json`](fpga_handoff/CURRENT_MODEL.json); the frozen
-[v3 manifest](fpga_handoff/v3/manifest.json) pins every implementation file.
-[The inference contract](fpga_handoff/README.md) and
-[v3 comparison](fpga_handoff/v3/comparison.md) describe the portable interface.
+Read the [full ten-row comparison](docs/ten_model_comparison_v1/table.md),
+[scientific paper](paper/main.pdf) and [annotated implementation edition](paper/annotated.pdf).
+The common C++ reference is a measured CPU traversal, not FPGA latency. Its
+product counts eliminate exact-zero and unit factors; additions, comparisons,
+preprocessing and storage overhead remain separate. Historical bundles and the
+old Compact default remain reproducible; the current three-family comparison
+is pinned by the new pointer.
 
-| Role | v3 candidate | Architecture | Dense / nonzero | Efficiency at 1% background |
-|---|---|---|---:|---:|
-| **DEFAULT: Compact refit** | `compact_refit_3t_d4` | 3 x D4, linear leaves | 1581 / 418 | **56.20%** |
-| Higher-efficiency alternative | `highest_efficiency_3t_d4` | 3 x D4, linear leaves | 1581 / 837 | 57.12% |
-| One-tree alternative | `single_tree_1t_d4` | 1 x D4, linear leaves | 527 / 452 | 55.63% |
-| XGBoost reference | `xgboost_reference` | 100 x D4, constant leaves | 3099 / not counted | 55.48% |
+Verify without datasets or a training stack:
 
-The default is chosen for compression, not maximum efficiency. Values are
-validation point estimates, not independent test results; the test set remains
-untouched. All six standardized/raw C++ variants passed **1,594 golden vector
-evaluations** with exact routes and margin error below 2.5e-14. Hardware precision,
-resource usage and latency still require implementation and synthesis. v1 and
-v2 remain unchanged historical bundles; do not use their older defaults for new
-work. The current Python suite passes **81 tests**.
+```bash
+python3 scripts/verify_comparison_handoff.py --compiler c++
+```
 
-[ROC](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/support_refit_scan_v1_roc.png)
-· [screenshot table with timings](https://schoef.web.cern.ch/schoef/tree_benchmark/plots/comparisons/current_winner_comparison.png)
-· [support-refit study](#support-refit-current).
+The hard TAO implementation is under `src/tao/`, with isolated axis search in
+`axis.py`; original GOLLUM sources remain under `vendor/gollum/`. Neural-network
+training and FPGA synthesis are outside this completed comparison. The remaining
+README documents the detailed and historical training studies.
 
 The methodological rule is:
 

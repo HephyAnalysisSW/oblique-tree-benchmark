@@ -1,0 +1,21 @@
+\Needspace{16\baselineskip}
+\section{Input feature order}
+\label{app:features}
+Table~\ref{tab:features} defines the coordinates $r_f$ of the archived feature
+vector, using the source dataset's feature names. All displayed cuts use their
+standardized counterparts $x_f$ from Eq.~\eqref{eq:standardization}.
+\begin{table}[H]\centering\small
+\caption{Feature-coordinate convention. Names identify columns in the
+high-level jet dataset~\cite{openml42468}.}\label{tab:features}
+\begin{tabular}{@{}rlrl@{}}\toprule
+$f$ & Dataset feature & $f$ & Dataset feature\\\midrule
+1 & \texttt{zlogz} & 9 & \texttt{d2\_a1\_b1\_mmdt}\\
+2 & \texttt{c1\_b0\_mmdt} & 10 & \texttt{d2\_a1\_b2\_mmdt}\\
+3 & \texttt{c1\_b1\_mmdt} & 11 & \texttt{m2\_b1\_mmdt}\\
+4 & \texttt{c1\_b2\_mmdt} & 12 & \texttt{m2\_b2\_mmdt}\\
+5 & \texttt{c2\_b1\_mmdt} & 13 & \texttt{n2\_b1\_mmdt}\\
+6 & \texttt{c2\_b2\_mmdt} & 14 & \texttt{n2\_b2\_mmdt}\\
+7 & \texttt{d2\_b1\_mmdt} & 15 & \texttt{mass\_mmdt}\\
+8 & \texttt{d2\_b2\_mmdt} & 16 & \texttt{multiplicity}\\\bottomrule
+\end{tabular}
+\end{table}

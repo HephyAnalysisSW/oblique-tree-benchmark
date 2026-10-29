@@ -1,0 +1,467 @@
+{
+  "complete": true,
+  "created_utc": "2026-10-29T08:54:35.577464+00:00",
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "events": 132800,
+  "test_evaluated": false,
+  "host": "clip-c2-48.cbe.vbc.ac.at",
+  "compiler": "g++ (GCC) 12.3.1 20230527",
+  "cpp_fixture_checks": [
+    {
+      "sign": 1.0,
+      "linear": false,
+      "passed": true
+    },
+    {
+      "sign": 1.0,
+      "linear": true,
+      "passed": true
+    },
+    {
+      "sign": -1.0,
+      "linear": false,
+      "passed": true
+    },
+    {
+      "sign": -1.0,
+      "linear": true,
+      "passed": true
+    }
+  ],
+  "rows": [
+    {
+      "id": "xgboost",
+      "family": "XGBoost reference",
+      "learned_nonzero_scalars": 3099,
+      "stored_nonzero_scalars": 3099,
+      "extra_cut_indices": 1499,
+      "source_status": "Frozen reference",
+      "layout": {
+        "trees": 100,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5548207101844587,
+        "auc": 0.920558806144742,
+        "strict_threshold": 2.819604839677922,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5548207101844587
+      },
+      "cpu": {
+        "checksum": 150467.56458669453,
+        "events": 132800,
+        "median_microseconds_per_event": 3.67543781626506,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 0,
+        "all_node_multiplications": 0,
+        "path_comparisons": 400,
+        "all_node_comparisons": 1499
+      },
+      "model_sha256": "d5682800392b1e09eaa4b1b37ec3aaa003e463339a18a3170ab42add317db603",
+      "canonical_margin_error": {
+        "max_abs": 2.884829299887315e-06,
+        "mean_abs": 4.3858867281687096e-07,
+        "exact_mismatches": 132800
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "axis_linear_d4_n3",
+      "family": "Axis / linear",
+      "learned_nonzero_scalars": 479,
+      "stored_nonzero_scalars": 524,
+      "extra_cut_indices": 45,
+      "source_status": "Regularized; refit held",
+      "expected_efficiency": 0.5632153844237692,
+      "checkpoint": "models/ten_model_comparison_v1_selected/c11f27d25ec85becf848de1d7487bd5d74707d540ffdf8ad62a9cbcb1db4d91b.pkl",
+      "checkpoint_sha256": "c11f27d25ec85becf848de1d7487bd5d74707d540ffdf8ad62a9cbcb1db4d91b",
+      "layout": {
+        "trees": 3,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5632153844237692,
+        "auc": 0.9257642477164258,
+        "strict_threshold": 3.036239713620472,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5632153844237692
+      },
+      "cpu": {
+        "checksum": 175820.3854246123,
+        "events": 132800,
+        "median_microseconds_per_event": 0.10076046686746988,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 35,
+        "all_node_multiplications": 386,
+        "path_comparisons": 12,
+        "all_node_comparisons": 45
+      },
+      "model_sha256": "1a263acf86de71363fb9dd09aa68f8831c74ddcd69bdb38c881be1491955286a",
+      "canonical_margin_error": {
+        "max_abs": 6.217248937900877e-15,
+        "mean_abs": 4.233467241424339e-16,
+        "exact_mismatches": 81008
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "axis_linear_d4_n1",
+      "family": "Axis / linear",
+      "learned_nonzero_scalars": 228,
+      "stored_nonzero_scalars": 243,
+      "extra_cut_indices": 15,
+      "source_status": "Leaf refit converged",
+      "expected_efficiency": 0.5473975264357509,
+      "checkpoint": "models/ten_model_comparison_v1_selected/dbb6fff5a84c25acc8a05f92c96c52cac4f3ccc37a739c2b9c01bba6e35659c2.pkl",
+      "checkpoint_sha256": "dbb6fff5a84c25acc8a05f92c96c52cac4f3ccc37a739c2b9c01bba6e35659c2",
+      "layout": {
+        "trees": 1,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5473975264357509,
+        "auc": 0.9238652175304918,
+        "strict_threshold": 3.1078649086002192,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5473975264357509
+      },
+      "cpu": {
+        "checksum": 169385.09601050877,
+        "events": 132800,
+        "median_microseconds_per_event": 0.04845728162650602,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 16,
+        "all_node_multiplications": 197,
+        "path_comparisons": 4,
+        "all_node_comparisons": 15
+      },
+      "model_sha256": "e50e959d8451b93bb2fd9ebfc09dcb819a84de705b99fccf6dabc8f39a307ee7",
+      "canonical_margin_error": {
+        "max_abs": 1.9539925233402755e-14,
+        "mean_abs": 8.37075138120476e-16,
+        "exact_mismatches": 81201
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "axis_linear_d3_n1",
+      "family": "Axis / linear",
+      "learned_nonzero_scalars": 132,
+      "stored_nonzero_scalars": 139,
+      "extra_cut_indices": 7,
+      "source_status": "Leaf refit converged",
+      "expected_efficiency": 0.5010026280063271,
+      "checkpoint": "models/ten_model_comparison_v1_selected/e96b08c2631f849ff143ad4a227560895347b7115873d03eb02d7e8980f54b95.pkl",
+      "checkpoint_sha256": "e96b08c2631f849ff143ad4a227560895347b7115873d03eb02d7e8980f54b95",
+      "layout": {
+        "trees": 1,
+        "depth": 3
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5010026280063271,
+        "auc": 0.9202037654114198,
+        "strict_threshold": 3.2592188590207334,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5010026280063271
+      },
+      "cpu": {
+        "checksum": 159320.86598631582,
+        "events": 132800,
+        "median_microseconds_per_event": 0.048815000000000004,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 16,
+        "all_node_multiplications": 117,
+        "path_comparisons": 3,
+        "all_node_comparisons": 7
+      },
+      "model_sha256": "d4ff1a8a7b317935b9531db4d892a567b28d5207df09977a82b393f715e2107c",
+      "canonical_margin_error": {
+        "max_abs": 1.2434497875801753e-14,
+        "mean_abs": 8.499350821538317e-16,
+        "exact_mismatches": 81613
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "oblique_constant_d4_n5",
+      "family": "Oblique / constant",
+      "learned_nonzero_scalars": 1250,
+      "stored_nonzero_scalars": 1250,
+      "extra_cut_indices": 0,
+      "source_status": "Regularized; source converged",
+      "expected_efficiency": 0.5540031480028398,
+      "checkpoint": "models/ten_model_comparison_v1_selected/f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1.pkl",
+      "checkpoint_sha256": "f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1",
+      "layout": {
+        "trees": 5,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5540031480028398,
+        "auc": 0.9261036412417836,
+        "strict_threshold": 3.0789135240382617,
+        "accepted_background": 506,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009636076250690332,
+        "strict_signal_efficiency": 0.5475469865112282
+      },
+      "cpu": {
+        "checksum": 172242.3295053188,
+        "events": 132800,
+        "median_microseconds_per_event": 0.9651705572289156,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 272,
+        "all_node_multiplications": 1088,
+        "path_comparisons": 20,
+        "all_node_comparisons": 75
+      },
+      "model_sha256": "5fd18cffd08b0cca904cf923fb6e0334db6e830e715bb616d3963b601cf7d59d",
+      "canonical_margin_error": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "exact_mismatches": 0
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "oblique_constant_d4_n3",
+      "family": "Oblique / constant",
+      "learned_nonzero_scalars": 753,
+      "stored_nonzero_scalars": 753,
+      "extra_cut_indices": 0,
+      "source_status": "Regularized; source converged",
+      "expected_efficiency": 0.5353551329476114,
+      "checkpoint": "models/ten_model_comparison_v1_selected/84d7607b2486193174a488fbff04d18ecb7711553de7c2a23646ef14c7b8f1fd.pkl",
+      "checkpoint_sha256": "84d7607b2486193174a488fbff04d18ecb7711553de7c2a23646ef14c7b8f1fd",
+      "layout": {
+        "trees": 3,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5353551329476114,
+        "auc": 0.9231827700679662,
+        "strict_threshold": 3.042350795785705,
+        "accepted_background": 511,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.00973129439546,
+        "strict_signal_efficiency": 0.5329995391647673
+      },
+      "cpu": {
+        "checksum": 163097.56724176413,
+        "events": 132800,
+        "median_microseconds_per_event": 0.5420589231927712,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 160,
+        "all_node_multiplications": 656,
+        "path_comparisons": 12,
+        "all_node_comparisons": 45
+      },
+      "model_sha256": "ce8a78ef786f879c6ea08f5f29df9cc028a6f5d19974af087e3928785964aba1",
+      "canonical_margin_error": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "exact_mismatches": 0
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "oblique_constant_d4_n1",
+      "family": "Oblique / constant",
+      "learned_nonzero_scalars": 256,
+      "stored_nonzero_scalars": 256,
+      "extra_cut_indices": 0,
+      "source_status": "Regularized; source converged",
+      "expected_efficiency": 0.4535519613108489,
+      "checkpoint": "models/ten_model_comparison_v1_selected/7a8ef326aaac665dce92dd0ef89d452ae293d7322debed9c469b5879cf982c85.pkl",
+      "checkpoint_sha256": "7a8ef326aaac665dce92dd0ef89d452ae293d7322debed9c469b5879cf982c85",
+      "layout": {
+        "trees": 1,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.4535519613108489,
+        "auc": 0.9124717036261892,
+        "strict_threshold": 2.792076299757433,
+        "accepted_background": 524,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009978861571861133,
+        "strict_signal_efficiency": 0.4533248639290563
+      },
+      "cpu": {
+        "checksum": 140566.51989592993,
+        "events": 132800,
+        "median_microseconds_per_event": 0.1711540813253012,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 64,
+        "all_node_multiplications": 224,
+        "path_comparisons": 4,
+        "all_node_comparisons": 15
+      },
+      "model_sha256": "ca5928d0eac6fa76674ee619b864db8d66041411d88854adc2353f3195cb7072",
+      "canonical_margin_error": {
+        "max_abs": 0.0,
+        "mean_abs": 0.0,
+        "exact_mismatches": 0
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "oblique_linear_performance_winner",
+      "family": "Oblique / linear",
+      "learned_nonzero_scalars": 1275,
+      "stored_nonzero_scalars": 1275,
+      "extra_cut_indices": 0,
+      "source_status": "Regularized; source converged",
+      "expected_efficiency": 0.5773019965375082,
+      "checkpoint": "models/ten_model_comparison_v1_selected/453ab170a1fc2260393f20f06fb41f610b037860ef79ffd85f71db1be1785239.pkl",
+      "checkpoint_sha256": "453ab170a1fc2260393f20f06fb41f610b037860ef79ffd85f71db1be1785239",
+      "layout": {
+        "trees": 5,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5773019965375082,
+        "auc": 0.9309044767954546,
+        "strict_threshold": 3.0244808619936423,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5773019965375082
+      },
+      "cpu": {
+        "checksum": 177648.7337118989,
+        "events": 132800,
+        "median_microseconds_per_event": 0.41169161144578315,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 212,
+        "all_node_multiplications": 1096,
+        "path_comparisons": 20,
+        "all_node_comparisons": 75
+      },
+      "model_sha256": "2f4849b9ebf3122ddc0fb237fc1786ba4f55aed78bb9f69c6b9e40132a1a5557",
+      "canonical_margin_error": {
+        "max_abs": 8.881784197001252e-15,
+        "mean_abs": 8.462108607540208e-16,
+        "exact_mismatches": 87663
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "highest_efficiency_3t_d4",
+      "family": "Oblique / linear",
+      "learned_nonzero_scalars": 837,
+      "stored_nonzero_scalars": 837,
+      "extra_cut_indices": 0,
+      "source_status": "Leaf refit converged",
+      "expected_efficiency": 0.5711616784366476,
+      "source_model": "fpga_handoff/v3/highest_efficiency_3t_d4/standardized/model.json",
+      "model_sha256": "cc1a7f9b7291ff03478d95836d51775309238fc1faf7765e10f05a4a267c2cb6",
+      "layout": {
+        "trees": 3,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5711616784366476,
+        "auc": 0.9296732693837841,
+        "strict_threshold": 3.0543668344428436,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5711616784366476
+      },
+      "cpu": {
+        "checksum": 174234.9801552407,
+        "events": 132800,
+        "median_microseconds_per_event": 0.32043582831325307,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 160,
+        "all_node_multiplications": 734,
+        "path_comparisons": 12,
+        "all_node_comparisons": 45
+      },
+      "canonical_margin_error": {
+        "max_abs": 6.217248937900877e-15,
+        "mean_abs": 5.154975342174346e-16,
+        "exact_mismatches": 79364
+      },
+      "all_leaf_assignments_exact": true
+    },
+    {
+      "id": "compact_refit_3t_d4",
+      "family": "Oblique / linear",
+      "learned_nonzero_scalars": 418,
+      "stored_nonzero_scalars": 418,
+      "extra_cut_indices": 0,
+      "source_status": "Full refit converged",
+      "expected_efficiency": 0.5620197038199505,
+      "source_model": "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json",
+      "model_sha256": "0ce4fabc4ca74d3fcd2ddb8c94bb6b614b4f2fb998a9225873e167977922d62a",
+      "layout": {
+        "trees": 3,
+        "depth": 4
+      },
+      "metrics": {
+        "signal_efficiency_at_1pct_background": 0.5620197038199505,
+        "auc": 0.9273325265778587,
+        "strict_threshold": 3.115695315310499,
+        "accepted_background": 525,
+        "background_budget": 525,
+        "strict_background_efficiency": 0.009997905200815067,
+        "strict_signal_efficiency": 0.5620197038199505
+      },
+      "cpu": {
+        "checksum": 171982.8616707456,
+        "events": 132800,
+        "median_microseconds_per_event": 0.16687383283132529,
+        "repeats": 9
+      },
+      "arithmetic": {
+        "path_multiplications": 78,
+        "all_node_multiplications": 325,
+        "path_comparisons": 12,
+        "all_node_comparisons": 23
+      },
+      "canonical_margin_error": {
+        "max_abs": 1.4210854715202004e-14,
+        "mean_abs": 9.424529011955572e-16,
+        "exact_mismatches": 96707
+      },
+      "all_leaf_assignments_exact": true
+    }
+  ],
+  "source_hashes": {
+    "scripts/compare_ten_models.py": "5bb07a2959f79cf9f7a7a31a65647647695a3537e8ce46dbf17f47297856615b",
+    "fpga/comparison/benchmark.cc": "6a126552bb8538872ff40d1180b66dbcfc96237b0f45ea64608aebe5fa12cf4c"
+  },
+  "timing": "Same binary64 C++ sparse traversal kernel; one thread; full batch; nine repeats after warmup; parsing, I/O and input conversion excluded. XGBoost inputs rounded to binary32 before timing.",
+  "products": "Exact-zero and +/-1 factors removed. Other constant multiplier optimizations not assumed. Path values are worst-case bounds; all-node values include every structurally reachable node and leaf. No preprocessing or sigmoid.",
+  "selection": "Winner plus two smaller representatives per family. Axis 3D3 is dominated in scalar-count/working-point space by axis 1D4. Oblique linear winner is the newer converged case50, not a change to the frozen handover.",
+  "synthesis_run": false,
+  "native_xgboost_microseconds_per_event": 1.4782749770029662
+}

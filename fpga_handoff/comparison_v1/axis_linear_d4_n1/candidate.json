@@ -1,0 +1,81 @@
+{
+  "id": "axis_linear_d4_n1",
+  "family": "Axis / linear",
+  "learned_nonzero_scalars": 228,
+  "stored_nonzero_scalars": 243,
+  "extra_cut_indices": 15,
+  "source_status": "Leaf refit converged",
+  "expected_efficiency": 0.5473975264357509,
+  "checkpoint": "models/ten_model_comparison_v1_selected/dbb6fff5a84c25acc8a05f92c96c52cac4f3ccc37a739c2b9c01bba6e35659c2.pkl",
+  "checkpoint_sha256": "dbb6fff5a84c25acc8a05f92c96c52cac4f3ccc37a739c2b9c01bba6e35659c2",
+  "layout": {
+    "trees": 1,
+    "depth": 4
+  },
+  "metrics": {
+    "signal_efficiency_at_1pct_background": 0.5473975264357509,
+    "auc": 0.9238652175304918,
+    "strict_threshold": 3.1078649086002192,
+    "accepted_background": 525,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009997905200815067,
+    "strict_signal_efficiency": 0.5473975264357509
+  },
+  "cpu": {
+    "checksum": 169385.09601050877,
+    "events": 132800,
+    "median_microseconds_per_event": 0.04845728162650602,
+    "repeats": 9
+  },
+  "arithmetic": {
+    "path_multiplications": 16,
+    "all_node_multiplications": 197,
+    "path_comparisons": 4,
+    "all_node_comparisons": 15
+  },
+  "model_sha256": "02feb68b93043cb6d870a06ff44470d75167c080bf4ea9f6a46788f4f3d8a23f",
+  "canonical_margin_error": {
+    "max_abs": 1.9539925233402755e-14,
+    "mean_abs": 8.37075138120476e-16,
+    "exact_mismatches": 81201
+  },
+  "all_leaf_assignments_exact": true,
+  "input_space": "standardized",
+  "role": "representative",
+  "training_configuration": {
+    "run_name": "qg_vs_wzt_axis_linear_v1_d4_n1_leaf_refit",
+    "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d4_n1_sa0_la1e-05_seed42_axis_linear_v1.pkl",
+    "source_sha256": "e3beea4ca27780a4d02e59f29d810ad52e30669a1a893890909edd8c7c103637",
+    "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+    "stages": [
+      "leaf_only"
+    ],
+    "exact_zero_support": true,
+    "minimum_epochs": 5,
+    "max_epochs": 200,
+    "local_leaf_max_iter": 400,
+    "global_leaf_chunk_iter": 400,
+    "max_global_chunks": 100,
+    "split_max_iter": 800,
+    "leaf_ftol": 1e-12,
+    "leaf_gtol": 1e-08,
+    "kkt_tol": 1e-06,
+    "loss_rtol": 1e-05,
+    "route_tol": 0.0001,
+    "separation_time_limit": 600
+  },
+  "working_point_calibration": "common_cpp_binary64_feature_order_reference",
+  "kind": "tao",
+  "model": "fpga_handoff/comparison_v1/axis_linear_d4_n1/standardized/model.json",
+  "selected_epoch": 4,
+  "training_config": "configs/axis_linear_v1/case_1.json",
+  "refit_config": "configs/axis_linear_v1/refit_1.json",
+  "source_terminal_epoch": 8,
+  "refit_outcome": "complete",
+  "benchmark_model_sha256": "e50e959d8451b93bb2fd9ebfc09dcb819a84de705b99fccf6dabc8f39a307ee7",
+  "golden_vector_count": 176,
+  "source_stage_converged": true,
+  "training_complete": true,
+  "convergence_scope": "numerical convergence of selected TAO source stage",
+  "selection_rule": "validation efficiency at 1% background, AUC secondary; earlier snapshots may precede a converged source terminal"
+}

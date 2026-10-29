@@ -1,0 +1,11 @@
+{
+  "source_sha256": "17283fb7f62501d8efe42a2fd0a292e5e218e8b3fba3681420b2b6200319f13b",
+  "axis_source_sha256": "293c079165680640c118050529e383aaaf6752c7c3f120c8e5214562653219cd",
+  "generator_sha256": "7ea52442c1a445aec9cedec85a7e4e00753a87bb080725cd753cca1f654a1c76",
+  "outputs": {
+    "generated/final_comparison.tex": "962a748d594153eb8fe360ccb1a07ab7832c66fb497c6039f177509c62345eea",
+    "generated/axis_cohort.tex": "b263d172b939a3eb2ae7ce8b70fcedf3b97bd26dfa790da2335e4c977f4028e7",
+    "figures/family_roc.pdf": "d369d83344fd2d1b73e558ad6491b1bcd29521671e66ab2fd17d49012932b98c",
+    "figures/family_tradeoff.pdf": "2825cd24d9a7ade71fb8ea99daa748101bdc9929f4c94ca18593c8de41442e57"
+  }
+}

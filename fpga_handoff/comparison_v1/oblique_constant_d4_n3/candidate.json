@@ -1,0 +1,140 @@
+{
+  "id": "oblique_constant_d4_n3",
+  "family": "Oblique / constant",
+  "learned_nonzero_scalars": 753,
+  "stored_nonzero_scalars": 753,
+  "extra_cut_indices": 0,
+  "source_status": "Regularized; source converged",
+  "expected_efficiency": 0.5353551329476114,
+  "checkpoint": "models/ten_model_comparison_v1_selected/84d7607b2486193174a488fbff04d18ecb7711553de7c2a23646ef14c7b8f1fd.pkl",
+  "checkpoint_sha256": "84d7607b2486193174a488fbff04d18ecb7711553de7c2a23646ef14c7b8f1fd",
+  "layout": {
+    "trees": 3,
+    "depth": 4
+  },
+  "metrics": {
+    "signal_efficiency_at_1pct_background": 0.5353551329476114,
+    "auc": 0.9231827700679662,
+    "strict_threshold": 3.042350795785705,
+    "accepted_background": 511,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.00973129439546,
+    "strict_signal_efficiency": 0.5329995391647673
+  },
+  "cpu": {
+    "checksum": 163097.56724176413,
+    "events": 132800,
+    "median_microseconds_per_event": 0.5420589231927712,
+    "repeats": 9
+  },
+  "arithmetic": {
+    "path_multiplications": 160,
+    "all_node_multiplications": 656,
+    "path_comparisons": 12,
+    "all_node_comparisons": 45
+  },
+  "model_sha256": "2ceb05db93d7fdaaf887e09854906aa6ba82c59c2544abefc45849d3aa3e1684",
+  "canonical_margin_error": {
+    "max_abs": 0.0,
+    "mean_abs": 0.0,
+    "exact_mismatches": 0
+  },
+  "all_leaf_assignments_exact": true,
+  "input_space": "standardized",
+  "role": "representative",
+  "training_configuration": {
+    "run_name": "qg_vs_wzt_hardtao_constant_d4_n3_sa0_la0_seed42_hyper_scan_v1_c33",
+    "seed": 42,
+    "data": {
+      "dataset_path": "data/qg_vs_wzt_standardized.npz",
+      "metadata_path": "data/qg_vs_wzt_metadata.json",
+      "input_representation": "standardized"
+    },
+    "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+    "implementation_sha256": "fd649bf8c777bd648c0ce66363d713213f73c0b336ba9fce6be872e2af1802a2",
+    "full_training_policy": {
+      "scan_name": "tao_hyper_scan_v1_c33",
+      "source_scan": null,
+      "task": "qg_vs_wzt",
+      "seed": 42,
+      "split_alpha": 0.0,
+      "leaf_alpha": 0.0,
+      "leaf_mode": "constant",
+      "local_leaf_max_iter": 300,
+      "global_leaf_chunk_iter": 250,
+      "split_max_iter": 300,
+      "leaf_ftol": 1e-12,
+      "leaf_gtol": 1e-08,
+      "convergence": {
+        "loss_rtol": 1e-05,
+        "kkt_tol": 1e-06,
+        "route_tol": 0.0001,
+        "patience": 3
+      },
+      "minimum_continuation_epochs": 5,
+      "layouts": [
+        {
+          "trees": 3,
+          "depth": 4
+        }
+      ],
+      "split_search": "hard_threshold",
+      "run_suffix": "hyper_scan_v1_c33",
+      "publication_prefix": "hyper_scan_v1",
+      "initialization": "cart",
+      "label": "CART sa=0 la=0",
+      "primary_metric": "signal_efficiency_at_fixed_fpr"
+    },
+    "split_search_sha256": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+    "initialization": "cart",
+    "initialization_records": [
+      {
+        "tree": 0,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 1,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 2,
+        "bootstrap": true,
+        "cart_nodes": 31
+      }
+    ],
+    "initialization_seconds": 24.26302928617224,
+    "source_run": null,
+    "source_model_sha256": null,
+    "source_training_seconds": 0,
+    "model": {
+      "type": "hard_tao_cross_entropy",
+      "output_model_path": "models/qg_vs_wzt_hardtao_constant_d4_n3_sa0_la0_seed42_hyper_scan_v1_c33.pkl",
+      "tao": {
+        "trees": 3,
+        "depth": 4,
+        "leaf_mode": "constant",
+        "split_alpha": 0.0,
+        "leaf_alpha": 0.0
+      }
+    },
+    "evaluation": {
+      "output_prefix": "results/qg_vs_wzt_hardtao_constant_d4_n3_sa0_la0_seed42_hyper_scan_v1_c33",
+      "fixed_fpr": 0.01
+    },
+    "epoch_checkpointing": "node"
+  },
+  "working_point_calibration": "common_cpp_binary64_feature_order_reference",
+  "kind": "tao",
+  "model": "fpga_handoff/comparison_v1/oblique_constant_d4_n3/standardized/model.json",
+  "selected_epoch": 16,
+  "training_config": "configs/hyper_scan_v1/case_33.json",
+  "source_terminal_epoch": 32,
+  "benchmark_model_sha256": "ce8a78ef786f879c6ea08f5f29df9cc028a6f5d19974af087e3928785964aba1",
+  "golden_vector_count": 188,
+  "source_stage_converged": true,
+  "training_complete": true,
+  "convergence_scope": "numerical convergence of selected TAO source stage",
+  "selection_rule": "validation efficiency at 1% background, AUC secondary; earlier snapshots may precede a converged source terminal"
+}

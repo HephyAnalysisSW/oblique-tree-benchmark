@@ -1,0 +1,36 @@
+\section{Axis-aligned linear-leaf cohort}
+\label{app:axis}
+All four CART-initialized source configurations converged under the common
+objective/KKT/routing stability rules, with $\lambda_\ell=10^{-5}$ and
+$\lambda_s=0$. Their frozen-support, fixed-cut unpenalized leaf refits produced
+three converged stages and one separation outcome. Table~\ref{tab:axis-cohort}
+reports the best eligible checkpoint for each layout. The three-tree depth-four
+entry therefore uses its regularized source, and the three-tree depth-three
+entry also retains its regularized checkpoint because its eligible refit did
+not improve the primary validation metric.
+
+\begin{table}[htbp]\centering\small
+\caption{Complete axis/linear cohort. Scalar slots exclude fixed unit routing
+weights; nonzeros include learned leaf values and active thresholds. Index
+counts require an additional direction bit per nonconstant cut. The refit
+column reports the unpenalized stage's outcome, not the source's convergence.}
+\label{tab:axis-cohort}\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrl@{}}\toprule
+Layout & Scalar slots & Nonzeros & Indices & $\epsilon_s$ [\%] & AUC & Refit\\\midrule
+\input{generated/axis_cohort.tex}\end{tabular}
+\end{table}
+A separated unpenalized fit is held because coefficients can grow along a
+recession direction without a finite minimizing parameter vector, as described
+in Section~\ref{sec:sfr}. Its regularized source can remain a valid
+candidate; the held stage supplies no selected result.
+
+\begin{implementation}
+Exact source/refit states, selected epochs, hashes and parameter counts are in
+\file{docs/axis_linear_v1/status.json}; the frozen paper copy is
+\code{paper/sources/axis_linear_study.json}. The four source policies are
+\code{configs/axis_linear_v1/case_0.json} through \code{case_3.json}; their
+hash-pinned terminal parents feed \code{refit_0.json} through \code{refit_3.json}.
+\file{scripts/monitor_axis_study.py} resumed only clean wall-time exits and
+stopped when every case had a converged or explicitly held refit outcome.
+No source in this four-case study remains incomplete.
+\end{implementation}

@@ -34,6 +34,9 @@ PDF without datasets, model pickles or a Python training environment.
 \renewcommand{\arraystretch}{1.15}
 \begin{tabularx}{\linewidth}{@{}p{.36\linewidth}X@{}}\toprule
 Object / operation & Entry point\\\midrule
+Axis cut search & \code{AxisTAOClassifier._split_update} in \file{src/tao/axis.py}\\
+Matched C++ comparison & \file{fpga/comparison/benchmark.cc}; \file{scripts/compare_ten_models.py}\\
+Final table generation & \file{paper/build_comparison_assets.py}\\
 Routing, logits, objective & \code{HardTree}; \code{HardTAOClassifier} in \file{src/tao/hard.py}\\
 Weighted leaf optimization & \code{fit_leaf_parameters}; \code{ce_value_gradient}\\
 Joint leaf design/refit & \code{_joint_design}; \code{global_refit}\\
@@ -47,22 +50,35 @@ Portable inference / firmware export & \code{export_model}; \code{predict_margin
 \end{tabularx}
 \par\endgroup
 
-\textbf{Frozen coefficients and reference verification.}
-\file{fpga_handoff/v3/manifest.json} hashes the candidate JSONs, hexadecimal C++
-headers, feature contract, conservative training-box ranges and golden vectors.
-Each candidate has both standardized and raw-input variants; choose one and
-use its matching vectors and working-point threshold. The default JSON hash is
-\begin{center}\footnotesize\ttfamily\CompactModelHash\end{center}
-The corresponding immutable pickle is named by the checkpoint hash given in
-the Compact training chain below, under \path{models/support_refit_scan_v1_selected/} on CLIP. The binary portable
-JSON and headers suffice for firmware; Python pickles are not needed there.
+\textbf{Frozen coefficients and verification.}
+\file{fpga_handoff/CURRENT_COMPARISON.json} pins all ten final entries in
+\code{fpga_handoff/comparison_v1/}. Each TAO candidate has standardized
+\code{model.json}, hexadecimal \code{model_coefficients.h}, ordered golden
+inputs and expected margins/leaf indices. The bundle is standardized-only;
+use its input contract and training scaler. Historical v3 additionally retains
+raw-folded variants for its original candidates. Do not mix those input spaces.
 
-The C++17 reference in \file{fpga_handoff/reference.cpp} passed all six v3
-variants: 1,594 vector evaluations with exact leaf assignments and maximum
-margin difference below $2.5\times10^{-14}$. The verifier
-\file{scripts/verify_fpga_handoff.py} needs only Python's standard library and
-a C++17 compiler. It checks bundle hashes before compiling/running the golden
-vectors and preserves an existing frozen verification report. Fixed-point
-verification remains a separate next step. v1 and v2 are retained historical
-bundles; \file{fpga_handoff/CURRENT_MODEL.json} selects v3 Compact refit for new
-implementation work.
+\file{scripts/verify_comparison_handoff.py} needs Python's standard library and
+a C++17 compiler. It checks every file hash, compiles the nine TAO references,
+and independently walks exported XGBoost on its golden vectors. The full
+common C++ benchmark separately checks every validation leaf assignment against
+the canonical TAO or native XGBoost inference. Reproduction in a new checkout:
+\begin{lstlisting}[language=bash]
+python3 scripts/verify_comparison_handoff.py --compiler c++
+# On CLIP, use EL9 because the native GCC is too old:
+scripts/conifer_container.sh bash -c \\
+ 'source scripts/conifer_runtime.sh && workspaces/python/conifer/bin/python scripts/verify_comparison_handoff.py --compiler g++'
+# Reproduce the measured comparison with archived data/checkpoints:
+scripts/run_ten_model_comparison.sh
+# Rebuild its document assets:
+python3 paper/build_comparison_assets.py --plot
+make -C paper
+\end{lstlisting}
+The plot command requires archived score files on CLIP; rebuilding both PDFs
+from the complete \code{paper/} folder requires only TeX and the included
+assets. \file{scripts/freeze_final_comparison.py} created the immutable bundle
+once and refuses to overwrite it. The old model bundles, pointer and verification
+reports remain available for historical reproduction. Fixed-point checks cover
+the stated earlier subsets; no synthesis or full ten-model quantization claim
+is made. Full training and configuration pointers are in
+\file{docs/DORIAN_HANDOVER.md} and the new manifest.

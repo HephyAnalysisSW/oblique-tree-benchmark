@@ -4,5 +4,6 @@
   "manifest_sha256": "fabdb25cf8022e4abadc48355da7364eac7a0ef3db0ff181e17b634a1951f2a4",
   "linear_candidate": "compact_refit_3t_d4",
   "constant_candidate": "constant_5t_d4",
-  "note": "Two competing algorithms. CURRENT_MODEL.json retains the historical linear implementation default. Neither is a synthesized resource winner."
+  "note": "Historical two-model pair retained for reproducing its emulator study. The final three-family comparison is pinned by CURRENT_COMPARISON.json.",
+  "current_comparison": "fpga_handoff/CURRENT_COMPARISON.json"
 }

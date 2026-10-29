@@ -1,0 +1,42 @@
+\section{Actual learned functions}
+\label{sec:example}
+Actual cuts illustrate the mixture of axis-aligned, oblique and constant
+nodes. In Compact refit, using the standardized feature indices of
+Table~\ref{tab:features}, the first tree contains
+\input{generated/research_cuts.tex}
+Coefficients marked $\simeq$ are rounded to eight significant digits. At the
+root an event goes right if $x_4>-0.4216204$. Otherwise it reaches $L$, whose
+constant cut sends it left again. Hence the entire $LR$ subtree is
+unreachable. The root's right child combines five input features.
+
+For the second tree, another learned cut is
+\input{generated/research_tiny_cut.tex}
+Its small scale does not make it uninformative: it routes right approximately
+when $x_{16}<-1.3334$. Setting both coefficients to zero would turn it into a
+constant left route. This example motivates distinguishing exact sparsity
+from coefficient magnitude before quantization.
+
+\begin{implementation}
+\textbf{Print the actual functions.} \code{TreePrinter} in
+\file{src/tao/printing.py} provides \code{print_tree}, \code{format_tree},
+\code{format_forest} and \code{records}. The CLI
+\file{scripts/print_tao_tree.py} prints every cut and affine leaf, including
+unreachable branches. It is read-only and separate from pinned fitting code.
+For example, after setting the environment described below:
+\begin{lstlisting}[language=Python]
+import json
+from pathlib import Path
+from tao.printing import TreePrinter
+spec = json.loads(Path(
+    "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json"
+).read_text())
+TreePrinter(spec, precision=17).print_tree(0)
+\end{lstlisting}
+The complete 17-digit record is
+\code{generated/compact_forest_full_precision.txt}; the annotated supplement
+prints all three trees at nine display digits. Only exact-zero terms are
+omitted. Independent tests parse the printed expressions, recover all 418
+nonzero coefficients, count 379 reachable coefficients, and compare predictions
+with the portable evaluator. They also check equality routing, constant leaves,
+tiny terms and non-mutation. The printer tests also preserve the source model and its exact-zero support.
+\end{implementation}

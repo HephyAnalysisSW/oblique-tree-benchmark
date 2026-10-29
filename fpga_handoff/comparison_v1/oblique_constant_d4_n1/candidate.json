@@ -1,0 +1,130 @@
+{
+  "id": "oblique_constant_d4_n1",
+  "family": "Oblique / constant",
+  "learned_nonzero_scalars": 256,
+  "stored_nonzero_scalars": 256,
+  "extra_cut_indices": 0,
+  "source_status": "Regularized; source converged",
+  "expected_efficiency": 0.4535519613108489,
+  "checkpoint": "models/ten_model_comparison_v1_selected/7a8ef326aaac665dce92dd0ef89d452ae293d7322debed9c469b5879cf982c85.pkl",
+  "checkpoint_sha256": "7a8ef326aaac665dce92dd0ef89d452ae293d7322debed9c469b5879cf982c85",
+  "layout": {
+    "trees": 1,
+    "depth": 4
+  },
+  "metrics": {
+    "signal_efficiency_at_1pct_background": 0.4535519613108489,
+    "auc": 0.9124717036261892,
+    "strict_threshold": 2.792076299757433,
+    "accepted_background": 524,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009978861571861133,
+    "strict_signal_efficiency": 0.4533248639290563
+  },
+  "cpu": {
+    "checksum": 140566.51989592993,
+    "events": 132800,
+    "median_microseconds_per_event": 0.1711540813253012,
+    "repeats": 9
+  },
+  "arithmetic": {
+    "path_multiplications": 64,
+    "all_node_multiplications": 224,
+    "path_comparisons": 4,
+    "all_node_comparisons": 15
+  },
+  "model_sha256": "fa122ef4d6d6a8a4c2d686f58fadded7ec3a381c445cadc9f9d924219dcdfb35",
+  "canonical_margin_error": {
+    "max_abs": 0.0,
+    "mean_abs": 0.0,
+    "exact_mismatches": 0
+  },
+  "all_leaf_assignments_exact": true,
+  "input_space": "standardized",
+  "role": "representative",
+  "training_configuration": {
+    "run_name": "qg_vs_wzt_hardtao_constant_d4_n1_sa0_la0_seed42_hyper_scan_v1_c15",
+    "seed": 42,
+    "data": {
+      "dataset_path": "data/qg_vs_wzt_standardized.npz",
+      "metadata_path": "data/qg_vs_wzt_metadata.json",
+      "input_representation": "standardized"
+    },
+    "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+    "implementation_sha256": "fd649bf8c777bd648c0ce66363d713213f73c0b336ba9fce6be872e2af1802a2",
+    "full_training_policy": {
+      "scan_name": "tao_hyper_scan_v1_c15",
+      "source_scan": null,
+      "task": "qg_vs_wzt",
+      "seed": 42,
+      "split_alpha": 0.0,
+      "leaf_alpha": 0.0,
+      "leaf_mode": "constant",
+      "local_leaf_max_iter": 300,
+      "global_leaf_chunk_iter": 250,
+      "split_max_iter": 300,
+      "leaf_ftol": 1e-12,
+      "leaf_gtol": 1e-08,
+      "convergence": {
+        "loss_rtol": 1e-05,
+        "kkt_tol": 1e-06,
+        "route_tol": 0.0001,
+        "patience": 3
+      },
+      "minimum_continuation_epochs": 5,
+      "layouts": [
+        {
+          "trees": 1,
+          "depth": 4
+        }
+      ],
+      "split_search": "hard_threshold",
+      "run_suffix": "hyper_scan_v1_c15",
+      "publication_prefix": "hyper_scan_v1",
+      "initialization": "cart",
+      "label": "CART sa=0 la=0",
+      "primary_metric": "signal_efficiency_at_fixed_fpr"
+    },
+    "split_search_sha256": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+    "initialization": "cart",
+    "initialization_records": [
+      {
+        "tree": 0,
+        "bootstrap": false,
+        "cart_nodes": 31
+      }
+    ],
+    "initialization_seconds": 6.7073505509179085,
+    "source_run": null,
+    "source_model_sha256": null,
+    "source_training_seconds": 0,
+    "model": {
+      "type": "hard_tao_cross_entropy",
+      "output_model_path": "models/qg_vs_wzt_hardtao_constant_d4_n1_sa0_la0_seed42_hyper_scan_v1_c15.pkl",
+      "tao": {
+        "trees": 1,
+        "depth": 4,
+        "leaf_mode": "constant",
+        "split_alpha": 0.0,
+        "leaf_alpha": 0.0
+      }
+    },
+    "evaluation": {
+      "output_prefix": "results/qg_vs_wzt_hardtao_constant_d4_n1_sa0_la0_seed42_hyper_scan_v1_c15",
+      "fixed_fpr": 0.01
+    },
+    "epoch_checkpointing": "node"
+  },
+  "working_point_calibration": "common_cpp_binary64_feature_order_reference",
+  "kind": "tao",
+  "model": "fpga_handoff/comparison_v1/oblique_constant_d4_n1/standardized/model.json",
+  "selected_epoch": 4,
+  "training_config": "configs/hyper_scan_v1/case_15.json",
+  "source_terminal_epoch": 9,
+  "benchmark_model_sha256": "ca5928d0eac6fa76674ee619b864db8d66041411d88854adc2353f3195cb7072",
+  "golden_vector_count": 176,
+  "source_stage_converged": true,
+  "training_complete": true,
+  "convergence_scope": "numerical convergence of selected TAO source stage",
+  "selection_rule": "validation efficiency at 1% background, AUC secondary; earlier snapshots may precede a converged source terminal"
+}

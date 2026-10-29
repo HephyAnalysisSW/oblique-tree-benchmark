@@ -1,0 +1,22 @@
+\section{Conditional uncertainty of an earlier subset}
+\label{app:uncertainty}
+These previously frozen intervals concern Compact refit, the 837-coefficient
+leaf refit and a one-tree oblique reference. They are not intervals for all ten
+current representatives; in particular they do not assess the new axis/linear
+models or five-tree performance winner. In this supporting table, ``Higher
+efficiency denotes the 837-coefficient refit.
+
+A paired class-stratified bootstrap with 1,000 replicates, seed 20261025,
+recomputes the interpolated working point in each replicate.
+Table~\ref{tab:uncertainty} gives percentile intervals for the difference from
+XGBoost. The Compact interval includes zero. These intervals condition on the
+selected models and account for neither hyperparameter/checkpoint selection
+nor training-seed variation; they are not independent test claims.
+\begin{table}[H]\centering\small
+\caption{Conditional validation efficiency difference from XGBoost, in
+percentage points (pp), with paired 95\% percentile intervals.}
+\label{tab:uncertainty}
+\begin{tabular}{@{}lrr@{}}\toprule
+Model & Difference [pp] & Interval [pp]\\\midrule
+\input{generated/uncertainty.tex}\end{tabular}
+\end{table}

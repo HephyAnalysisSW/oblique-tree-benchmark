@@ -1,0 +1,54 @@
+{
+  "id": "xgboost",
+  "family": "XGBoost reference",
+  "learned_nonzero_scalars": 3099,
+  "stored_nonzero_scalars": 3099,
+  "extra_cut_indices": 1499,
+  "source_status": "Frozen reference",
+  "layout": {
+    "trees": 100,
+    "depth": 4
+  },
+  "metrics": {
+    "signal_efficiency_at_1pct_background": 0.5548207101844587,
+    "auc": 0.920558806144742,
+    "strict_threshold": 2.819604839677922,
+    "accepted_background": 525,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009997905200815067,
+    "strict_signal_efficiency": 0.5548207101844587
+  },
+  "cpu": {
+    "checksum": 150467.56458669453,
+    "events": 132800,
+    "median_microseconds_per_event": 3.67543781626506,
+    "repeats": 9
+  },
+  "arithmetic": {
+    "path_multiplications": 0,
+    "all_node_multiplications": 0,
+    "path_comparisons": 400,
+    "all_node_comparisons": 1499
+  },
+  "model_sha256": "d5682800392b1e09eaa4b1b37ec3aaa003e463339a18a3170ab42add317db603",
+  "canonical_margin_error": {
+    "max_abs": 2.884829299887315e-06,
+    "mean_abs": 4.3858867281687096e-07,
+    "exact_mismatches": 132800
+  },
+  "all_leaf_assignments_exact": true,
+  "input_space": "standardized",
+  "role": "reference",
+  "training_configuration": null,
+  "working_point_calibration": "common_cpp_binary64_feature_order_reference",
+  "kind": "xgboost",
+  "model": "fpga_handoff/comparison_v1/xgboost/conifer_model.json",
+  "native_model": "fpga_handoff/comparison_v1/xgboost/native_model.json",
+  "training_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+  "benchmark_model_sha256": "d5682800392b1e09eaa4b1b37ec3aaa003e463339a18a3170ab42add317db603",
+  "golden_vector_count": 506,
+  "source_stage_converged": null,
+  "training_complete": true,
+  "convergence_scope": "fixed 100 boosting rounds; no TAO stationarity test",
+  "selection_rule": "validation efficiency at 1% background, AUC secondary; earlier snapshots may precede a converged source terminal"
+}

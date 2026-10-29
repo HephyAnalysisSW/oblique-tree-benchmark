@@ -1,0 +1,49 @@
+\subsection{Oblique-leaf feasibility check}
+The following supporting precision check concerns the previously frozen
+five-tree constant-leaf winner and three-tree linear Compact refit only.
+It does not quantize all ten final representatives or the new axis/linear cohort.
+For an exploratory reduced-precision comparison, each cut is first multiplied
+by a positive power of two, $w'_{tv}=2^{k_{tv}}w_{tv}$ and
+$b'_{tv}=2^{k_{tv}}b_{tv}$. This preserves its real-arithmetic decision; the
+exported binary64 scaling is constrained to retain every nonzero coefficient,
+and validation leaf assignments are checked before quantization.
+We use the nearest-even, saturating quantizer of Eq.~\eqref{eq:quantizer}, with
+10 integer bits for inputs, thresholds and cut accumulators, 6 for weights,
+and 16 for scores and leaf biases, all including sign. Every type uses the
+same fractional width $F$. Cast inputs and coefficients precede multiplication;
+cut products accumulate in feature order, with a cast to the cut-accumulator
+format after each addition. For a linear leaf, products accumulate similarly
+in the score format, followed by the leaf bias. The negative tree outputs are
+summed in the score format. Integer widths are conservatively checked against
+absolute partial-sum bounds in the observed training box; they have not been
+minimized separately for the two candidates.
+
+\begin{table}[htbp]\centering\small
+\caption{Common-format fixed-point emulation of the two selected leaf
+architectures. Efficiencies are percentages at 1\% background. Total widths
+are $F+10$ input/threshold bits, $F+6$ weight bits and $F+16$ score bits.}
+\label{tab:leafprecision}
+\begin{tabular}{@{}lrrr@{}}\toprule
+Leaf type & $F$ & $\epsilon_s$ [\%] & $\epsilon_s^{\rm strict}$ [\%]\\\midrule
+\input{generated/leaf_competition_precision.tex}\end{tabular}
+\end{table}
+At $F=12$, both architectures remain within 0.02 percentage points of their
+floating-point interpolated working-point efficiency (Table~\ref{tab:leafprecision}).
+For constant leaves, independent fixed-point path traversal and the existing
+weighted-cut backend agree exactly on all validation scores. The generated
+all-node HLS C++ implementation also agrees exactly on a 512-vector check at
+$F=12$. The linear-leaf evaluation uses an independent affine-leaf reference;
+a corresponding HLS backend extension and synthesis remain to be completed.
+These checks establish numerical feasibility at common precision, rather than
+an optimized FPGA resource comparison.
+
+
+\begin{implementation}
+\file{docs/leaf_competition_v1/README.md} records this earlier two-candidate
+experiment. \file{scripts/run_leaf_competition.sh} and
+\file{fpga/leaf_competition/emulate.cc} reproduce its independent sparse
+reference. Constant leaves use unmodified conifer 1.11 weighted-cut/scalar-leaf
+backends; the old CMSSW 1.7 external is axis-aligned only. Affine leaves still
+require a conifer HLS backend extension. This feasibility check is separate
+from the final common timing kernel and does not establish synthesized resources.
+\end{implementation}

@@ -1,0 +1,17 @@
+{
+  "schema": "tree-benchmark.current-comparison.v1",
+  "as_of": "2026-10-29",
+  "manifest": "fpga_handoff/comparison_v1/manifest.json",
+  "manifest_sha256": "7882cf714b0489cdb88441c3b4ab35f2c18f02b71d0bcbcbc2954d52ce35fdb0",
+  "verification": "fpga_handoff/comparison_v1/verification.json",
+  "verification_sha256": "eed2523e8d5039ddc5498159240875160d14fdd82d0420481c284de21a8a1063",
+  "family_winners": {
+    "axis_linear": "axis_linear_d4_n3",
+    "oblique_constant": "oblique_constant_d4_n5",
+    "oblique_linear": "oblique_linear_performance_winner"
+  },
+  "compact_reference": "compact_refit_3t_d4",
+  "reference": "xgboost",
+  "hardware_winner": null,
+  "note": "Final ten-model paper comparison. Standardized inputs. No synthesized resource winner; historical CURRENT_MODEL remains the Compact refit default."
+}

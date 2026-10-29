@@ -6,17 +6,17 @@
 \usepackage{amsmath,amssymb,mathtools,bm}
 \usepackage{booktabs,tabularx,array,longtable}
 \usepackage{graphicx,xcolor,float,placeins}
-\usepackage{enumitem,listings,comment}
+\usepackage{enumitem,listings,comment,needspace}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{fancyhdr}
 \usepackage[most]{tcolorbox}
 \usepackage[colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
 \usepackage{bookmark}
-\hypersetup{pdftitle={Sparse hard oblique forests for jet classification},pdfsubject={Tree alternating optimization and Select-Freeze-Refit}}
+\hypersetup{pdftitle={Tree families for jet classification: accuracy, sparsity and inference cost},pdfsubject={Tree alternating optimization and Select-Freeze-Refit}}
 \definecolor{ink}{HTML}{20334D}
 \definecolor{softblue}{HTML}{EEF4FC}
 \raggedbottom
-\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Sparse hard oblique forests}\fancyfoot[C]{\thepage}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Tree families and inference cost}\fancyfoot[C]{\thepage}
 \emergencystretch=2em
 \setlength{\parskip}{4pt}\setlength{\parindent}{0pt}
 \setlist{itemsep=2pt,topsep=3pt}
@@ -44,50 +44,62 @@
 \lstset{style=codeblock}
 \input{generated/provenance.tex}
 \input{generated/constant_leaf_macros.tex}
-\input{generated/leaf_competition_macros.tex}
-\title{Sparse hard oblique forests for jet classification}
+\title{Tree families for jet classification: accuracy, sparsity and inference cost}
 \author{}
-\date{28 October 2026}
+\date{29 October 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
-We study compact classifiers built from shallow oblique trees with linear
-leaves. Tree Alternating Optimization updates their cuts and leaf functions
-against a common forest loss. To reduce the number of coefficients, we select
-support with an L1 penalty, freeze it, and refit without shrinkage
-(\SFR{}). In a jet-classification application, three depth-four trees with
-418 nonzero coefficients achieve 56.20\% signal efficiency at 1\% background
-acceptance, compared with 55.48\% for a 100-tree XGBoost reference with 3,099
-scalar parameters. The results motivate sparse oblique forests as candidates
-for resource-constrained inference.
+We compare three families of shallow hard trees for jet classification:
+axis-aligned cuts with linear leaves, oblique cuts with constant leaves, and
+oblique cuts with linear leaves, against a 100-tree XGBoost reference.
+Tree Alternating Optimization minimizes a shared cross-entropy loss; L1
+support selection followed by unpenalized frozen-support refitting reduces
+coefficient budgets. A ten-model comparison spans smaller and higher-efficiency
+representatives of each family on fixed data partitions. The highest eligible
+oblique/linear model reaches 57.73\% signal efficiency at 1\% background with
+1275 nonzero scalars. A sparse three-tree oblique refit reaches 56.20\% with
+418, while three axis-aligned depth-four trees reach 56.32\% with 479 plus
+discrete cut choices. XGBoost reaches 55.48\% with 3099 scalars. The latter
+two compact candidates reverse their arithmetic ranking between selected-path
+and all-node evaluation. Matched C++ timings, realizable thresholds and
+supporting fixed-point checks provide implementation evidence; synthesized
+FPGA resources and latency remain unmeasured.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:intro}
-Fast classification under hardware resource constraints motivates models that
-combine predictive accuracy with a small arithmetic workload. An axis-aligned
-decision tree tests one feature at each node; an oblique tree tests a linear
-combination. Oblique cuts can describe correlated decision boundaries within
-shallow trees. Linear leaf functions add first-order variation inside each
-region. Their coefficients also introduce a cost: a general affine function
-requires several multiplications and additions.
+Fast classification under hardware resource constraints requires balancing
+prediction quality, coefficient storage and arithmetic workload. An axis-aligned
+tree tests one feature at a node; an oblique tree tests a linear combination.
+A constant leaf assigns one score to its region, whereas a linear leaf captures
+first-order feature dependence inside that region. These choices distribute
+expressivity differently between routing and prediction. Linear leaves in
+axis-aligned trees have a long history as model trees, including classification
+applications~\cite{modeltrees1998}. Their cost must be assessed at the level of
+the complete classifier, rather than by comparing isolated nodes or leaves.
 
-We investigate this tradeoff using additive forests of hard oblique trees.
-Tree Alternating Optimization (TAO) revisits the cuts of an existing tree,
-rather than fixing each cut in a single top-down construction~\cite{tao2018}.
-Sparse oblique trees have also been used to analyze learned feature
-representations~\cite{tao2021}. Here we optimize a shared classification loss
-for all forest members and study L1 regularization followed by fixed-support
-refitting. This separates coefficient selection from shrinkage, following the
-motivation of post-selection methods such as relaxed Lasso~\cite{relaxed}.
+We compare three combinations of these choices: axis-aligned cuts with linear
+leaves, oblique cuts with constant leaves, and oblique cuts with linear leaves.
+A boosted ensemble of axis-aligned, constant-leaf trees provides the reference.
+The application distinguishes quark/gluon jets from W, Z and top jets using
+16 high-level features, motivated by FPGA inference in the CMS Phase-II
+Level-1 trigger. The central result is a ten-model comparison of validation
+performance, learned nonzero scalars, matched C++ evaluation time, and two
+arithmetic schedules. Its summary table is placed last in both document editions.
 
-Our application distinguishes quark/gluon jets from W, Z and top jets using
-16 high-level input features. The intended implementation context is FPGA
-inference for the CMS Phase-II Level-1 trigger. We compare floating-point
-classification performance, coefficient counts and arithmetic bounds, providing
-a basis for subsequent quantization and synthesis studies.
+Tree Alternating Optimization (TAO) revisits existing cuts instead of fixing
+them in a single greedy construction~\cite{tao2018}; sparse oblique trees have
+also been used to analyze learned feature representations~\cite{tao2021}.
+Here leaves and cuts are trained against the common loss of an additive forest.
+We separate support selection from coefficient shrinkage through L1
+regularization, support freezing and unpenalized refitting (\SFR{}), following
+the motivation of post-selection methods such as relaxed Lasso~\cite{relaxed}.
+Detailed derivations below define both the oblique proposals and the exhaustive
+axis-aligned node search. Supporting appendices retain the full refit and
+constant-leaf studies, numerical feasibility checks and actual learned functions.
 
-\section{Oblique forests}
+\section{Tree families and inference cost}
 \label{sec:architecture}
 \subsection{Cuts, paths and leaf functions}
 An event is represented by a feature vector $x\in\mathbb R^F$ and a class
@@ -108,6 +120,19 @@ determines the next branch. Here $w_{tp}\in\mathbb R^F$ is the cut's feature
 weight vector and $b_{tp}\in\mathbb R$ its bias. Routing is hard: each event
 follows exactly one branch. A cut is axis-aligned when only one component of
 $w_{tp}$ is nonzero, and oblique when it combines several features.
+
+For the axis-aligned family we fix the normal's magnitude and use
+\begin{equation}
+ w_{tp}=s_{tp}e_{j_{tp}},\qquad
+ h_{tp}(x)=s_{tp}x_{j_{tp}}+b_{tp},\qquad
+ j_{tp}\in\{1,\ldots,F\},\quad s_{tp}\in\{-1,+1\},
+ \label{eq:axis-cut}
+\end{equation}
+where $e_j$ is a coordinate unit vector. A cut therefore learns a discrete
+feature index, a direction and one scalar threshold; it needs no general
+feature multiplication. Input-independent cuts remain allowed. Together with
+Eq.~\eqref{eq:leaf}, this defines the three families compared below. Oblique
+cuts retain unconstrained multivariate normals, including axis-aligned cases.
 
 A complete depth-$D$ tree has $I=2^D-1$ internal nodes and $L_D=2^D$ leaves.
 Its effective topology can be smaller. If $w_{tp}=0$, the bias determines a
@@ -159,6 +184,20 @@ zero, and $P_{\mathrm{reach}}$, the nonzero count after removing algebraically
 unreachable branches. These counts include biases and exclude feature indices,
 connectivity and preprocessing metadata.
 
+For an axis-aligned tree, the fixed unit normal is not a learned scalar
+vector. Its continuous allocation is instead
+\begin{equation}
+ P_{\rm cont}^{\rm axis}=T\big[(2^D-1)+2^D(F+1)(K-1)\big]
+ \label{eq:axis-count}
+\end{equation}
+for linear leaves, plus one feature index and direction bit per nonconstant
+cut. The reported learned nonzero count includes active scalar thresholds
+and leaf coefficients, not fixed unit weights or constant-routing flags.
+For axis/linear layouts 1$\times$D3, 1$\times$D4, 3$\times$D3 and 3$\times$D4,
+Eq.~\eqref{eq:axis-count} gives 143, 287, 429 and 861 scalar slots. Sparse
+representations also need indices; nonzero scalar count is not a complete
+memory-footprint estimate. All main comparison counts use standardized inputs.
+
 For $F=16,K=2,D=4$, one linear-leaf tree has $15\cdot17+16\cdot17=527$
 coefficient slots, while three have 1,581. A single dense tree may therefore
 have a similar \emph{nonzero} count to a more strongly regularized forest
@@ -170,6 +209,29 @@ are not multiplications. Evaluating all internal functions and leaves instead
 uses $TF(2^{D+1}-1)$ multiplications. Sparse functions reduce these counts
 according to their retained feature weights. They are arithmetic bounds;
 latency also depends on parallelism, multiplier reuse, precision and memory.
+
+For the final comparison we also remove exact $+1$ and $-1$ factors,
+implemented by selection or sign change. Define
+$c(g)=\#\{f:u_f\notin\{0,-1,+1\}\}$ for an affine function
+$g(x)=u^{\mathsf T}x+d$. Let $\mathcal L_t^r$ and $\mathcal I_t^r$ be the
+leaves and internal paths remaining after input-independent route pruning.
+For free class logits, the two multiplication counts are
+\begin{align}
+ M_{\rm path}&=\sum_t\max_{\ell\in\mathcal L_t^r}
+ \left[\sum_{p\prec\ell}c(h_{tp})+\sum_{k=0}^{K-2}c(f_{t\ell k})\right],\\
+ M_{\rm all}&=\sum_t\left[\sum_{p\in\mathcal I_t^r}c(h_{tp})+
+                 \sum_{\ell\in\mathcal L_t^r}\sum_{k=0}^{K-2}c(f_{t\ell k})\right].
+ \label{eq:work-counts}
+\end{align}
+Here $p\prec\ell$ denotes a retained internal ancestor of leaf $\ell$.
+The first count is an upper bound for sequential selected-path evaluation;
+the second evaluates every reachable affine function, as in a parallel
+implementation. Maximal paths in different trees need not be simultaneously
+realizable. Bias additions, comparisons and score aggregation are excluded.
+Other constant-multiplier optimizations, including shifts, are not assumed.
+Rescaling a one-feature cut into a pure comparison could further reduce work,
+but requires its own numerical routing checks and is not assumed here.
+These operation counts cannot be equated with DSP usage or FPGA latency.
 
 \begin{implementation}
 \textbf{Storage and inference.} \code{HardTree} and \code{HardTAOClassifier}
@@ -204,7 +266,8 @@ and $W=\sum_i v_i>0$. All results below use $v_i=1$. We minimize
 \end{align}
 Here $\theta$ denotes all cut and leaf parameters, $\lambda_s\geq0$ penalizes
 cuts and $\lambda_\ell\geq0$ penalizes leaf feature weights. Leaf biases are
-unpenalized; cut biases are penalized. For constant leaves, $\lambda_\ell$
+unpenalized; cut biases are penalized in oblique training. Axis training fixes
+unit normals and sets $\lambda_s=0$; its feature and direction choices are discrete. For constant leaves, $\lambda_\ell$
 has no effect. Every subproblem retains the full training-weight denominator
 $W$, so a penalty has the same normalization at different depths and node
 occupancies.
@@ -495,6 +558,44 @@ it. If all $\gamma_i=0$, any route has the same data loss; the current cut
 already attains the unpenalized lower bound. These cases introduce no third
 branch and do not require a finite optimum of a one-class logistic problem.
 
+\subsection{Exhaustive axis-aligned node updates}
+For Eq.~\eqref{eq:axis-cut}, keep the same reaching set and child losses of
+Eq.~\eqref{eq:reduced}. Set $w=se_j$, $u=-b$ and $\lambda_s=0$ in
+Eq.~\eqref{eq:cut-subproblem}. Then
+\begin{equation}
+ Q_{j,s}(u)=\frac1W\left[
+ \sum_{i:sx_{ij}\leq u}v_i C_i^L+
+ \sum_{i:sx_{ij}>u}v_i C_i^R\right],
+ \quad i\in\mathcal R_{tp}.
+ \label{eq:axis-objective}
+\end{equation}
+For each of the $2F$ pairs $(j,s)$, sort $sx_{ij}$, move tied groups together,
+and use the prefix sums of Eqs.~\eqref{eq:threshold-prefix}--\eqref{eq:threshold-objective}
+with zero cut penalty. Every distinct routing interval, including both constant
+endpoints, is considered. An input-independent zero direction is also included.
+The minimizing candidate is reevaluated with the actual hard decision; an
+update is accepted only if Eq.~\eqref{eq:cut-acceptance} holds. The current cut
+is retained on a tie. If all effective weights vanish, it is already optimal
+for the fixed child losses and remains unchanged.
+
+This search exhausts the axis-aligned coordinate subproblem, with other cuts,
+leaves and trees fixed. It does not establish a global optimum of the forest.
+It uses the current linear leaf functions when scoring each split, rather than
+first learning a constant-leaf partition and only then replacing its leaves.
+During the axis cohort's unpenalized refit, cuts and exact-zero leaf support
+are frozen, so only the allowed leaf coefficients are optimized.
+
+\begin{implementation}
+\code{AxisTAOClassifier} in \file{src/tao/axis.py} overrides only node proposal
+search; its leaf solvers and resumable epoch follow the common implementation.
+\code{assert_axis} enforces zero or signed-unit one-feature normals;
+\code{axis_parameter_counts} separates continuous values and discrete choices.
+\file{scripts/train_axis_tao.py} isolates this experiment from existing oblique
+runs and checks pinned source hashes. Exhaustive small binary/multiclass tests,
+equality routing, tied losses, checkpoint/resume identity and frozen leaf
+refitting are covered by \file{tests/test_axis_tao.py}.
+\end{implementation}
+
 \subsection{Initialization and numerical stopping}
 Fresh trees are initialized by greedy axis-aligned classification trees fitted
 to bootstrap draws from the training sample. Subsequent TAO updates use the
@@ -661,18 +762,20 @@ partitions, labels and feature order.
 
 The primary metric is signal efficiency $\epsilon_s$ at background efficiency
 $\epsilon_b=0.01$, interpolated on the empirical receiver operating
-characteristic (ROC). AUC denotes its area. Both use the predicted signal
-probability. For a threshold $\tau$, the operating efficiencies are the
+characteristic (ROC). AUC denotes its area. The final comparison uses the increasing signal margin; its sigmoid is
+monotonic in exact arithmetic, but finite-precision probabilities can introduce
+additional ties. Saved training checkpoints are selected using the shared
+probability-based metric and rechecked during export. For a threshold $\tau$, the operating efficiencies are the
 fractions of signal and background events accepted by a score above $\tau$.
 Interpolation can give a point not exactly realized by a strict threshold.
 With the validation sample here, a realizable threshold accepting at most
 1\% background permits at most $\lfloor0.01\cdot52{,}511\rfloor=525$
 background events.
 
-All oblique scans, SFR choices and results below use validation, with AUC
+All tree-family scans, SFR choices and results below use validation, with AUC
 secondary to the low-background working point. The test partition was used
 in an earlier XGBoost reproduction check, but not to select the oblique models
-or penalties. Reported uncertainties consequently concern validation and
+or penalties, including the later axis/linear study. Reported uncertainties consequently concern validation and
 condition on the selected fitted models.
 
 The XGBoost reference is an additive ensemble of axis-aligned trees with
@@ -682,6 +785,19 @@ learning rate 0.1, row and feature subsampling 0.8, histogram-based splits,
 binary logistic objective and random seed 42. Its realized structure contains
 1,499 thresholds, 1,599 leaf values and one base bias: 3,099 scalar parameters.
 Feature indices and topology are excluded, consistently with the oblique count.
+
+Its increasing signal margin is
+\begin{equation}
+ m_{\rm XGB}(x)=m_0+\sum_{t=1}^{100}u_{t,\ell_t(x)},\qquad
+ P_{\rm XGB}(y=1\mid x)=\sigma(m_{\rm XGB}(x)),
+ \label{eq:xgb-margin}
+\end{equation}
+where $m_0$ is the initial signal log-odds and $u_{t\ell}$ is the scalar leaf
+contribution with the learning rate already absorbed. Its native cut sends
+$x_j<\tau_{tp}$ left and equality right, unlike Eq.~\eqref{eq:cut}.
+Early terminal leaves need not have length-four paths. The numerical checks
+preserve these routing and score conventions.
+
 
 \begin{implementation}
 The project repository~\cite{benchmark} contains the archived data contract and
@@ -697,258 +813,94 @@ are those of that version. The handed-over native JSON fixes the actual model.
 The paper input generator evaluates validation only.
 \end{implementation}
 
-\subsection{Selected models and fixed-support study}
-\label{sec:results}
-Table~\ref{tab:main} compares three oblique configurations and XGBoost. All
-oblique entries use depth-four trees and linear leaves. We call the
-418-coefficient three-tree model \emph{Compact refit}; the
-837-coefficient model is the \emph{higher-efficiency} alternative. A one-tree
-reference illustrates the distinction between allocated and retained
-parameters. Figure~\ref{fig:roc} shows the corresponding ROCs.
-
-\begin{table}[htbp]\centering\small
-\caption{Validation comparison. Layout gives tree count and maximum depth
-(D4 means depth four). Dense and nonzero counts include biases. CPU is median
-bulk time per event in microseconds, measured as described in the text.}
-\label{tab:main}\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrrrrr@{}}\toprule
-Model & Layout & $P_{\rm dense}$ & $P_{\rm nz}$ & $\epsilon_s$ [\%] & AUC & CPU [$\mu$s]\\\midrule
-\input{generated/main_results.tex}\end{tabular}
-\end{table}
-The Compact refit uses 49\% fewer allocated scalars than XGBoost and about half
-the nonzero coefficients of the higher-efficiency oblique model. These are
-different comparisons: a coefficient slot is not necessarily nonzero, and an
-oblique feature weight does not have the same hardware cost as an axis-aligned
-threshold. The one-tree reference has fewer allocated slots but more nonzero
-coefficients than Compact refit.
-
-\begin{figure}[htbp]\centering
-\includegraphics[width=\textwidth]{figures/roc.pdf}
-\caption{Validation ROCs of the four selected models. The right panel resolves
-low background acceptance; dots mark the interpolated 1\% background point.}
-\label{fig:roc}
-\end{figure}
-
-For Compact refit, a converged three-tree parent was continued along a
-split-penalty path
-$\lambda_s=3\cdot10^{-5},10^{-4},3\cdot10^{-4},10^{-3},3\cdot10^{-3}$,
-with $\lambda_\ell=10^{-5}$. The terminal fit at the final penalty supplied
-418 coefficients. Leaf-only refitting raised validation efficiency from
-54.59\% to 54.81\%. Full alternating refitting converged after 15 epochs at
-55.98\%; its best saved validation snapshot was epoch 8 at 56.20\%. The
-selected model is this earlier snapshot, with the same 418 coefficients.
-The one-tree reference was trained without L1 and without SFR.
-
-Table~\ref{tab:sfr} and Fig.~\ref{fig:tradeoff} summarize ten parent supports.
-Six full refits completed, two were held for separation and two for an
-inconclusive linear-program timeout. The higher-efficiency model is a completed
-leaf-only refit at 57.12\%, improving its own parent by about 0.21 percentage
-points. Its full stage was held and is excluded from selection. Stronger
-penalization does not consistently improve the accuracy--size tradeoff;
-refitting cannot restore a direction removed by support selection.
-
-\begin{table}[htbp]\centering\small
-\caption{Fixed-support refitting study. Efficiencies are percentages at 1\%
-background. All models have three depth-four trees except the starred
-one-tree case. Parent and leaf columns are terminal stage results; best is the
-best eligible saved leaf/full refit. Held full stages contribute no candidates.
-The support budget is the parent's exact nonzero count.}
-\label{tab:sfr}\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lrrrrl@{}}\toprule
-$\lambda_s/\lambda_\ell$ & Support & Parent & Leaf & Best & Full stage\\\midrule
-\input{generated/research_sfr_results.tex}\end{tabular}
-\end{table}
-
-\begin{figure}[H]\centering
-\includegraphics[width=\textwidth]{figures/sfr_research.pdf}
-\caption{L1-selected terminal parents and their best eligible fixed-support
-refits. Each vertical segment keeps the support budget fixed. Only refits
-from eligible stages contribute; the penalty settings are given in
-Table~\ref{tab:sfr}.}
-\label{fig:tradeoff}
-\end{figure}
-
+\input{comparison_study.tex}
 \FloatBarrier
-\input{constant_leaf_study.tex}
-\FloatBarrier
-\input{xgboost_emulation.tex}
-\FloatBarrier
-\subsection{Uncertainty and inference cost}
-A paired class-stratified bootstrap with 1,000 replicates, seed 20261025,
-recomputes the interpolated working point in each replicate.
-Table~\ref{tab:uncertainty} gives percentile intervals for the difference from
-XGBoost. The Compact interval includes zero. These intervals condition on the
-selected models and account for neither hyperparameter/checkpoint selection
-nor training-seed variation; they are not independent test claims.
-\begin{table}[H]\centering\small
-\caption{Conditional validation efficiency difference from XGBoost, in
-percentage points (pp), with paired 95\% percentile intervals.}
-\label{tab:uncertainty}
-\begin{tabular}{@{}lrr@{}}\toprule
-Model & Difference [pp] & Interval [pp]\\\midrule
-\input{generated/uncertainty.tex}\end{tabular}
-\end{table}
+\section{Discussion and conclusions}
+\label{sec:discussion}
+The comparison supports three observations. First, expressive leaves can
+reduce the total coefficient and arithmetic budget needed for a useful
+working point. Compact refit's 418 scalars reach comparable validation
+performance to the 3099-scalar boosted reference, and exceed the selected
+1250-scalar constant-leaf forest's working point. Second, inexpensive axis
+routing with linear leaves is competitive: the 479-scalar model reaches
+56.32\%, while a single 228-scalar tree reaches 54.74\%. Third, the preferred
+candidate depends on implementation schedule. For the two candidates near 56.2\%, the axis model uses fewer selected-path
+products; Compact refit uses fewer scalars and fewer all-node products. The larger
+oblique/linear model supplies the highest observed working point, 57.73\%,
+at a higher resource budget. The final table records these distinct choices.
 
-Table~\ref{tab:arithmetic} gives sparse arithmetic bounds. For comparison, a
-dense three-tree depth-four linear forest has 240 selected-path or 1,488
-all-node feature multiplications and 12 path decisions. The CPU timings in
-Table~\ref{tab:main} use 132,800-event validation batches, one thread, nine
-repeats and the median wall time per event. They compare a NumPy oblique
-traversal with compiled XGBoost and are bulk-throughput measurements.
-Parameter and operation counts motivate implementation studies; FPGA cost
-requires a numeric format, device, clock and synthesis strategy.
-\begin{table}[H]\centering\small
-\caption{Sparse arithmetic bounds after removing input-independent unreachable
-branches. Path counts bound one selected route; all-node counts evaluate every
-reachable affine function. Bias additions are excluded from multiplications.}
-\label{tab:arithmetic}
-\begin{tabular}{@{}lrrrr@{}}\toprule
-Model & $P_{\rm reach}$ & Path mult. & All-node mult. & Path decisions\\\midrule
-\input{generated/arithmetic.tex}\end{tabular}
-\end{table}
+No single scalar count captures FPGA cost. Fixed unit cuts, nontrivial affine
+weights, comparisons, adders, sparse indices and leaf selection differ in
+implementation cost. Zero products do not make XGBoost free: its tree count
+still requires substantial routing and score aggregation. A path evaluator
+can reuse arithmetic but has sequential dependencies; an all-node pipeline
+can spend more resources to expose parallelism. Coefficient precision and
+constant-multiplier transformations can change either ranking. C++ throughput
+is useful software evidence, but does not determine FPGA clock, initiation
+interval or latency.
+
+Training and selection also limit interpretation. The common objective and
+fixed data partitions support a consistent candidate comparison, but the
+families have different scan and refitting histories. \SFR{} can recover
+shrinkage loss without restoring excluded directions; it cannot repair an
+inadequate selected support. Axis three-tree depth-three performance is worse
+at the primary working point than a smaller single depth-four tree, despite
+its slightly higher AUC. Model size is not a guarantee of low-background
+performance. Separation explains why one unpenalized axis refit was held,
+rather than being reported as a converged improvement. Existing conditional
+bootstrap intervals for the earlier subset are retained in
+Appendix~\ref{app:uncertainty}; no independent significance claim is made for
+the small differences between the new selected models.
+
+This closes the floating-point candidate comparison and its supporting
+numerical implementation checks. Hardware evaluation requires a common target
+device, clock, interface and throughput requirement; validated feature,
+coefficient and accumulator formats; and a recalibrated realizable selection
+threshold after quantization. The scalar-leaf weighted-cut implementation is
+already numerically checked, whereas affine leaves require a corresponding
+hardware-backend extension. Synthesis must decide whether simpler routing or
+sparser all-node computation provides the better resource/latency tradeoff.
+Further test evaluation should retain disclosure of the historical XGBoost-only
+test check and use model choices fixed before inspecting that partition.
 
 \begin{implementation}
-\textbf{Selected results.} The frozen comparison uses the v3 model bundle.
-\file{fpga_handoff/CURRENT_MODEL.json} selects
-\code{fpga_handoff/v3/compact_refit_3t_d4/}. The 837-coefficient alternative is
-\code{highest_efficiency_3t_d4}; the one-tree reference is
-\code{single_tree_1t_d4}. All exact source snapshots and masks are recorded
-in the handover manifest. A later 57.24\% full-refit diagnostic for the
-higher-efficiency support is held and not an eligible model.
-
-\textbf{Compact training chain.} Start from the v2 \code{winner_3t_d4}
-coefficients, run \file{configs/l1_path_v1/control.json}, then the split path
-\code{split_01.json} through \code{split_05.json} in \code{configs/l1_path_v1/}.
-The manifest is \file{configs/tao_l1_path_v1.json}. The final terminal parent
-feeds \file{configs/support_refit_scan_v1/split300.json}. Parent training uses
-\file{scripts/train_tao_fully.py}; SFR uses
-\file{scripts/train_tao_support_refit.py},
-\file{scripts/run_support_refit_scan_case.py} and
-\file{scripts/support_refit_artifacts.py}. Exact refit reproduction begins with
-the archived hash-pinned terminal parent, rather than a fresh fit at the final
-penalties. The selected checkpoint hash is
-\begin{center}\scriptsize\ttfamily\CompactCheckpointHash\end{center}
-
-\textbf{Budgets.} The penalty path starts with local/joint/split iteration
-budgets 300/250/300 and logs repeated chunks or adaptive increases. Compact
-refit uses 400/400/800, L-BFGS-B tolerances \code{ftol=1e-12},
-\code{gtol=1e-8}, at most 100 joint-fit chunks and 200 epochs per stage.
-A 2,700-second allocation checkpoints with return code 75. A mild-control
-router required a documented 800-to-4,000 iteration-budget amendment and
-converged after 2,028 auxiliary iterations; this changed no objective or
-stopping tolerances. See \file{scripts/amend_support_solver_budget.py} and
-\file{docs/support_refit_scan_budget_amendments.json}.
-
-\textbf{Research status.} These results were frozen on 25 October 2026.
-The separate dated record \file{docs/handover_status_2026-10-26.json} found
-37/58 architecture cases converged and the 16-point L1 path complete. A running
-five-tree depth-four checkpoint reached 57.13\% with 1,258 nonzeros but was
-unconverged and was not promoted. \file{src/tao/uncertainty.py} implements the
-bootstrap; \file{scripts/build_paper_inputs.py} regenerates frozen tables and
-curves. \code{sources/provenance.json} in this document folder records hashes
-of inputs, numerical source files, tables and figures.
-\end{implementation}
-
-\section{An example learned tree}
-\label{sec:example}
-Actual cuts illustrate the mixture of axis-aligned, oblique and constant
-nodes. In Compact refit, using the standardized feature indices of
-Table~\ref{tab:features}, the first tree contains
-\input{generated/research_cuts.tex}
-Coefficients marked $\simeq$ are rounded to eight significant digits. At the
-root an event goes right if $x_4>-0.4216204$. Otherwise it reaches $L$, whose
-constant cut sends it left again. Hence the entire $LR$ subtree is
-unreachable. The root's right child combines five input features.
-
-For the second tree, another learned cut is
-\input{generated/research_tiny_cut.tex}
-Its small scale does not make it uninformative: it routes right approximately
-when $x_{16}<-1.3334$. Setting both coefficients to zero would turn it into a
-constant left route. This example motivates distinguishing exact sparsity
-from coefficient magnitude before quantization.
-
-\begin{implementation}
-\textbf{Print the actual functions.} \code{TreePrinter} in
-\file{src/tao/printing.py} provides \code{print_tree}, \code{format_tree},
-\code{format_forest} and \code{records}. The CLI
-\file{scripts/print_tao_tree.py} prints every cut and affine leaf, including
-unreachable branches. It is read-only and separate from pinned fitting code.
-For example, after setting the environment described below:
-\begin{lstlisting}[language=Python]
-import json
-from pathlib import Path
-from tao.printing import TreePrinter
-spec = json.loads(Path(
-    "fpga_handoff/v3/compact_refit_3t_d4/standardized/model.json"
-).read_text())
-TreePrinter(spec, precision=17).print_tree(0)
-\end{lstlisting}
-The complete 17-digit record is
-\code{generated/compact_forest_full_precision.txt}; the annotated supplement
-prints all three trees at nine display digits. Only exact-zero terms are
-omitted. Independent tests parse the printed expressions, recover all 418
-nonzero coefficients, count 379 reachable coefficients, and compare predictions
-with the portable evaluator. They also check equality routing, constant leaves,
-tiny terms and non-mutation. The full suite passed 81 tests.
-\end{implementation}
-
-\FloatBarrier
-\section{Discussion}
-Shallow oblique forests with linear leaves provide competitive validation
-performance with fewer coefficients than the axis-aligned reference in this
-application. Compact refit reaches 56.20\% signal efficiency at 1\% background
-acceptance, with 418 nonzeros in 1,581 allocated slots. The higher-efficiency
-alternative reaches 57.12\% with 837 nonzeros. The conditional uncertainty on
-the Compact--XGBoost difference includes zero, so the principal result is a
-compression point at comparable validation performance.
-
-Fixed-support refitting recovers accuracy lost to shrinkage without restoring
-removed coefficients. Its benefit depends on the selected support: aggressive
-L1 can remove useful directions that refitting cannot recover. Separation,
-cut-scale ambiguity and the distinction between a converged terminal model
-and a validation-selected earlier snapshot remain relevant to interpreting
-training results. Axis-aligned cuts are contained in the oblique family, but
-this does not imply that three shallow trees can represent every function of
-a hundred-tree ensemble.
-
-The next step is to quantify how the reduced arithmetic workload translates
-into hardware. This requires explicit feature, coefficient and accumulator
-formats, verification of routing changes near cut boundaries, calibration of
-a realizable working-point threshold, and synthesis measurements at a specified
-device and clock. Further model choices should be completed before additional
-test evaluation, retaining disclosure of the earlier XGBoost-only test check.
-
-\begin{implementation}
-\input{implementation_reproduction.tex}
+\textbf{Final handover.} \file{fpga_handoff/CURRENT_COMPARISON.json} pins
+\file{fpga_handoff/comparison_v1/manifest.json} and its verification report.
+All ten table entries have exact standardized coefficients, golden vectors,
+metrics and training/configuration pointers. The three family winners and
+Compact refit have distinct roles; no synthesized hardware winner is selected.
+\file{docs/DORIAN_HANDOVER.md} is the entry point for Dorian.
+The historical v3 bundle and its default remain reproducible.
 \end{implementation}
 
 \FloatBarrier
 \bibliographystyle{unsrtnat}
 \bibliography{references}
-\ifimplementationdetails\else\clearpage\fi
+\clearpage
 \appendix
-\section{Input feature order}
-\label{app:features}
-Table~\ref{tab:features} defines the coordinates $r_f$ of the archived feature
-vector, using the source dataset's feature names. All displayed cuts use their
-standardized counterparts $x_f$ from Eq.~\eqref{eq:standardization}.
-\begin{table}[H]\centering\small
-\caption{Feature-coordinate convention. Names identify columns in the
-high-level jet dataset~\cite{openml42468}.}\label{tab:features}
-\begin{tabular}{@{}rlrl@{}}\toprule
-$f$ & Dataset feature & $f$ & Dataset feature\\\midrule
-1 & \texttt{zlogz} & 9 & \texttt{d2\_a1\_b1\_mmdt}\\
-2 & \texttt{c1\_b0\_mmdt} & 10 & \texttt{d2\_a1\_b2\_mmdt}\\
-3 & \texttt{c1\_b1\_mmdt} & 11 & \texttt{m2\_b1\_mmdt}\\
-4 & \texttt{c1\_b2\_mmdt} & 12 & \texttt{m2\_b2\_mmdt}\\
-5 & \texttt{c2\_b1\_mmdt} & 13 & \texttt{n2\_b1\_mmdt}\\
-6 & \texttt{c2\_b2\_mmdt} & 14 & \texttt{n2\_b2\_mmdt}\\
-7 & \texttt{d2\_b1\_mmdt} & 15 & \texttt{mass\_mmdt}\\
-8 & \texttt{d2\_b2\_mmdt} & 16 & \texttt{multiplicity}\\\bottomrule
-\end{tabular}
-\end{table}
+\input{support_appendix.tex}
+\FloatBarrier
+\input{axis_appendix.tex}
+\FloatBarrier
+\input{constant_leaf_study.tex}
+\FloatBarrier
+\section{Fixed-point feasibility checks}
+\input{xgboost_emulation.tex}
+\FloatBarrier
+\input{leaf_precision_appendix.tex}
+\FloatBarrier
+\input{uncertainty_appendix.tex}
+\FloatBarrier
+\input{features_appendix.tex}
+\FloatBarrier
+\input{example_appendix.tex}
+\begin{implementation}
+\input{implementation_reproduction.tex}
+\end{implementation}
 \ifimplementationdetails
 \clearpage
 \input{implementation_trees.tex}
 \fi
+\FloatBarrier
+\input{final_comparison.tex}
 \end{document}

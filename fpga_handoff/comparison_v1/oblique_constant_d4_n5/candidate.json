@@ -1,0 +1,150 @@
+{
+  "id": "oblique_constant_d4_n5",
+  "family": "Oblique / constant",
+  "learned_nonzero_scalars": 1250,
+  "stored_nonzero_scalars": 1250,
+  "extra_cut_indices": 0,
+  "source_status": "Regularized; source converged",
+  "expected_efficiency": 0.5540031480028398,
+  "checkpoint": "models/ten_model_comparison_v1_selected/f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1.pkl",
+  "checkpoint_sha256": "f410db2667b637940577733e4bcc0f4d950733f666e3a98b71f82079629af9c1",
+  "layout": {
+    "trees": 5,
+    "depth": 4
+  },
+  "metrics": {
+    "signal_efficiency_at_1pct_background": 0.5540031480028398,
+    "auc": 0.9261036412417836,
+    "strict_threshold": 3.0789135240382617,
+    "accepted_background": 506,
+    "background_budget": 525,
+    "strict_background_efficiency": 0.009636076250690332,
+    "strict_signal_efficiency": 0.5475469865112282
+  },
+  "cpu": {
+    "checksum": 172242.3295053188,
+    "events": 132800,
+    "median_microseconds_per_event": 0.9651705572289156,
+    "repeats": 9
+  },
+  "arithmetic": {
+    "path_multiplications": 272,
+    "all_node_multiplications": 1088,
+    "path_comparisons": 20,
+    "all_node_comparisons": 75
+  },
+  "model_sha256": "99e3e3b519041ce8de98bd9973ba43c3f9414ca31cf14daa4b78bd02c3ec4bd3",
+  "canonical_margin_error": {
+    "max_abs": 0.0,
+    "mean_abs": 0.0,
+    "exact_mismatches": 0
+  },
+  "all_leaf_assignments_exact": true,
+  "input_space": "standardized",
+  "role": "family_performance_winner",
+  "training_configuration": {
+    "run_name": "qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51",
+    "seed": 42,
+    "data": {
+      "dataset_path": "data/qg_vs_wzt_standardized.npz",
+      "metadata_path": "data/qg_vs_wzt_metadata.json",
+      "input_representation": "standardized"
+    },
+    "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+    "implementation_sha256": "fd649bf8c777bd648c0ce66363d713213f73c0b336ba9fce6be872e2af1802a2",
+    "full_training_policy": {
+      "scan_name": "tao_hyper_scan_v1_c51",
+      "source_scan": null,
+      "task": "qg_vs_wzt",
+      "seed": 42,
+      "split_alpha": 0.0,
+      "leaf_alpha": 0.0,
+      "leaf_mode": "constant",
+      "local_leaf_max_iter": 300,
+      "global_leaf_chunk_iter": 250,
+      "split_max_iter": 300,
+      "leaf_ftol": 1e-12,
+      "leaf_gtol": 1e-08,
+      "convergence": {
+        "loss_rtol": 1e-05,
+        "kkt_tol": 1e-06,
+        "route_tol": 0.0001,
+        "patience": 3
+      },
+      "minimum_continuation_epochs": 5,
+      "layouts": [
+        {
+          "trees": 5,
+          "depth": 4
+        }
+      ],
+      "split_search": "hard_threshold",
+      "run_suffix": "hyper_scan_v1_c51",
+      "publication_prefix": "hyper_scan_v1",
+      "initialization": "cart",
+      "label": "CART sa=0 la=0",
+      "primary_metric": "signal_efficiency_at_fixed_fpr"
+    },
+    "split_search_sha256": "3eb44f8706543e6323a6786f73f02d723e52a260e9d3ca793f58953551453054",
+    "initialization": "cart",
+    "initialization_records": [
+      {
+        "tree": 0,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 1,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 2,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 3,
+        "bootstrap": true,
+        "cart_nodes": 31
+      },
+      {
+        "tree": 4,
+        "bootstrap": true,
+        "cart_nodes": 31
+      }
+    ],
+    "initialization_seconds": 36.489596992963925,
+    "source_run": null,
+    "source_model_sha256": null,
+    "source_training_seconds": 0,
+    "model": {
+      "type": "hard_tao_cross_entropy",
+      "output_model_path": "models/qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51.pkl",
+      "tao": {
+        "trees": 5,
+        "depth": 4,
+        "leaf_mode": "constant",
+        "split_alpha": 0.0,
+        "leaf_alpha": 0.0
+      }
+    },
+    "evaluation": {
+      "output_prefix": "results/qg_vs_wzt_hardtao_constant_d4_n5_sa0_la0_seed42_hyper_scan_v1_c51",
+      "fixed_fpr": 0.01
+    },
+    "epoch_checkpointing": "node"
+  },
+  "working_point_calibration": "common_cpp_binary64_feature_order_reference",
+  "kind": "tao",
+  "model": "fpga_handoff/comparison_v1/oblique_constant_d4_n5/standardized/model.json",
+  "selected_epoch": 23,
+  "training_config": "configs/hyper_scan_v1/case_51.json",
+  "source_terminal_epoch": 36,
+  "benchmark_model_sha256": "5fd18cffd08b0cca904cf923fb6e0334db6e830e715bb616d3963b601cf7d59d",
+  "golden_vector_count": 198,
+  "source_stage_converged": true,
+  "training_complete": true,
+  "convergence_scope": "numerical convergence of selected TAO source stage",
+  "selection_rule": "validation efficiency at 1% background, AUC secondary; earlier snapshots may precede a converged source terminal"
+}

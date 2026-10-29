@@ -1,0 +1,66 @@
+{
+  "all_passed": true,
+  "compiler": "g++ (GCC) 12.3.1 20230527",
+  "checks": [
+    {
+      "id": "xgboost",
+      "vectors": 506,
+      "max_margin_error": 0.0,
+      "method": "independent Python exported-tree walk; full C++/native checks in benchmark report"
+    },
+    {
+      "id": "axis_linear_d4_n3",
+      "vectors": 188,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "axis_linear_d4_n1",
+      "vectors": 176,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "axis_linear_d3_n1",
+      "vectors": 168,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "oblique_constant_d4_n5",
+      "vectors": 198,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "oblique_constant_d4_n3",
+      "vectors": 188,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "oblique_constant_d4_n1",
+      "vectors": 176,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "oblique_linear_performance_winner",
+      "vectors": 202,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "highest_efficiency_3t_d4",
+      "vectors": 189,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    },
+    {
+      "id": "compact_refit_3t_d4",
+      "vectors": 178,
+      "max_margin_error": 0.0,
+      "method": "standalone C++17"
+    }
+  ]
+}

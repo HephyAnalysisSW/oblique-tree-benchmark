@@ -1,7 +1,7 @@
 .PHONY: all clean scientific-assets
 all: main.pdf annotated.pdf
 
-INPUTS = main.tex constant_leaf_study.tex xgboost_emulation.tex references.bib implementation_reproduction.tex implementation_trees.tex $(wildcard generated/*.tex) $(wildcard generated/*.txt) $(wildcard figures/*.pdf)
+INPUTS = $(wildcard *.tex) references.bib $(wildcard generated/*.tex) $(wildcard generated/*.txt) $(wildcard figures/*.pdf)
 
 main.pdf: $(INPUTS)
 	latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex

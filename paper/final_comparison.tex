@@ -1,0 +1,46 @@
+\clearpage
+\section*{Final comparison}
+\begin{table}[H]\centering\normalsize
+\caption{Ten-model validation comparison. Layout specifies tree count and
+maximum depth; D4 means depth four. $P_{\rm nz}$ counts learned nonzero scalar
+values. $\epsilon_s$ is interpolated at 1\% background;
+$\epsilon_s^{\rm strict}$ uses a strict threshold accepting at most 525
+background events. C++ times are measured with the same sparse reference
+kernel. $M_{\rm path}$ is a selected-path upper bound and $M_{\rm all}$ counts
+all structurally reachable affine functions, both after exact-zero and
+$\pm1$ factor elimination.}
+\label{tab:comparison}
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.28}
+\begin{tabular}{@{}llrrrrrrr@{}}\toprule
+Family & Layout & $P_{\rm nz}$ & \shortstack{$\epsilon_s$\\{[\%]}} & \shortstack{$\epsilon_s^{\rm strict}$\\{[\%]}} & AUC & \shortstack{C++\\{[$\mu$s/event]}} & $M_{\rm path}$ & $M_{\rm all}$\\\midrule
+\input{generated/final_comparison.tex}
+\end{tabular}
+
+\vspace{8pt}
+\begin{minipage}{\textwidth}\small
+$^{c}$Compact refit. Axis rows additionally use 45, 15 and 7 feature indices,
+respectively, and one direction bit per nonconstant cut. Their fixed unit
+routing coefficients are excluded from $P_{\rm nz}$. XGBoost stores 1499
+feature indices; sparse oblique storage can also require coordinate indices.
+These scalar counts are not complete memory-footprint estimates.
+
+All selected TAO snapshots come from converged source stages; selection can choose
+an earlier checkpoint. The axis 3$\times$D4 entry uses its regularized source:
+its unpenalized leaf refit was held for separation. The 837-coefficient
+oblique/linear entry uses a converged leaf-only stage; its held full stage is
+excluded. Representatives cover different scalar budgets within each family.
+
+Timing: one CPU thread, 132,800 events, median of nine repeats after warmup;
+parsing, input conversion and I/O excluded. Native optimized XGBoost separately
+measured 1.478 $\mu$s/event, including probability output. Working points are calibrated to the stated
+reference arithmetic and must be rechecked after a change of reduction order
+or precision. The common C++
+column is not a ranking of maximally optimized software implementations.
+
+Multiplication counts exclude preprocessing, sigmoid, additions and
+comparisons; no shift or general constant-multiplier optimization is assumed
+beyond exact-zero and unit factors. They are arithmetic workloads, not
+synthesized DSP/LUT/BRAM use or FPGA latency. Results use the fixed validation
+split and do not include a new test evaluation.
+\end{minipage}
+\end{table}

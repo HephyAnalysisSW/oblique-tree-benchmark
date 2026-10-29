@@ -1,0 +1,86 @@
+{
+  "all_passed": true,
+  "dataset_sha256": "f5ec6f7ed442010656a904700f8f6421cc34b674a1ec810c5cf6b2de003ed926",
+  "events": 132800,
+  "test_evaluated": false,
+  "checks": [
+    {
+      "id": "xgboost",
+      "cpp_threshold": 2.819604839677922,
+      "cpp_background_events": 525
+    },
+    {
+      "id": "axis_linear_d4_n3",
+      "cpp_threshold": 3.036239713620472,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.036239713620472,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 525
+    },
+    {
+      "id": "axis_linear_d4_n1",
+      "cpp_threshold": 3.1078649086002192,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.1078649086002192,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 525
+    },
+    {
+      "id": "axis_linear_d3_n1",
+      "cpp_threshold": 3.2592188590207334,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.2592188590207334,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 525
+    },
+    {
+      "id": "oblique_constant_d4_n5",
+      "cpp_threshold": 3.0789135240382617,
+      "cpp_background_events": 506,
+      "numpy_threshold": 3.0789135240382617,
+      "numpy_background_events": 506,
+      "numpy_events_using_cpp_threshold": 506
+    },
+    {
+      "id": "oblique_constant_d4_n3",
+      "cpp_threshold": 3.042350795785705,
+      "cpp_background_events": 511,
+      "numpy_threshold": 3.042350795785705,
+      "numpy_background_events": 511,
+      "numpy_events_using_cpp_threshold": 511
+    },
+    {
+      "id": "oblique_constant_d4_n1",
+      "cpp_threshold": 2.792076299757433,
+      "cpp_background_events": 524,
+      "numpy_threshold": 2.792076299757433,
+      "numpy_background_events": 524,
+      "numpy_events_using_cpp_threshold": 524
+    },
+    {
+      "id": "oblique_linear_performance_winner",
+      "cpp_threshold": 3.0244808619936423,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.0244808619936414,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 525
+    },
+    {
+      "id": "highest_efficiency_3t_d4",
+      "cpp_threshold": 3.0543668344428436,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.054366834442842,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 525
+    },
+    {
+      "id": "compact_refit_3t_d4",
+      "cpp_threshold": 3.115695315310499,
+      "cpp_background_events": 525,
+      "numpy_threshold": 3.1156953153105,
+      "numpy_background_events": 525,
+      "numpy_events_using_cpp_threshold": 526
+    }
+  ],
+  "note": "Thresholds are evaluator-specific, even for binary64; Compact demonstrates an ulp-sensitive boundary. Recheck after arithmetic changes."
+}
