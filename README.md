@@ -74,9 +74,20 @@ both, their exact model files, and reproduction commands. Arithmetic/storage
 counts and CPU emulation are available without a vendor license; FPGA resources
 and latency require synthesis. The historical v3 Compact refit default is retained.
 
-## Axis-aligned cuts with linear leaves: new experiment
+## Axis-aligned cuts with linear leaves: completed first study
 
-The [axis/linear study](docs/axis_linear_v1/README.md) tests **one and three trees,
+The [axis/linear study](docs/axis_linear_v1/README.md) has **4/4 converged sources**
+and **3/4 converged unpenalized leaf refits**. The 3×D4 refit detected logistic
+separation and is held; its converged regularized source remains eligible.
+The best axis layout, 3×D4, reaches **56.32%** signal efficiency at 1% background
+with **479 learned nonzero scalars**, plus 45 feature indices/direction bits.
+The smaller 1×D4 reaches **54.74%** with **228 learned nonzero scalars**, plus
+15 feature indices/direction bits. Compared with oblique Compact refit's 56.20%
+and 418 coefficients, axis 3×D4 uses fewer selected-path products (35 vs 80),
+but more all-reachable products (386 vs 327). FPGA resource/latency comparisons
+remain pending.
+
+The study tests **one and three trees,
 depths three and four**, using the original fixed split. At each TAO node it
 searches all features, both directions and exact hard-loss thresholds against
 the current linear-leaf subtrees. Leaf L1 starts at `1e-5`; split directions are

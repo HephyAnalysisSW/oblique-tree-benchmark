@@ -1,0 +1,22 @@
+{
+  "run_name": "qg_vs_wzt_axis_linear_v1_d3_n1_leaf_refit",
+  "source_checkpoint": "models/qg_vs_wzt_hardtao_linear_d3_n1_sa0_la1e-05_seed42_axis_linear_v1.pkl",
+  "source_sha256": "685f36525e53915a3eb0cde5af7926aefeba61ccdc15c9ec76920bcfdfe0fe40",
+  "reference_config": "configs/bdt_qg_vs_wzt_seed42.yaml",
+  "stages": [
+    "leaf_only"
+  ],
+  "exact_zero_support": true,
+  "minimum_epochs": 5,
+  "max_epochs": 200,
+  "local_leaf_max_iter": 400,
+  "global_leaf_chunk_iter": 400,
+  "max_global_chunks": 100,
+  "split_max_iter": 800,
+  "leaf_ftol": 1e-12,
+  "leaf_gtol": 1e-08,
+  "kkt_tol": 1e-06,
+  "loss_rtol": 1e-05,
+  "route_tol": 0.0001,
+  "separation_time_limit": 600
+}
